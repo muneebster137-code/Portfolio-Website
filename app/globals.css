@@ -14,7 +14,7 @@
 
   --background: var(--paper);
   --foreground: var(--ink);
-}
+} 
 
 @theme {
   --color-ink: var(--ink);

@@ -184,11 +184,11 @@ export default function About() {
       {/* 1. About Hero Header Band (Full Page Stretch) */}
       <section 
         className="w-full min-h-[55vh] flex flex-col justify-end py-16 px-6 md:px-12 relative overflow-hidden transition-colors duration-700 bg-accent text-paper"
-      >
+      > 
         {/* Parallax Desaturated Background Image */}
         <motion.div 
           style={{ y }}
-          className="absolute inset-0 z-0 opacity-12 mix-blend-overlay pointer-events-none select-none"
+          className="absolute inset-0 z-0 opacity-50 mix-blend-overlay pointer-events-none select-none"
         >
           <img 
             src={heroImg} 

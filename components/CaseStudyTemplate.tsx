@@ -198,7 +198,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
         {/* Parallax Desaturated Background Image */}
         <motion.div 
           style={{ y }}
-          className="absolute inset-0 z-0 opacity-12 mix-blend-overlay pointer-events-none select-none"
+          className="absolute inset-0 z-0 opacity-50 mix-blend-overlay pointer-events-none select-none"
         >
           <img 
             src={headerImg} 
