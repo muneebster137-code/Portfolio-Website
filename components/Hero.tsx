@@ -22,10 +22,12 @@ export const Hero = () => {
 
     // Mouse coordinates with smoothing
     const mouse = { x: width / 2, y: height / 2, targetX: width / 2, targetY: height / 2 };
+    let mouseActive = false;
 
     const handleMouseMove = (e: MouseEvent) => {
       mouse.targetX = e.clientX;
       mouse.targetY = e.clientY;
+      mouseActive = true;
     };
 
     const handleResize = () => {
@@ -37,33 +39,32 @@ export const Hero = () => {
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("resize", handleResize);
 
-    // Define floating abstract visual nodes
-    interface VisualNode {
+    // Define floating abstract visual nodes for liquid simulation
+    interface Blob {
       x: number;
       y: number;
-      radius: number;
       vx: number;
       vy: number;
-      color: string;
+      radius: number;
       originalRadius: number;
+      color: string;
     }
 
     const colors = [
-      "rgba(194, 78, 43, 0.18)",   // Terracotta accent
-      "rgba(74, 77, 82, 0.12)",    // Graphite
-      "rgba(216, 212, 201, 0.22)",  // Line
-      "rgba(21, 23, 27, 0.05)"     // Ink
+      "rgba(194, 78, 43, 0.95)", // Terracotta accent (vibrant)
+      "rgba(74, 77, 82, 0.85)",  // Deep graphite
+      "rgba(216, 212, 201, 0.95)" // Warm line grey
     ];
 
-    const nodes: VisualNode[] = Array.from({ length: 7 }, () => {
-      const radius = Math.random() * 200 + 150;
+    const blobs: Blob[] = Array.from({ length: 8 }, () => {
+      const radius = Math.random() * 100 + 180; // Huge blobs (180px to 280px)
       return {
         x: Math.random() * width,
         y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 1.8, // More active drifting speed
+        vy: (Math.random() - 0.5) * 1.8,
         radius,
         originalRadius: radius,
-        vx: (Math.random() - 0.5) * 0.8,
-        vy: (Math.random() - 0.5) * 0.8,
         color: colors[Math.floor(Math.random() * colors.length)]
       };
     });
@@ -73,65 +74,77 @@ export const Hero = () => {
       ctx.clearRect(0, 0, width, height);
 
       // Smooth mouse interpolation (lerp)
-      mouse.x += (mouse.targetX - mouse.x) * 0.08;
-      mouse.y += (mouse.targetY - mouse.y) * 0.08;
+      mouse.x += (mouse.targetX - mouse.x) * 0.12;
+      mouse.y += (mouse.targetY - mouse.y) * 0.12;
 
-      // Draw and update nodes
-      nodes.forEach((node) => {
-        // Move nodes
-        node.x += node.vx;
-        node.y += node.vy;
+      // Update and draw floating blobs
+      blobs.forEach((blob) => {
+        // Move blobs
+        blob.x += blob.vx;
+        blob.y += blob.vy;
 
-        // Wall collisions
-        if (node.x - node.radius < 0 || node.x + node.radius > width) node.vx *= -1;
-        if (node.y - node.radius < 0 || node.y + node.radius > height) node.vy *= -1;
+        // Bounce off bounds
+        if (blob.x - blob.radius < -100 || blob.x + blob.radius > width + 100) blob.vx *= -1;
+        if (blob.y - blob.radius < -100 || blob.y + blob.radius > height + 100) blob.vy *= -1;
 
-        // Interaction with mouse (pull and distort)
-        const dx = mouse.x - node.x;
-        const dy = mouse.y - node.y;
-        const distance = Math.hypot(dx, dy);
-        
-        if (distance < 500) {
-          const factor = (500 - distance) / 500;
-          node.x += dx * factor * 0.03;
-          node.y += dy * factor * 0.03;
-          node.radius = node.originalRadius + factor * 50;
+        // Mouse interaction (elastic pull and distortion)
+        if (mouseActive) {
+          const dx = mouse.x - blob.x;
+          const dy = mouse.y - blob.y;
+          const distance = Math.hypot(dx, dy);
+          
+          if (distance < 550) {
+            const force = (550 - distance) / 550;
+            // Snappy elastic pull
+            blob.x += dx * force * 0.08;
+            blob.y += dy * force * 0.08;
+            blob.radius = blob.originalRadius + force * 45;
+          } else {
+            blob.radius += (blob.originalRadius - blob.radius) * 0.1;
+          }
         } else {
-          node.radius += (node.originalRadius - node.radius) * 0.1;
+          blob.radius += (blob.originalRadius - blob.radius) * 0.1;
         }
 
-        // Draw soft fuzzy circle
-        ctx.beginPath();
-        const gradient = ctx.createRadialGradient(
-          node.x,
-          node.y,
-          node.radius * 0.1,
-          node.x,
-          node.y,
-          node.radius
+        // Draw radial gradient blob for liquid blur merging
+        const baseColor = blob.color.substring(0, blob.color.lastIndexOf(",")); // Extracts 'rgba(r, g, b'
+        const grad = ctx.createRadialGradient(
+          blob.x,
+          blob.y,
+          0,
+          blob.x,
+          blob.y,
+          blob.radius
         );
-        gradient.addColorStop(0, node.color);
-        gradient.addColorStop(0.5, node.color.replace("0.", "0.05"));
-        gradient.addColorStop(1, "rgba(246, 244, 239, 0)");
+        grad.addColorStop(0, `${baseColor}, 0.95)`);
+        grad.addColorStop(0.6, `${baseColor}, 0.25)`);
+        grad.addColorStop(1, "rgba(246, 244, 239, 0)");
         
-        ctx.fillStyle = gradient;
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(blob.x, blob.y, blob.radius, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Draw a subtle moving connecting web
-      ctx.strokeStyle = "rgba(216, 212, 201, 0.15)";
-      ctx.lineWidth = 1;
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
-          if (dist < 400) {
-            ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.stroke();
-          }
-        }
+      // Draw mouse-attracted slime nucleolus
+      if (mouseActive) {
+        const mouseRadius = 220; // Massive attractor blob
+        const grad = ctx.createRadialGradient(
+          mouse.x,
+          mouse.y,
+          0,
+          mouse.x,
+          mouse.y,
+          mouseRadius
+        );
+        grad.addColorStop(0, "rgba(194, 78, 43, 0.95)"); // Terracotta core
+        grad.addColorStop(0.6, "rgba(194, 78, 43, 0.25)");
+        grad.addColorStop(1, "rgba(246, 244, 239, 0)");
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, mouseRadius, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       animationFrameId = requestAnimationFrame(animate);
@@ -175,8 +188,24 @@ export const Hero = () => {
       {/* Background Interactive Art */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        style={{ filter: "url(#gooey-hero)" }}
+        className="absolute -top-20 -left-20 w-[calc(100%+160px)] h-[calc(100%+160px)] pointer-events-none z-0 select-none"
       />
+
+      {/* SVG gooey filter for alpha-only thresholding (prevents color bleaching) */}
+      <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
+        <defs>
+          <filter id="gooey-hero">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="35" result="blur" />
+            <feColorMatrix
+              in="blur"
+              mode="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15"
+              result="goo"
+            />
+          </filter>
+        </defs>
+      </svg>
 
       {/* Structural Watermark Silhouette Background */}
       <div className="absolute right-[-10%] top-[-10%] w-[60%] h-[120%] opacity-[0.018] pointer-events-none z-0 select-none hidden lg:block">

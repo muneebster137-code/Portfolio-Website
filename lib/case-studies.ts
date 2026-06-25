@@ -313,7 +313,7 @@ export const caseStudies: CaseStudy[] = [
     status: "ongoing",
     category: "C",
     tier: 3,
-    accent: { primary: "#0C0C0C", secondary: "#FAFAFA" },
+    accent: { primary: "#00000022", secondary: "#FAFAFA" },
     summary: "Anebos (Greek for 'youthful') is my own studio, built around one idea: most brands have good photography but no rhythm. I treat every piece of video content as a choreographed performance — transitions, product movement, and lighting cued to the beat — rather than a static post with motion added on top.",
     bullets: [
       "Developed the 'Kinetic Pulse' framework: vertical, high-impact video as the core of brand strategy, not an add-on.",

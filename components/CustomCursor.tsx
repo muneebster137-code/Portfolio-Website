@@ -92,7 +92,7 @@ export const CustomCursor = () => {
           translateX: "-50%",
           translateY: "-50%",
         }}
-        className="w-1.5 h-1.5 bg-accent rounded-full fixed pointer-events-none z-[99999]"
+        className="w-1.5 h-1.5 bg-accent rounded-full fixed pointer-events-none z-[999999]"
       />
       
       {/* Secondary Ring - follows with spring physics */}
@@ -110,7 +110,7 @@ export const CustomCursor = () => {
           borderColor: isHoveringLink ? "rgba(194, 78, 43, 0.8)" : "rgba(194, 78, 43, 0.4)",
         }}
         transition={{ type: "spring", stiffness: 350, damping: 25 }}
-        className="fixed pointer-events-none z-[99999] rounded-full border border-accent/40"
+        className="fixed pointer-events-none z-[999999] rounded-full border border-accent/40"
       />
     </>
   );
