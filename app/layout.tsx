@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import { AccentProvider } from "@/components/AccentProvider";
 import { LenisScroll } from "@/components/LenisScroll";
+import { CustomCursor } from "@/components/CustomCursor";
 import { PageLoader } from "@/components/PageLoader";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
@@ -45,6 +46,7 @@ export default function RootLayout({
         className={`${fraunces.variable} ${inter.variable} font-sans bg-paper text-ink selection:bg-accent-primary/20 selection:text-ink antialiased`}
       >
         <AccentProvider>
+          <CustomCursor />
           <LenisScroll>
             {/* Morphing Loader Reveal */}
             <PageLoader />

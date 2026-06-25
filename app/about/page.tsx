@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import Link from "next/link";
 import { Award, Briefcase, GraduationCap, Code, FileText, ArrowRight, Compass } from "lucide-react";
 
@@ -177,6 +177,19 @@ export default function About() {
   const y = useTransform(scrollY, [0, 400], [0, 120]);
   const [heroImg, setHeroImg] = useState("/images/about-hero.webp");
   const [portraitImg, setPortraitImg] = useState("/images/muneeb-bilal.webp");
+
+  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { damping: 25, stiffness: 250 };
+  const cursorXSpring = useSpring(mouseX, springConfig);
+  const cursorYSpring = useSpring(mouseY, springConfig);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    mouseX.set(e.clientX);
+    mouseY.set(e.clientY);
+  };
 
   return (
     <article className="w-full pb-20">
@@ -370,7 +383,7 @@ export default function About() {
         </div>
 
         {/* Timeline Line */}
-        <div className="relative pl-6 md:pl-12 border-l border-line/70 space-y-12">
+        <div className="relative pl-6 md:pl-12 border-l border-line/70 space-y-12" onMouseMove={handleMouseMove}>
           {TIMELINE.map((item, idx) => (
             <motion.div
               key={item.slug}
@@ -398,7 +411,11 @@ export default function About() {
               )}
 
               {/* Event Block */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-2 border-b border-line/30 group">
+              <div 
+                className="flex flex-col md:flex-row md:items-center justify-between gap-2 pb-2 border-b border-line/30 group cursor-pointer"
+                onMouseEnter={() => setHoveredSlug(item.slug)}
+                onMouseLeave={() => setHoveredSlug(null)}
+              >
                 <div>
                   <h3 className="font-display font-bold text-lg md:text-xl text-ink flex items-center gap-2 group-hover:text-accent-primary transition-colors">
                     <Link href={`/work/${item.slug}`} className="hover:underline flex items-center gap-1">
@@ -528,6 +545,52 @@ export default function About() {
           ))}
         </div>
       </section>
+      {/* Floating Hover Preview Card */}
+      <AnimatePresence>
+        {hoveredSlug && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              x: cursorXSpring,
+              y: cursorYSpring,
+              translateX: 20,
+              translateY: -100,
+            }}
+            className="fixed pointer-events-none z-50 w-64 h-36 rounded-2xl overflow-hidden shadow-2xl border border-line bg-paper"
+          >
+            {/* Show reel for video-first clients, otherwise header image */}
+            <div className="relative w-full h-full">
+              {["trenddeck", "aba-group", "treats-for-life", "anebos-studios"].includes(hoveredSlug) ? (
+                <video
+                  src={`/images/${hoveredSlug}-reel.mp4`}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <img
+                  src={`/images/${hoveredSlug}.webp`}
+                  alt="Engagement preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop";
+                  }}
+                />
+              )}
+              {/* Client name overlay */}
+              <div className="absolute bottom-3 left-3 bg-ink/75 backdrop-blur-md px-2 py-1 rounded text-[10px] text-paper font-sans uppercase font-bold tracking-wider">
+                {TIMELINE.find((t) => t.slug === hoveredSlug)?.client}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       </div>
     </article>
   );
