@@ -1,9 +1,13 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Lenis from "lenis";
+import { usePathname } from "next/navigation";
 
 export const LenisScroll = ({ children }: { children: React.ReactNode }) => {
+  const pathname = usePathname();
+  const lenisRef = useRef<Lenis | null>(null);
+
   useEffect(() => {
     // Initialize Lenis smooth scroll
     const lenis = new Lenis({
@@ -15,6 +19,8 @@ export const LenisScroll = ({ children }: { children: React.ReactNode }) => {
       wheelMultiplier: 1.0,
       touchMultiplier: 1.5,
     });
+
+    lenisRef.current = lenis;
 
     let rafId: number;
     const raf = (time: number) => {
@@ -30,8 +36,16 @@ export const LenisScroll = ({ children }: { children: React.ReactNode }) => {
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
+
+  // Reset scroll to top on pathname changes
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
+  }, [pathname]);
 
   return <>{children}</>;
 };
