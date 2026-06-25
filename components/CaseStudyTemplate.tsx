@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { CaseStudy, caseStudies } from "@/lib/case-studies";
@@ -103,6 +103,31 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
     `/images/${study.slug}-artifact-3.webp`,
     `/images/${study.slug}-artifact-4.webp`
   ]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Pause video and reset state when case study changes
+  useEffect(() => {
+    setIsPlaying(false);
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.load();
+    }
+  }, [study.slug]);
+
+  const handlePlayToggle = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch((err) => {
+        console.error("Video failed to play: ", err);
+      });
+    }
+  };
 
   useEffect(() => {
     setHeaderImg(`/images/${study.slug}.webp`);
@@ -356,51 +381,79 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
                 {/* 9:16 Video Player Interface Mockup */}
                 <div className="md:col-span-5 flex justify-center">
-                  <div className="w-52 aspect-[9/16] rounded-[2rem] border-[5px] border-ink bg-ink relative overflow-hidden shadow-2xl group flex flex-col justify-between p-4">
-                    <div className="absolute inset-0 bg-gradient-to-b from-ink via-accent-primary/25 to-ink z-0" />
-                    <div className="absolute inset-0 grain-overlay opacity-[0.14] z-10" />
+                  <div 
+                    onClick={handlePlayToggle}
+                    className="w-52 aspect-[9/16] rounded-[2rem] border-[5px] border-ink bg-ink relative overflow-hidden shadow-2xl group flex flex-col justify-between p-4 cursor-pointer"
+                  >
+                    {/* HTML5 video element (hidden until playing) */}
+                    <video
+                      ref={videoRef}
+                      src={`/images/${study.slug}-reel.mp4`}
+                      loop
+                      playsInline
+                      className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${isPlaying ? "opacity-100" : "opacity-0"}`}
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                    />
+
+                    {/* Mockup visual layers (only show when not playing) */}
+                    {!isPlaying && (
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-b from-ink via-accent-primary/25 to-ink z-0" />
+                        <div className="absolute inset-0 grain-overlay opacity-[0.14] z-10 pointer-events-none" />
+
+                        {/* Faded Silhouette in background of screen */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] z-10 p-4 pointer-events-none">
+                          <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-paper" strokeWidth="0.5">
+                            <circle cx="50" cy="50" r="40" />
+                            <path d="M50,10 L50,90 M10,50 L90,50" />
+                          </svg>
+                        </div>
+
+                        {/* Sound Waves dancing */}
+                        <div className="flex items-end justify-center gap-1.5 h-20 my-auto z-20 relative pointer-events-none">
+                          {[...Array(6)].map((_, idx) => (
+                            <div
+                              key={idx}
+                              className="w-1.5 rounded-full bg-accent-primary"
+                              style={{
+                                height: `${Math.floor(Math.random() * 60) + 30}%`,
+                                animation: `shimmer 1.5s infinite ease-in-out alternate`,
+                                animationDelay: `${idx * 0.18}s`
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
 
                     {/* Camera Notch */}
                     <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-3.5 bg-ink rounded-full z-30" />
 
-                    {/* Faded Silhouette in background of screen */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] z-10 p-4">
-                      <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-paper" strokeWidth="0.5">
-                        <circle cx="50" cy="50" r="40" />
-                        <path d="M50,10 L50,90 M10,50 L90,50" />
-                      </svg>
-                    </div>
-
-                    {/* Sound Waves dancing */}
-                    <div className="flex items-end justify-center gap-1.5 h-20 my-auto z-20 relative">
-                      {[...Array(6)].map((_, idx) => (
-                        <div
-                          key={idx}
-                          className="w-1.5 rounded-full bg-accent-primary"
-                          style={{
-                            height: `${Math.floor(Math.random() * 60) + 30}%`,
-                            animation: `shimmer 1.5s infinite ease-in-out alternate`,
-                            animationDelay: `${idx * 0.18}s`
-                          }}
-                        />
-                      ))}
-                    </div>
-
                     {/* Playhead controllers */}
-                    <div className="z-20 relative flex flex-col items-center gap-2">
+                    <div className="z-20 relative flex flex-col items-center gap-2 mt-auto">
                       <button className="w-11 h-11 rounded-full bg-paper text-ink flex items-center justify-center shadow-lg transform active:scale-95 group-hover:scale-105 transition-all duration-300">
-                        <svg className="w-4 h-4 fill-current ml-0.5 text-accent-primary" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
+                        {isPlaying ? (
+                          <svg className="w-4 h-4 fill-current text-accent-primary" viewBox="0 0 24 24">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4 fill-current ml-0.5 text-accent-primary" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        )}
                       </button>
                       <span className="text-[8px] font-sans font-bold uppercase tracking-[0.15em] text-paper/80">
-                        Play Beat edit
+                        {isPlaying ? "Pause Video" : "Play Beat edit"}
                       </span>
                     </div>
 
                     {/* Progress Bar scrubber */}
                     <div className="w-full bg-paper/20 h-[3px] rounded-full overflow-hidden z-20 relative mt-2">
-                      <div className="w-[60%] h-full bg-accent-primary rounded-full" />
+                      <div 
+                        className="h-full bg-accent-primary rounded-full transition-all duration-100" 
+                        style={{ width: isPlaying ? "100%" : "60%" }}
+                      />
                     </div>
                   </div>
                 </div>

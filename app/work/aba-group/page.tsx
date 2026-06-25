@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { caseStudies } from "@/lib/case-studies";
@@ -24,6 +24,22 @@ export default function AbaGroupHub() {
     "/images/aba-group-artifact-2.webp",
     "/images/aba-group-artifact-3.webp"
   ]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const handlePlayToggle = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch((err) => {
+        console.error("Video failed to play: ", err);
+      });
+    }
+  };
 
   const handleArtifactError = (idx: number) => {
     setArtifactImgs((prev) => {
@@ -217,51 +233,82 @@ export default function AbaGroupHub() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
               {/* 9:16 Video Player Mockup */}
               <div className="md:col-span-5 flex justify-center">
-                <div className="w-52 aspect-[9/16] rounded-[2rem] border-[5px] border-ink bg-ink relative overflow-hidden shadow-2xl group flex flex-col justify-between p-4">
-                  <div className="absolute inset-0 bg-gradient-to-b from-ink via-accent-primary/25 to-ink z-0" />
-                  <div className="absolute inset-0 grain-overlay opacity-[0.14] z-10" />
+                <div 
+                  onClick={handlePlayToggle}
+                  className="w-52 aspect-[9/16] rounded-[2rem] border-[5px] border-ink bg-ink relative overflow-hidden shadow-2xl group flex flex-col justify-between p-4 cursor-pointer"
+                >
+                  {/* HTML5 video element */}
+                  <video
+                    ref={videoRef}
+                    src="/images/aba-group-reel.mp4"
+                    loop
+                    playsInline
+                    className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${isPlaying ? "opacity-100" : "opacity-0"}`}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                  />
 
-                  {/* Notch */}
-                  <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-3.5 bg-ink rounded-full z-30" />
+                  {/* Mockup visual layers (only show when not playing) */}
+                  {!isPlaying && (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-b from-ink via-accent-primary/25 to-ink z-0" />
+                      <div className="absolute inset-0 grain-overlay opacity-[0.14] z-10 pointer-events-none" />
 
-                  {/* Faded Blueprint inside mockup */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] z-10 p-4">
-                    <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-paper" strokeWidth="0.5">
-                      <polygon points="50,15 85,85 15,85" />
-                      <line x1="50" y1="5" x2="50" y2="95" />
-                    </svg>
-                  </div>
+                      {/* Notch */}
+                      <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-3.5 bg-ink rounded-full z-30 pointer-events-none" />
 
-                  {/* Animated Sound Wave Bars */}
-                  <div className="flex items-end justify-center gap-1.5 h-20 my-auto z-20 relative">
-                    {[...Array(6)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-1.5 rounded-full bg-accent-primary"
-                        style={{
-                          height: `${Math.floor(Math.random() * 70) + 20}%`,
-                          animation: `shimmer 1.4s infinite ease-in-out alternate`,
-                          animationDelay: `${i * 0.12}s`
-                        }}
-                      />
-                    ))}
-                  </div>
+                      {/* Faded Blueprint inside mockup */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] z-10 p-4 pointer-events-none">
+                        <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-paper" strokeWidth="0.5">
+                          <polygon points="50,15 85,85 15,85" />
+                          <line x1="50" y1="5" x2="50" y2="95" />
+                        </svg>
+                      </div>
+
+                      {/* Animated Sound Wave Bars */}
+                      <div className="flex items-end justify-center gap-1.5 h-20 my-auto z-20 relative pointer-events-none">
+                        {[...Array(6)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="w-1.5 rounded-full bg-accent-primary"
+                            style={{
+                              height: `${Math.floor(Math.random() * 70) + 20}%`,
+                              animation: `shimmer 1.4s infinite ease-in-out alternate`,
+                              animationDelay: `${i * 0.12}s`
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Camera Notch (visible even when playing for device realism) */}
+                  <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-3.5 bg-ink rounded-full z-30 pointer-events-none" />
 
                   {/* Controllers */}
-                  <div className="z-20 relative flex flex-col items-center gap-2">
+                  <div className="z-20 relative flex flex-col items-center gap-2 mt-auto">
                     <button className="w-11 h-11 rounded-full bg-paper text-ink flex items-center justify-center shadow-lg group-hover:scale-105 active:scale-95 transition-all">
-                      <svg className="w-4 h-4 fill-current ml-0.5 text-accent-primary" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                      {isPlaying ? (
+                        <svg className="w-4 h-4 fill-current text-accent-primary" viewBox="0 0 24 24">
+                          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 fill-current ml-0.5 text-accent-primary" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      )}
                     </button>
                     <span className="text-[8px] font-sans font-bold uppercase tracking-widest text-paper/80">
-                      Play Campaign Reel
+                      {isPlaying ? "Pause Reel" : "Play Campaign Reel"}
                     </span>
                   </div>
 
                   {/* Scrubber */}
                   <div className="w-full bg-paper/20 h-[3px] rounded-full overflow-hidden z-20 relative mt-2">
-                    <div className="w-[50%] h-full bg-accent-primary rounded-full" />
+                    <div 
+                      className="h-full bg-accent-primary rounded-full transition-all duration-100" 
+                      style={{ width: isPlaying ? "100%" : "50%" }}
+                    />
                   </div>
                 </div>
               </div>
