@@ -198,16 +198,16 @@ export default function About() {
       <section 
         className="w-full min-h-[55vh] flex flex-col justify-end py-16 px-6 md:px-12 relative overflow-hidden transition-colors duration-700 bg-accent text-paper"
       > 
-        {/* Parallax Desaturated Background Image */}
+        {/* Parallax Background Image */}
         <motion.div 
           style={{ y }}
-          className="absolute inset-0 z-0 opacity-50 mix-blend-overlay pointer-events-none select-none"
+          className="absolute inset-0 z-0 opacity-100 pointer-events-none select-none"
         >
           <img 
             src={heroImg} 
             onError={() => setHeroImg("https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=1200")}
             alt="" 
-            className="w-full h-full object-cover filter grayscale contrast-125 brightness-90"
+            className="w-full h-full object-cover filter brightness-[0.75]"
           />
         </motion.div>
 

@@ -195,16 +195,16 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
         className="w-full min-h-[55vh] flex flex-col justify-end py-16 px-6 md:px-12 relative overflow-hidden transition-colors duration-700"
         style={{ backgroundColor: study.accent.primary }}
       >
-        {/* Parallax Desaturated Background Image */}
+        {/* Parallax Background Image */}
         <motion.div 
           style={{ y }}
-          className="absolute inset-0 z-0 opacity-50 mix-blend-overlay pointer-events-none select-none"
+          className="absolute inset-0 z-0 opacity-100 pointer-events-none select-none"
         >
           <img 
             src={headerImg} 
             onError={() => setHeaderImg(getHeaderBgImage(study.slug))}
             alt="" 
-            className="w-full h-full object-cover filter grayscale contrast-125 brightness-90"
+            className="w-full h-full object-cover filter brightness-[0.75]"
           />
         </motion.div>
 
@@ -772,17 +772,18 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                 transition={{ duration: 0.4, ease: "easeOut" }}
                 className="flex-1 min-h-[450px] border border-line/10 rounded-3xl relative overflow-hidden flex flex-col justify-end p-8 bg-paper/5 shadow-2xl"
               >
-                {artifactImgs[activePhotoIdx] && (
+                {artifactImgs[activePhotoIdx] ? (
                   <img 
                     src={artifactImgs[activePhotoIdx]} 
                     alt="" 
-                    className="absolute inset-0 w-full h-full object-cover filter grayscale contrast-125 opacity-30 z-0"
+                    className="absolute inset-0 w-full h-full object-cover z-0"
+                  />
+                ) : (
+                  <div 
+                    className="absolute inset-0 opacity-35 shimmer-bg z-10 pointer-events-none"
+                    style={{ backgroundColor: activePhotoIdx % 2 === 0 ? study.accent.primary : study.accent.secondary }}
                   />
                 )}
-                <div 
-                  className="absolute inset-0 opacity-35 shimmer-bg z-10 pointer-events-none"
-                  style={{ backgroundColor: activePhotoIdx % 2 === 0 ? study.accent.primary : study.accent.secondary }}
-                />
                 <div className="absolute inset-0 grain-overlay opacity-10 z-10 pointer-events-none" />
 
                 {/* Silhouette inside modal slide */}

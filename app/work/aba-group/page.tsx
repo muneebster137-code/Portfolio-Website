@@ -103,16 +103,16 @@ export default function AbaGroupHub() {
         className="w-full min-h-[55vh] flex flex-col justify-end py-16 px-6 md:px-12 relative overflow-hidden transition-colors duration-700 bg-ink text-paper"
         style={{ backgroundColor: study.accent.primary }}
       >
-        {/* Parallax Desaturated Background Image */}
+        {/* Parallax Background Image */}
         <motion.div 
           style={{ y }}
-          className="absolute inset-0 z-0 opacity-12 mix-blend-overlay pointer-events-none select-none"
+          className="absolute inset-0 z-0 opacity-100 pointer-events-none select-none"
         >
           <img 
             src={headerImg} 
             onError={() => setHeaderImg("https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1200")}
             alt="" 
-            className="w-full h-full object-cover filter grayscale contrast-125 brightness-90"
+            className="w-full h-full object-cover filter brightness-[0.75]"
           />
         </motion.div>
 
@@ -555,17 +555,18 @@ export default function AbaGroupHub() {
                 transition={{ duration: 0.4, ease: "easeOut" }}
                 className="flex-1 min-h-[450px] border border-line/10 rounded-3xl relative overflow-hidden flex flex-col justify-end p-8 bg-paper/5 shadow-2xl"
               >
-                {artifactImgs[activePhotoIdx] && (
+                {artifactImgs[activePhotoIdx] ? (
                   <img 
                     src={artifactImgs[activePhotoIdx]} 
                     alt="" 
-                    className="absolute inset-0 w-full h-full object-cover filter grayscale contrast-125 opacity-30 z-0"
+                    className="absolute inset-0 w-full h-full object-cover z-0"
+                  />
+                ) : (
+                  <div 
+                    className="absolute inset-0 opacity-35 shimmer-bg z-10 pointer-events-none"
+                    style={{ backgroundColor: ARTIFACT_DETAILS[activePhotoIdx].bg }}
                   />
                 )}
-                <div 
-                  className="absolute inset-0 opacity-35 shimmer-bg z-10 pointer-events-none"
-                  style={{ backgroundColor: ARTIFACT_DETAILS[activePhotoIdx].bg }}
-                />
                 <div className="absolute inset-0 grain-overlay opacity-10 z-10 pointer-events-none" />
 
                 {/* Silhouette inside modal */}
