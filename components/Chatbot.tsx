@@ -124,34 +124,37 @@ export const Chatbot = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.92 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="fixed bottom-24 right-6 z-[9999] w-[90vw] sm:w-[380px] h-[500px] border border-line/40 rounded-3xl bg-paper/85 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col justify-between"
+            className="fixed bottom-24 right-6 z-[9999] w-[90vw] sm:w-[380px] h-[500px] border border-line rounded-3xl bg-paper/95 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col justify-between"
           >
+            {/* Organic Grain Texture Overlay inside Chatbot */}
+            <div className="absolute inset-0 grain-overlay opacity-[0.06] pointer-events-none z-0" />
+
             {/* Header */}
-            <div className="p-4 border-b border-line/30 bg-ink text-paper flex items-center justify-between">
+            <div className="p-4 border-b border-line bg-paper text-ink flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-accent-primary flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-accent-primary flex items-center justify-center shrink-0 shadow-sm shadow-accent-primary/20">
                   <Sparkles className="w-4 h-4 text-paper" />
                 </div>
                 <div>
-                  <h3 className="font-display font-semibold italic text-sm text-paper leading-tight">
-                    Muneeb Clone
+                  <h3 className="font-display font-semibold italic text-sm text-ink leading-tight">
+                    Muneeb Bilal
                   </h3>
-                  <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-paper/60 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    AI Twin Online
+                  <span className="text-[9px] font-sans font-bold uppercase tracking-[0.15em] text-graphite/60 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    AI Clone Active
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-lg hover:bg-paper/10 flex items-center justify-center text-paper/70 hover:text-paper transition-all"
+                className="w-8 h-8 rounded-lg hover:bg-line/25 flex items-center justify-center text-graphite hover:text-ink transition-all cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Message Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-paper/20">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-paper/10 relative z-10">
               {messages.map((msg, idx) => {
                 const isAssistant = msg.role === "assistant";
                 return (
@@ -160,10 +163,10 @@ export const Chatbot = () => {
                     className={`flex ${isAssistant ? "justify-start" : "justify-end"}`}
                   >
                     <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed font-light ${
+                      className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-sm ${
                         isAssistant
-                          ? "bg-line/20 text-ink border border-line/30 rounded-tl-none font-sans"
-                          : "bg-ink text-paper rounded-tr-none font-sans font-normal"
+                          ? "bg-paper text-ink border border-line rounded-tl-none font-sans font-light"
+                          : "bg-accent-primary text-paper rounded-tr-none font-sans font-normal"
                       }`}
                     >
                       {/* Simple parse lists & lines to render lists cleanly */}
@@ -190,7 +193,7 @@ export const Chatbot = () => {
               {/* Typing indicator */}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-line/20 border border-line/30 rounded-2xl rounded-tl-none px-4 py-3 flex gap-1.5 items-center">
+                  <div className="bg-paper border border-line rounded-2xl rounded-tl-none px-4 py-3 flex gap-1.5 items-center shadow-sm">
                     <span className="w-1.5 h-1.5 bg-graphite/60 rounded-full animate-bounce" />
                     <span className="w-1.5 h-1.5 bg-graphite/60 rounded-full animate-bounce [animation-delay:0.2s]" />
                     <span className="w-1.5 h-1.5 bg-graphite/60 rounded-full animate-bounce [animation-delay:0.4s]" />
@@ -215,7 +218,7 @@ export const Chatbot = () => {
             {/* Input Bar */}
             <form
               onSubmit={handleSend}
-              className="p-3 border-t border-line/30 bg-paper/90 flex gap-2 items-center"
+              className="p-3 border-t border-line bg-paper/95 flex gap-2 items-center relative z-10"
             >
               <input
                 type="text"
@@ -223,12 +226,12 @@ export const Chatbot = () => {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask me about my projects..."
                 disabled={isLoading}
-                className="flex-1 bg-line/10 border border-line/30 rounded-xl px-4 py-2.5 text-xs font-sans text-ink focus-visible:outline-none focus:border-accent-primary disabled:opacity-50"
+                className="flex-1 bg-paper border border-line rounded-2xl px-4 py-3 text-xs font-sans text-ink focus-visible:outline-none focus:border-accent-primary disabled:opacity-50"
               />
               <button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="w-9 h-9 rounded-xl bg-ink hover:bg-ink/90 text-paper flex items-center justify-center shrink-0 disabled:opacity-40 transition-opacity"
+                className="w-10 h-10 rounded-2xl bg-accent-primary hover:bg-accent-primary/90 text-paper flex items-center justify-center shrink-0 disabled:opacity-40 transition-all cursor-pointer shadow-md shadow-accent-primary/10"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>

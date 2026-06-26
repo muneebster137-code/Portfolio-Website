@@ -189,6 +189,7 @@ export default function About() {
   const [portraitImg, setPortraitImg] = useState("/images/muneeb-bilal.webp");
 
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
+  const [failedVideos, setFailedVideos] = useState<Record<string, boolean>>({});
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -196,10 +197,20 @@ export default function About() {
   const cursorXSpring = useSpring(mouseX, springConfig);
   const cursorYSpring = useSpring(mouseY, springConfig);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    mouseX.set(e.clientX);
-    mouseY.set(e.clientY);
-  };
+  useEffect(() => {
+    const handleWindowMouseMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("mousemove", handleWindowMouseMove);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("mousemove", handleWindowMouseMove);
+      }
+    };
+  }, [mouseX, mouseY]);
 
   if (isPageLoading) {
     return <AboutLoading />;
@@ -397,7 +408,7 @@ export default function About() {
         </div>
 
         {/* Timeline Line */}
-        <div className="relative pl-6 md:pl-12 border-l border-line/70 space-y-12" onMouseMove={handleMouseMove}>
+        <div className="relative pl-6 md:pl-12 border-l border-line/70 space-y-12">
           {TIMELINE.map((item, idx) => (
             <motion.div
               key={item.slug}
@@ -573,11 +584,11 @@ export default function About() {
               translateX: 20,
               translateY: -100,
             }}
-            className="fixed pointer-events-none z-50 w-64 h-36 rounded-2xl overflow-hidden shadow-2xl border border-line bg-paper"
+            className="fixed pointer-events-none z-[9999] w-64 h-36 rounded-2xl overflow-hidden shadow-2xl border border-line bg-paper"
           >
             {/* Show reel for video-first clients, otherwise header image */}
             <div className="relative w-full h-full">
-              {["trenddeck", "aba-group", "treats-for-life", "anebos-studios"].includes(hoveredSlug) ? (
+              {["trenddeck", "aba-group", "treats-for-life", "anebos-studios"].includes(hoveredSlug) && !failedVideos[hoveredSlug] ? (
                 <video
                   src={`/images/${hoveredSlug}-reel.webm`}
                   autoPlay
@@ -585,6 +596,9 @@ export default function About() {
                   muted
                   playsInline
                   className="w-full h-full object-cover"
+                  onError={() => {
+                    setFailedVideos((prev) => ({ ...prev, [hoveredSlug]: true }));
+                  }}
                 />
               ) : (
                 <img
