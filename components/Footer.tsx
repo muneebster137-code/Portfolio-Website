@@ -11,7 +11,7 @@ export const Footer = () => {
 
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-16 md:py-24 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 border-b border-line/10 pb-16">
-          
+
           {/* Identity Column */}
           <div className="lg:col-span-2">
             <h3 className="font-display text-2xl font-bold italic tracking-wide mb-4">
@@ -61,7 +61,7 @@ export const Footer = () => {
             <ul className="space-y-4">
               <li>
                 <a
-                  href="https://linkedin.com/in/Muneeb-Bilal"
+                  href="https://linkedin.com/in/muneeb-bilal-886481282"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-center gap-1 font-sans text-sm hover:text-accent transition-colors duration-300"

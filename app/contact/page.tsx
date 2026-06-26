@@ -9,7 +9,7 @@ export default function ContactPage() {
   return (
     <div className="max-w-[1280px] mx-auto px-6 md:px-12 py-16 md:py-24">
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-        
+
         {/* Left Column: Direct Info & Taglines */}
         <div className="lg:col-span-5 space-y-8">
           <div className="space-y-4">
@@ -32,7 +32,7 @@ export default function ContactPage() {
             <h3 className="text-[10px] font-sans font-bold uppercase tracking-widest text-graphite/40">
               Direct Coordinates
             </h3>
-            
+
             <ul className="space-y-4">
               <li className="flex items-center gap-4 group">
                 <div className="w-10 h-10 border border-line rounded-xl flex items-center justify-center text-accent bg-paper group-hover:bg-ink group-hover:text-paper transition-all">
@@ -64,10 +64,10 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <span className="text-[9px] uppercase tracking-wider text-graphite/60 font-semibold block">LinkedIn</span>
-                  <a 
-                    href="https://linkedin.com/in/Muneeb-Bilal" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <a
+                    href="https://linkedin.com/in/muneeb-bilal-886481282"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="font-sans text-sm font-semibold hover:text-accent transition-colors"
                   >
                     linkedin.com/in/Muneeb-Bilal
@@ -85,7 +85,7 @@ export default function ContactPage() {
             <p className="font-sans text-xs text-graphite/70 leading-relaxed">
               Recruiters looking for a hardcopy summary can print my direct web-rebuilt portfolio resume immediately.
             </p>
-            <Link 
+            <Link
               href="/resume"
               className="pill-active-hover inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:underline uppercase tracking-wider"
             >
