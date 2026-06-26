@@ -124,6 +124,7 @@ export const Chatbot = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.92 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            data-lenis-prevent
             className="fixed bottom-24 right-6 z-[9999] w-[90vw] sm:w-[380px] h-[500px] border border-line rounded-3xl bg-paper/95 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col justify-between"
           >
             {/* Organic Grain Texture Overlay inside Chatbot */}
@@ -154,7 +155,10 @@ export const Chatbot = () => {
             </div>
 
             {/* Message Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-paper/10 relative z-10">
+            <div 
+              data-lenis-prevent
+              className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-paper/10 relative z-10"
+            >
               {messages.map((msg, idx) => {
                 const isAssistant = msg.role === "assistant";
                 return (
