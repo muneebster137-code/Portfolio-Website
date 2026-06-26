@@ -605,10 +605,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                   <circle cx="50" cy="50" r="30" />
                 </svg>
               </div>
-              <div className="relative z-20">
-                <span className="text-[9px] uppercase tracking-widest text-paper/50 block mb-1">Artifact 01 — Overview</span>
-                <h4 className="font-display font-semibold text-lg italic text-paper">{study.client} Brand Core Layout</h4>
-              </div>
+
             </div>
 
             {/* Box 2: Tall Vertical (Takes 4 cols, height 400) */}
@@ -634,10 +631,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                   <path d="M10,10 L90,90 M10,90 L90,10" />
                 </svg>
               </div>
-              <div className="relative z-20">
-                <span className="text-[9px] uppercase tracking-widest text-paper/50 block mb-1">Artifact 02 — Identity Color</span>
-                <h4 className="font-display font-semibold text-lg italic text-paper">Palette Inherent Swatch</h4>
-              </div>
+
             </div>
 
             {/* Box 3: Square Left (Takes 5 cols, height 350) */}
@@ -663,10 +657,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                   <polygon points="50,20 80,80 20,80" />
                 </svg>
               </div>
-              <div className="relative z-20">
-                <span className="text-[9px] uppercase tracking-widest text-paper/50 block mb-1">Artifact 03 — Typography Grid</span>
-                <h4 className="font-display font-semibold text-lg italic text-paper">Type Hierarchy Framework</h4>
-              </div>
+
             </div>
 
             {/* Box 4: Horizontal Right (Takes 7 cols, height 350) */}
@@ -692,10 +683,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                   <line x1="20" y1="20" x2="80" y2="80" />
                 </svg>
               </div>
-              <div className="relative z-20">
-                <span className="text-[9px] uppercase tracking-widest text-paper/50 block mb-1">Artifact 04 — Social Delivery</span>
-                <h4 className="font-display font-semibold text-lg italic text-paper">Grid Placement Alignment</h4>
-              </div>
+
             </div>
             
           </div>
@@ -794,17 +782,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                   </svg>
                 </div>
 
-                <div className="relative z-10 text-paper text-left space-y-2">
-                  <span className="text-[9px] uppercase tracking-widest text-paper/40 block mb-1">
-                    Artifact 0{activePhotoIdx + 1} — Detail View
-                  </span>
-                  <h3 className="font-display font-semibold italic text-2xl md:text-3xl text-paper">
-                    {study.client} — Carousel Frame {activePhotoIdx + 1}
-                  </h3>
-                  <p className="font-sans text-xs md:text-sm text-paper/60 max-w-lg leading-relaxed font-light">
-                    This mockup slot represents high-end photography layout frames, design guidelines boards, and content strategy matrices. Artifact files will be populated dynamically.
-                  </p>
-                </div>
+
               </motion.div>
 
               {/* Next Button */}
