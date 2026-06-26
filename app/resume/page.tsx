@@ -50,7 +50,7 @@ export default function ResumePage() {
             <p>muneebster137@gmail.com</p>
             <p>+92-328-5726711</p>
             <p>Islamabad, Pakistan</p>
-            <p className="font-semibold text-ink">linkedin.com/in/Muneeb-Bilal</p>
+            <p className="font-semibold text-ink">linkedin.com/in/muneeb-bilal-886481282</p>
           </div>
         </header>
 
