@@ -1,15 +1,29 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Printer, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import ResumeLoading from "./loading";
 
 export default function ResumePage() {
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handlePrint = () => {
     if (typeof window !== "undefined") {
       window.print();
     }
   };
+
+  if (isPageLoading) {
+    return <ResumeLoading />;
+  }
 
   return (
     <div className="min-h-screen bg-paper py-12 px-6 md:px-12 print:p-0 transition-colors duration-500">

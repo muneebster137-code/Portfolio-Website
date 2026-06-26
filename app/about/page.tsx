@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
 import Link from "next/link";
 import { Award, Briefcase, GraduationCap, Code, FileText, ArrowRight, Compass } from "lucide-react";
+import AboutLoading from "./loading";
 
 // Chronological timeline entries matching the PRD and content copy
 const TIMELINE = [
@@ -173,6 +174,15 @@ const CERTIFICATIONS = [
 ];
 
 export default function About() {
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 400], [0, 120]);
   const [heroImg, setHeroImg] = useState("/images/about-hero.webp");
@@ -190,6 +200,10 @@ export default function About() {
     mouseX.set(e.clientX);
     mouseY.set(e.clientY);
   };
+
+  if (isPageLoading) {
+    return <AboutLoading />;
+  }
 
   return (
     <article className="w-full pb-20">

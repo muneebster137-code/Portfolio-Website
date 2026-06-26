@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { CaseStudy, caseStudies } from "@/lib/case-studies";
+import CaseStudyLoading from "@/app/work/[slug]/loading";
 import { useAccent } from "./AccentProvider";
 import { 
   Globe, 
@@ -94,6 +95,16 @@ const getHeroIcon = (slug: string) => {
 };
 
 export const CaseStudyTemplate = ({ study }: TemplateProps) => {
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  useEffect(() => {
+    setIsPageLoading(true);
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [study.slug]);
+
   const { setAccent, resetAccent } = useAccent();
   const [activePhotoIdx, setActivePhotoIdx] = useState<number | null>(null);
   const [headerImg, setHeaderImg] = useState(`/images/${study.slug}.webp`);
@@ -186,6 +197,10 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
+
+  if (isPageLoading) {
+    return <CaseStudyLoading />;
+  }
 
   return (
     <article className="w-full pb-20">

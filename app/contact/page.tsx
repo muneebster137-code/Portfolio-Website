@@ -1,11 +1,25 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ContactForm } from "@/components/ContactForm";
 import { Mail, Phone, Linkedin, Download, Sparkles } from "lucide-react";
 import Link from "next/link";
+import ContactLoading from "./loading";
 
 export default function ContactPage() {
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isPageLoading) {
+    return <ContactLoading />;
+  }
+
   return (
     <div className="max-w-[1280px] mx-auto px-6 md:px-12 py-16 md:py-24">
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">

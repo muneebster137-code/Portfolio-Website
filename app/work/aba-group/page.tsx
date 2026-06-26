@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { caseStudies } from "@/lib/case-studies";
+import AbaGroupLoading from "./loading";
 import { useAccent } from "@/components/AccentProvider";
 import { 
   Users, 
@@ -15,6 +16,15 @@ import {
 } from "lucide-react";
 
 export default function AbaGroupHub() {
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const { setAccent, resetAccent } = useAccent();
   const study = caseStudies.find((cs) => cs.slug === "aba-group");
   const [activePhotoIdx, setActivePhotoIdx] = useState<number | null>(null);
@@ -70,6 +80,10 @@ export default function AbaGroupHub() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  if (isPageLoading) {
+    return <AbaGroupLoading />;
+  }
 
   if (!study) return <div className="p-12 text-center text-sm font-semibold">Study not loaded.</div>;
 

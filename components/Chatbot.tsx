@@ -82,7 +82,7 @@ export const Chatbot = () => {
       {/* 1. Floating Toggle Button */}
       <motion.button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-ink hover:bg-ink/90 text-paper border border-line/20 shadow-2xl flex items-center justify-center cursor-pointer select-none group"
+        className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-accent-primary hover:bg-accent-primary/90 text-paper border border-line/10 shadow-2xl flex items-center justify-center cursor-pointer select-none group"
         whileHover={{ scale: 1.06, y: -2 }}
         whileTap={{ scale: 0.94 }}
         initial={{ opacity: 0, scale: 0.8 }}
@@ -109,8 +109,8 @@ export const Chatbot = () => {
               transition={{ duration: 0.2 }}
               className="relative"
             >
-              <MessageSquare className="w-5.5 h-5.5 text-accent-primary" />
-              <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-accent-primary animate-ping" />
+              <MessageSquare className="w-5.5 h-5.5 text-paper" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-paper animate-ping" />
             </motion.div>
           )}
         </AnimatePresence>

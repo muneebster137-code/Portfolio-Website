@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { caseStudies } from "@/lib/case-studies";
 import { CaseStudyCard } from "@/components/CaseStudyCard";
 import { Sparkles, Grid } from "lucide-react";
+import WorkIndexLoading from "./loading";
 
 // Categorize case studies programmatically based on deliverables
 const getTagsForStudy = (slug: string) => {
@@ -49,6 +50,15 @@ const getTagsForStudy = (slug: string) => {
 const FILTERS = ["All", "Brand Identity", "Web Design", "Social Strategy", "Multimedia"];
 
 export default function WorkIndex() {
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const [selectedFilter, setSelectedFilter] = useState("All");
 
   // Reverse chronological sort mapping from 2026 down to 2023
@@ -60,6 +70,10 @@ export default function WorkIndex() {
     const studyTags = getTagsForStudy(study.slug);
     return studyTags.includes(selectedFilter);
   });
+
+  if (isPageLoading) {
+    return <WorkIndexLoading />;
+  }
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-16 md:py-24">
