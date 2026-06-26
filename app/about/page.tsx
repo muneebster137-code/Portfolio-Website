@@ -140,6 +140,24 @@ const TIMELINE = [
   }
 ];
 
+const UPLOADED_REELS = ["treats-for-life"];
+const UPLOADED_IMAGES = [
+  "bic-szabist",
+  "tim-hortons",
+  "green-pakistan-agro",
+  "beatrix-konnect",
+  "ndrmf",
+  "treats-for-life",
+  "fairmans-uk",
+  "bakebox",
+  "watch-how-malaysia",
+  "safir-wear",
+  "facingnorth",
+  "trenddeck",
+  "aba-group",
+  "anebos-studios"
+];
+
 const SKILL_GROUPS = [
   {
     category: "Visual Design & Branding",
@@ -585,11 +603,10 @@ export default function About() {
               x: previewX,
               y: previewY,
             }}
-            className="fixed pointer-events-none z-[9999] w-64 h-36 rounded-2xl overflow-hidden shadow-2xl border border-line bg-paper"
+            className="fixed top-0 left-0 pointer-events-none z-[9999] w-64 h-36 rounded-2xl overflow-hidden shadow-2xl border border-line bg-paper"
           >
-            {/* Show reel for video-first clients, otherwise header image */}
             <div className="relative w-full h-full">
-              {["trenddeck", "aba-group", "treats-for-life", "anebos-studios"].includes(hoveredSlug) && !failedVideos[hoveredSlug] ? (
+              {UPLOADED_REELS.includes(hoveredSlug) ? (
                 <video
                   src={`/images/${hoveredSlug}-reel.webm`}
                   autoPlay
@@ -597,19 +614,16 @@ export default function About() {
                   muted
                   playsInline
                   className="w-full h-full object-cover"
-                  onError={() => {
-                    setFailedVideos((prev) => ({ ...prev, [hoveredSlug]: true }));
-                  }}
                 />
               ) : (
                 <img
-                  src={`/images/${hoveredSlug}.webp`}
+                  src={
+                    UPLOADED_IMAGES.includes(hoveredSlug)
+                      ? `/images/${hoveredSlug}.webp`
+                      : "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop"
+                  }
                   alt="Engagement preview"
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop";
-                  }}
                 />
               )}
               {/* Client name overlay */}
