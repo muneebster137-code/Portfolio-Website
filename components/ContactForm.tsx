@@ -49,10 +49,20 @@ export const ContactForm = () => {
 
     setStatus("submitting");
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch("https://formsubmit.co/ajax/muneebster137@gmail.com", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          "Project Type": form.projectType,
+          message: form.message,
+          _captcha: "false",
+          _subject: `New Lead: ${form.name} - ${form.projectType}`
+        })
       });
 
       if (response.ok) {
