@@ -197,6 +197,9 @@ export default function About() {
   const cursorXSpring = useSpring(mouseX, springConfig);
   const cursorYSpring = useSpring(mouseY, springConfig);
 
+  const previewX = useTransform(cursorXSpring, (val) => val + 20);
+  const previewY = useTransform(cursorYSpring, (val) => val - 100);
+
   useEffect(() => {
     const handleWindowMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -579,10 +582,8 @@ export default function About() {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2 }}
             style={{
-              x: cursorXSpring,
-              y: cursorYSpring,
-              translateX: 20,
-              translateY: -100,
+              x: previewX,
+              y: previewY,
             }}
             className="fixed pointer-events-none z-[9999] w-64 h-36 rounded-2xl overflow-hidden shadow-2xl border border-line bg-paper"
           >

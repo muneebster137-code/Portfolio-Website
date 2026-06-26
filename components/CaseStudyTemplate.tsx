@@ -547,11 +547,8 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
             {hasBrandVision && (
               <a
                 href={`/assets/brand-vision-${study.slug}.pdf`}
-                download
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert(`Brand Vision Deck PDF download triggered for ${study.client}. PDF file will be hosted at '/public/assets/brand-vision-${study.slug}.pdf' in the future.`);
-                }}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="pill-active-hover w-full flex items-center justify-center gap-2 px-6 py-4 bg-transparent border border-accent-primary text-accent-primary hover:bg-accent-primary hover:text-paper rounded-2xl font-sans text-xs font-semibold uppercase tracking-wider transition-all duration-300"
               >
                 <FileText className="w-3.5 h-3.5" />
