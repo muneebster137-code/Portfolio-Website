@@ -21,15 +21,34 @@ export async function POST(request: Request) {
       );
     }
 
-    // Simulate sending time (e.g. SMTP handshake or third party API request)
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    // Dispatch submission to FormSubmit.co AJAX endpoint (forwards to muneebster137@gmail.com)
+    const formSubmitRes = await fetch("https://formsubmit.co/ajax/muneebster137@gmail.com", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        "Project Type": projectType,
+        message,
+        _captcha: "false",
+        _subject: `New Lead: ${name} - ${projectType}`
+      })
+    });
 
-    // Console logging message details for Vercel/local developer logs
-    console.log(`[CONTACT FORM SUBMISSION]`);
-    console.log(`Name: ${name}`);
-    console.log(`Email: ${email}`);
-    console.log(`Type: ${projectType}`);
-    console.log(`Message: ${message}`);
+    if (!formSubmitRes.ok) {
+      const errText = await formSubmitRes.text();
+      console.error("FormSubmit response error:", errText);
+      return NextResponse.json(
+        { message: "FormSubmit server failed to accept the email submission." },
+        { status: 502 }
+      );
+    }
+
+    const data = await formSubmitRes.json();
+    console.log("[CONTACT FORM SUBMISSION SENT]:", data);
 
     return NextResponse.json(
       { message: "Message successfully dispatched." },
