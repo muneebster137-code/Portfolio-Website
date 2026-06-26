@@ -81,7 +81,8 @@ Keep answers short and conversational. Answer their queries directly.`;
     const data = await response.json();
     const reply = data.choices?.[0]?.message?.content || "";
     return NextResponse.json({ reply });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Server Error" }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Server Error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

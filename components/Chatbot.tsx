@@ -68,9 +68,10 @@ export const Chatbot = () => {
 
       const data = await response.json();
       setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "An unexpected connection error occurred.");
+      const errMsg = err instanceof Error ? err.message : "An unexpected connection error occurred.";
+      setError(errMsg);
     } finally {
       setIsLoading(false);
     }
