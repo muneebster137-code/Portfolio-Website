@@ -240,7 +240,7 @@ export default function AbaGroupHub() {
                   {/* HTML5 video element */}
                   <video
                     ref={videoRef}
-                    src="/images/aba-group-reel.mp4"
+                    src="/images/aba-group-reel.webm"
                     loop
                     playsInline
                     className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${isPlaying ? "opacity-100" : "opacity-0"}`}

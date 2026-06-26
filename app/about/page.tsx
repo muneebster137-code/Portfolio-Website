@@ -565,7 +565,7 @@ export default function About() {
             <div className="relative w-full h-full">
               {["trenddeck", "aba-group", "treats-for-life", "anebos-studios"].includes(hoveredSlug) ? (
                 <video
-                  src={`/images/${hoveredSlug}-reel.mp4`}
+                  src={`/images/${hoveredSlug}-reel.webm`}
                   autoPlay
                   loop
                   muted

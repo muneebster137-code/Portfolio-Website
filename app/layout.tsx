@@ -6,6 +6,7 @@ import { CustomCursor } from "@/components/CustomCursor";
 import { PageLoader } from "@/components/PageLoader";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { Chatbot } from "@/components/Chatbot";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -62,6 +63,9 @@ export default function RootLayout({
               </div>
               <Footer />
             </div>
+            
+            {/* AI Clone Chatbot Widget */}
+            <Chatbot />
           </LenisScroll>
         </AccentProvider>
       </body>

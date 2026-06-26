@@ -388,7 +388,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                     {/* HTML5 video element (hidden until playing) */}
                     <video
                       ref={videoRef}
-                      src={`/images/${study.slug}-reel.mp4`}
+                      src={`/images/${study.slug}-reel.webm`}
                       loop
                       playsInline
                       className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${isPlaying ? "opacity-100" : "opacity-0"}`}
