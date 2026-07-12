@@ -115,11 +115,13 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
     `/images/${study.slug}-artifact-4.webp`
   ]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // Pause video and reset state when case study changes
   useEffect(() => {
     setIsPlaying(false);
+    setVideoError(false);
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.load();
@@ -127,7 +129,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
   }, [study.slug]);
 
   const handlePlayToggle = () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || videoError) return;
     if (isPlaying) {
       videoRef.current.pause();
       setIsPlaying(false);
@@ -136,6 +138,8 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
         setIsPlaying(true);
       }).catch((err) => {
         console.error("Video failed to play: ", err);
+        setVideoError(true);
+        setIsPlaying(false);
       });
     }
   };
@@ -403,16 +407,24 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                     {/* HTML5 video element (hidden until playing) */}
                     <video
                       ref={videoRef}
-                      src={`/images/${study.slug}-reel.webm`}
                       loop
+                      muted
                       playsInline
-                      className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${isPlaying ? "opacity-100" : "opacity-0"}`}
+                      className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${isPlaying && !videoError ? "opacity-100" : "opacity-0"}`}
                       onPlay={() => setIsPlaying(true)}
                       onPause={() => setIsPlaying(false)}
-                    />
+                      onError={() => {
+                        console.warn(`Video reel missing or failed to load for ${study.slug}`);
+                        setVideoError(true);
+                        setIsPlaying(false);
+                      }}
+                    >
+                      <source src={`/images/${study.slug}-reel.webm`} type="video/webm" />
+                      <source src={`/images/${study.slug}-reel.mp4`} type="video/mp4" />
+                    </video>
 
-                    {/* Mockup visual layers (only show when not playing) */}
-                    {!isPlaying && (
+                    {/* Mockup visual layers (only show when not playing or video failed) */}
+                    {(!isPlaying || videoError) && (
                       <>
                         <div className="absolute inset-0 bg-gradient-to-b from-ink via-accent-primary/25 to-ink z-0" />
                         <div className="absolute inset-0 grain-overlay opacity-[0.14] z-10 pointer-events-none" />
@@ -433,7 +445,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                               className="w-1.5 rounded-full bg-accent-primary"
                               style={{
                                 height: `${Math.floor(Math.random() * 60) + 30}%`,
-                                animation: `shimmer 1.5s infinite ease-in-out alternate`,
+                                animation: videoError ? "none" : `shimmer 1.5s infinite ease-in-out alternate`,
                                 animationDelay: `${idx * 0.18}s`
                               }}
                             />
@@ -447,8 +459,17 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
 
                     {/* Playhead controllers */}
                     <div className="z-20 relative flex flex-col items-center gap-2 mt-auto">
-                      <button className="w-11 h-11 rounded-full bg-paper text-ink flex items-center justify-center shadow-lg transform active:scale-95 group-hover:scale-105 transition-all duration-300">
-                        {isPlaying ? (
+                      <button 
+                        disabled={videoError}
+                        className={`w-11 h-11 rounded-full bg-paper text-ink flex items-center justify-center shadow-lg transform active:scale-95 transition-all duration-300 ${
+                          videoError ? "opacity-40 cursor-not-allowed" : "group-hover:scale-105"
+                        }`}
+                      >
+                        {videoError ? (
+                          <svg className="w-4 h-4 fill-none stroke-current text-accent-primary" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+                          </svg>
+                        ) : isPlaying ? (
                           <svg className="w-4 h-4 fill-current text-accent-primary" viewBox="0 0 24 24">
                             <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                           </svg>
@@ -459,7 +480,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                         )}
                       </button>
                       <span className="text-[8px] font-sans font-bold uppercase tracking-[0.15em] text-paper/80">
-                        {isPlaying ? "Pause Video" : "Play Beat edit"}
+                        {videoError ? "Visualization Mode" : isPlaying ? "Pause Video" : "Play Beat edit"}
                       </span>
                     </div>
 
@@ -467,7 +488,7 @@ export const CaseStudyTemplate = ({ study }: TemplateProps) => {
                     <div className="w-full bg-paper/20 h-[3px] rounded-full overflow-hidden z-20 relative mt-2">
                       <div 
                         className="h-full bg-accent-primary rounded-full transition-all duration-100" 
-                        style={{ width: isPlaying ? "100%" : "60%" }}
+                        style={{ width: videoError ? "100%" : isPlaying ? "100%" : "60%" }}
                       />
                     </div>
                   </div>

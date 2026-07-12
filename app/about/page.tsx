@@ -140,7 +140,7 @@ const TIMELINE = [
   }
 ];
 
-const UPLOADED_REELS = ["treats-for-life"];
+const UPLOADED_REELS = ["treats-for-life", "trenddeck", "aba-group"];
 const UPLOADED_IMAGES = [
   "bic-szabist",
   "tim-hortons",
@@ -207,7 +207,6 @@ export default function About() {
   const [portraitImg, setPortraitImg] = useState("/images/muneeb-bilal.webp");
 
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
-  const [failedVideos, setFailedVideos] = useState<Record<string, boolean>>({});
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -608,13 +607,15 @@ export default function About() {
             <div className="relative w-full h-full">
               {UPLOADED_REELS.includes(hoveredSlug) ? (
                 <video
-                  src={`/images/${hoveredSlug}-reel.webm`}
                   autoPlay
                   loop
                   muted
                   playsInline
                   className="w-full h-full object-cover"
-                />
+                >
+                  <source src={`/images/${hoveredSlug}-reel.webm`} type="video/webm" />
+                  <source src={`/images/${hoveredSlug}-reel.mp4`} type="video/mp4" />
+                </video>
               ) : (
                 <img
                   src={

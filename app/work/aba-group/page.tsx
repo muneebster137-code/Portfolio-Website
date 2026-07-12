@@ -35,10 +35,11 @@ export default function AbaGroupHub() {
     "/images/aba-group-artifact-3.webp"
   ]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const handlePlayToggle = () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || videoError) return;
     if (isPlaying) {
       videoRef.current.pause();
       setIsPlaying(false);
@@ -47,6 +48,8 @@ export default function AbaGroupHub() {
         setIsPlaying(true);
       }).catch((err) => {
         console.error("Video failed to play: ", err);
+        setVideoError(true);
+        setIsPlaying(false);
       });
     }
   };
@@ -254,16 +257,24 @@ export default function AbaGroupHub() {
                   {/* HTML5 video element */}
                   <video
                     ref={videoRef}
-                    src="/images/aba-group-reel.webm"
                     loop
+                    muted
                     playsInline
-                    className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${isPlaying ? "opacity-100" : "opacity-0"}`}
+                    className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${isPlaying && !videoError ? "opacity-100" : "opacity-0"}`}
                     onPlay={() => setIsPlaying(true)}
                     onPause={() => setIsPlaying(false)}
-                  />
+                    onError={() => {
+                      console.warn("Video reel missing or failed to load for aba-group");
+                      setVideoError(true);
+                      setIsPlaying(false);
+                    }}
+                  >
+                    <source src="/images/aba-group-reel.webm" type="video/webm" />
+                    <source src="/images/aba-group-reel.mp4" type="video/mp4" />
+                  </video>
 
-                  {/* Mockup visual layers (only show when not playing) */}
-                  {!isPlaying && (
+                  {/* Mockup visual layers (only show when not playing or video failed) */}
+                  {(!isPlaying || videoError) && (
                     <>
                       <div className="absolute inset-0 bg-gradient-to-b from-ink via-accent-primary/25 to-ink z-0" />
                       <div className="absolute inset-0 grain-overlay opacity-[0.14] z-10 pointer-events-none" />
@@ -287,7 +298,7 @@ export default function AbaGroupHub() {
                             className="w-1.5 rounded-full bg-accent-primary"
                             style={{
                               height: `${Math.floor(Math.random() * 70) + 20}%`,
-                              animation: `shimmer 1.4s infinite ease-in-out alternate`,
+                              animation: videoError ? "none" : `shimmer 1.4s infinite ease-in-out alternate`,
                               animationDelay: `${i * 0.12}s`
                             }}
                           />
@@ -301,8 +312,17 @@ export default function AbaGroupHub() {
 
                   {/* Controllers */}
                   <div className="z-20 relative flex flex-col items-center gap-2 mt-auto">
-                    <button className="w-11 h-11 rounded-full bg-paper text-ink flex items-center justify-center shadow-lg group-hover:scale-105 active:scale-95 transition-all">
-                      {isPlaying ? (
+                    <button 
+                      disabled={videoError}
+                      className={`w-11 h-11 rounded-full bg-paper text-ink flex items-center justify-center shadow-lg active:scale-95 transition-all ${
+                        videoError ? "opacity-40 cursor-not-allowed" : "group-hover:scale-105"
+                      }`}
+                    >
+                      {videoError ? (
+                        <svg className="w-4 h-4 fill-none stroke-current text-accent-primary" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+                        </svg>
+                      ) : isPlaying ? (
                         <svg className="w-4 h-4 fill-current text-accent-primary" viewBox="0 0 24 24">
                           <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                         </svg>
@@ -313,7 +333,7 @@ export default function AbaGroupHub() {
                       )}
                     </button>
                     <span className="text-[8px] font-sans font-bold uppercase tracking-widest text-paper/80">
-                      {isPlaying ? "Pause Reel" : "Play Campaign Reel"}
+                      {videoError ? "Visualization Mode" : isPlaying ? "Pause Reel" : "Play Campaign Reel"}
                     </span>
                   </div>
 
@@ -321,7 +341,7 @@ export default function AbaGroupHub() {
                   <div className="w-full bg-paper/20 h-[3px] rounded-full overflow-hidden z-20 relative mt-2">
                     <div 
                       className="h-full bg-accent-primary rounded-full transition-all duration-100" 
-                      style={{ width: isPlaying ? "100%" : "50%" }}
+                      style={{ width: videoError ? "100%" : isPlaying ? "100%" : "50%" }}
                     />
                   </div>
                 </div>
