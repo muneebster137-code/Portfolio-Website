@@ -44,12 +44,22 @@ export default function AbaGroupHub() {
       videoRef.current.pause();
       setIsPlaying(false);
     } else {
+      // Try playing unmuted first as this is user-triggered click gesture
+      videoRef.current.muted = false;
       videoRef.current.play().then(() => {
         setIsPlaying(true);
       }).catch((err) => {
-        console.error("Video failed to play: ", err);
-        setVideoError(true);
-        setIsPlaying(false);
+        console.warn("Unmuted play blocked by browser policies, falling back to muted...", err);
+        if (videoRef.current) {
+          videoRef.current.muted = true;
+          videoRef.current.play().then(() => {
+            setIsPlaying(true);
+          }).catch((fallbackErr) => {
+            console.error("Video failed to play completely: ", fallbackErr);
+            setVideoError(true);
+            setIsPlaying(false);
+          });
+        }
       });
     }
   };
@@ -258,7 +268,6 @@ export default function AbaGroupHub() {
                   <video
                     ref={videoRef}
                     loop
-                    muted
                     playsInline
                     className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300 ${isPlaying && !videoError ? "opacity-100" : "opacity-0"}`}
                     onPlay={() => setIsPlaying(true)}
