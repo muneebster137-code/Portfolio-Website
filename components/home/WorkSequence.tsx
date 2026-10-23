@@ -65,7 +65,7 @@ export function WorkSequence({ images }: { images: Record<string, string | undef
   const s = SLIDES[index];
 
   return (
-    <section ref={wrap} id="work" data-chapter="Work" className="relative h-[560vh] bg-void" aria-labelledby="work-h">
+    <section ref={wrap} id="work" data-chapter="Work" className="relative h-[560svh] bg-void" aria-labelledby="work-h">
       <div className="sticky top-0 h-svh overflow-hidden">
         <p className="absolute left-5 md:left-10 top-28 label text-fog z-[200]">04 · Inside the dream</p>
         <h2 id="work-h" className="sr-only">Selected case studies</h2>

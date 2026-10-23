@@ -7,6 +7,9 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
+// On phones the address bar resizes the viewport while scrolling; re-measuring then makes pinned
+// scenes jump. Sections use svh heights, so those resizes can be ignored.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 let lenis: Lenis | null = null;
 
@@ -29,12 +32,15 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     if (!reduced && !sessionStorage.getItem("mmb-loaded")) lenis.stop();
 
     lenis.on("scroll", ScrollTrigger.update);
+    const onRotate = () => setTimeout(() => ScrollTrigger.refresh(), 250);
+    window.addEventListener("orientationchange", onRotate);
     const tick = (time: number) => lenis?.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
       gsap.ticker.remove(tick);
+      window.removeEventListener("orientationchange", onRotate);
       lenis?.destroy();
       lenis = null;
     };
