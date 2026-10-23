@@ -10,6 +10,7 @@ import { dreamState } from "@/components/three/store";
 import { useInViewport } from "@/components/three/useInViewport";
 import { PRELOADER_DONE } from "@/components/shell/Preloader";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
+import { rustle } from "@/components/fx/sound";
 import { StillIntro } from "./StillScenes";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -44,6 +45,8 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
     if ((window as unknown as { __mmbReady?: boolean }).__mmbReady) play();
     else window.addEventListener(PRELOADER_DONE, play, { once: true });
 
+    // Which side of the page turn the reader is on, so the rustle plays once per turn, either way.
+    let turned = false;
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         defaults: { ease: "none" },
@@ -56,6 +59,10 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
         // The sheet reads the timeline's own (smoothed) progress, so captions and 3D move as one.
         onUpdate() {
           dreamState.progress = this.progress();
+          if (this.progress() > 0.7 !== turned) {
+            turned = !turned;
+            rustle();
+          }
         },
       });
       tl.set({}, {}, 1)

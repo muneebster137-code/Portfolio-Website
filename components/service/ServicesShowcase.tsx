@@ -11,6 +11,7 @@ import { useInViewport } from "@/components/three/useInViewport";
 import { getLenis } from "@/components/shell/SmoothScroll";
 import { showcaseState } from "@/components/three/store";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
+import { tone } from "@/components/fx/sound";
 import { StillServices } from "@/components/home/StillScenes";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -38,6 +39,12 @@ function AnimatedShowcase({ label, textures, intro = false }: Props) {
   const wrap = useRef<HTMLElement>(null);
   const meta = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
+  const firstTone = useRef(true);
+  // Each object on the shelf has its own note (only when the visitor has turned sound on).
+  useEffect(() => {
+    if (firstTone.current) firstTone.current = false;
+    else tone(index);
+  }, [index]);
   const active = useInViewport(wrap, "0px");
   const s = services[index];
   const segs = segmentsOf(s.href);

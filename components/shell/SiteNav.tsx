@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { identity, navLinks, services } from "@/lib/site";
 import { getLenis } from "./SmoothScroll";
+import { SoundToggle } from "@/components/fx/SoundToggle";
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
@@ -50,6 +51,7 @@ export function SiteNav() {
           <span className="type-x text-[22px] leading-none">MMB<span className="text-signal">.</span></span>
         </Link>
         <div className="pointer-events-auto flex items-center gap-2">
+          <SoundToggle />
           <Link href="/resume" className="hidden md:inline-flex h-11 items-center rounded-full bg-void/55 px-5 text-sm text-bone ring-1 ring-bone/10 backdrop-blur-xl backdrop-saturate-150 hover:ring-bone/40 transition">
             Resume
           </Link>

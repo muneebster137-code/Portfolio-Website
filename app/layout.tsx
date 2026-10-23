@@ -9,6 +9,8 @@ import { SiteFooter } from "@/components/shell/SiteFooter";
 import { DreamTransition } from "@/components/shell/DreamTransition";
 import { PencilTrail } from "@/components/fx/PencilTrail";
 import { SketchFilter } from "@/components/fx/SketchHover";
+import { Totem } from "@/components/fx/Totem";
+import { Limbo } from "@/components/fx/Limbo";
 import { identity } from "@/lib/site";
 import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
@@ -71,6 +73,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans bg-void text-bone antialiased">
         <SketchFilter />
         <PencilTrail />
+        <Totem />
+        <Limbo />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
         <AccentProvider>
           <SmoothScroll>
