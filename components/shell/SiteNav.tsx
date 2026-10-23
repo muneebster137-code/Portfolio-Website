@@ -46,12 +46,11 @@ export function SiteNav() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-5 md:px-8 pt-5 pointer-events-none">
-        <Link href="/" className="pointer-events-auto mix-blend-difference text-bone flex items-center gap-3" aria-label="Muhammad Muneeb Bilal, home">
+        <Link href="/" className="pointer-events-auto flex h-11 items-center gap-3 rounded-full bg-void/55 px-4 text-bone backdrop-blur-xl backdrop-saturate-150 ring-1 ring-bone/10" aria-label="Muhammad Muneeb Bilal, home">
           <span className="type-x text-[22px] leading-none">MMB<span className="text-signal">.</span></span>
-          <span className="label hidden md:inline">N°01 / Creative engine</span>
         </Link>
         <div className="pointer-events-auto flex items-center gap-2">
-          <Link href="/resume" className="hidden md:inline-flex h-11 items-center rounded-full border border-hair bg-void/60 backdrop-blur-sm px-5 text-sm hover:border-bone transition-colors">
+          <Link href="/resume" className="hidden md:inline-flex h-11 items-center rounded-full bg-void/55 px-5 text-sm text-bone ring-1 ring-bone/10 backdrop-blur-xl backdrop-saturate-150 hover:ring-bone/40 transition">
             Resume
           </Link>
           <Link href="/contact" className="hidden sm:inline-flex h-11 items-center rounded-full bg-signal px-5 text-sm font-medium text-void hover:bg-bone transition-colors">
@@ -62,12 +61,12 @@ export function SiteNav() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls="site-menu"
-            className="h-11 inline-flex items-center gap-3 rounded-full bg-bone pl-5 pr-1.5 text-sm font-medium text-void"
+            className="h-11 inline-flex items-center gap-3 rounded-full bg-bone pl-5 pr-1.5 text-sm font-medium text-void shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-void/10"
           >
             {open ? "Close" : "Menu"}
-            <span className="grid place-items-center size-8 rounded-full bg-void" aria-hidden="true">
-              <span className={`block h-px w-3.5 bg-bone transition-transform duration-500 ${open ? "rotate-45 translate-y-px" : "-translate-y-[3px]"}`} />
-              <span className={`block h-px w-3.5 bg-bone transition-transform duration-500 ${open ? "-rotate-45 -translate-y-px" : "translate-y-[3px]"}`} />
+            <span className="relative size-8 rounded-full bg-void" aria-hidden="true">
+              <span className={`absolute left-1/2 top-1/2 -ml-[7px] h-px w-3.5 bg-bone transition-transform duration-500 ${open ? "rotate-45" : "-translate-y-[3px]"}`} />
+              <span className={`absolute left-1/2 top-1/2 -ml-[7px] h-px w-3.5 bg-bone transition-transform duration-500 ${open ? "-rotate-45" : "translate-y-[3px]"}`} />
             </span>
           </button>
         </div>
@@ -90,7 +89,7 @@ export function SiteNav() {
                 className="group relative overflow-hidden border-t border-hair py-2 flex items-baseline gap-6"
               >
                 <span className="label text-fog w-10">{String(i + 1).padStart(2, "0")}</span>
-                <span className="menu-link block type-x text-[13vw] lg:text-[8.5vw] leading-[0.9] transition-[font-stretch,color] duration-500 group-hover:text-signal [font-stretch:125%] group-hover:[font-stretch:62%]">
+                <span className="menu-link block type-x text-[13vw] lg:text-[8.5vw] leading-[0.9] transition-colors duration-500 group-hover:text-signal">
                   {l.label}
                 </span>
               </Link>
@@ -102,7 +101,6 @@ export function SiteNav() {
               <ul className="space-y-2">
                 {services.map((s) => (
                   <li key={s.code} className="flex items-center gap-3 text-sm text-mist">
-                    <span className="size-3 rounded-[3px]" style={{ background: s.color }} />
                     {s.name}
                   </li>
                 ))}

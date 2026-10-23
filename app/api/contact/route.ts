@@ -1,42 +1,22 @@
 import { NextResponse } from "next/server";
 
+// Receives the contact form. It validates and logs the brief; delivery to muneebster137@gmail.com
+// needs an email service (for example Resend) and its API key, which are not set up yet.
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, projectType, message } = body;
+    const { name, email, brand, service, brief, timeline } = await request.json();
 
-    // Server-side validation
-    if (!name || !email || !message) {
-      return NextResponse.json(
-        { message: "Name, email, and message fields are required." },
-        { status: 400 }
-      );
+    if (!name || !email || !brief) {
+      return NextResponse.json({ message: "Add your name, email and a short brief." }, { status: 400 });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ message: "That email address doesn't look right." }, { status: 400 });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { message: "Please supply a valid email address." },
-        { status: 400 }
-      );
-    }
-
-    // Console logging message details for Vercel/local developer logs
-    console.log(`[CONTACT FORM SUBMISSION LOG]`);
-    console.log(`Name: ${name}`);
-    console.log(`Email: ${email}`);
-    console.log(`Type: ${projectType}`);
-    console.log(`Message: ${message}`);
-
-    return NextResponse.json(
-      { message: "Message successfully simulated." },
-      { status: 200 }
-    );
+    console.log("[contact]", { name, email, brand, service, brief, timeline });
+    return NextResponse.json({ message: "Received." }, { status: 200 });
   } catch (error) {
-    console.error("Contact API routing error:", error);
-    return NextResponse.json(
-      { message: "Internal server error occurred while processing message." },
-      { status: 500 }
-    );
+    console.error("[contact] failed", error);
+    return NextResponse.json({ message: "Couldn't send that. Email muneebster137@gmail.com instead." }, { status: 500 });
   }
 }

@@ -6,26 +6,15 @@ import { useInViewport } from "./useInViewport";
 
 // Client-only wrappers so server pages can place 3D scenes. Each pauses while off screen.
 
-const HeroScene = dynamic(() => import("./HeroScene"), { ssr: false });
-const SwatchCardScene = dynamic(() => import("./SwatchCardScene"), { ssr: false });
+const ServiceObjectScene = dynamic(() => import("./ServiceObjectScene"), { ssr: false });
 const PackagingScene = dynamic(() => import("./PackagingScene"), { ssr: false });
 
-export function OpenFan({ className = "" }: { className?: string }) {
+export function ServiceObject({ index, className = "" }: { index: number; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const active = useInViewport(ref, "0px");
   return (
     <div ref={ref} className={className}>
-      <HeroScene active={active} fixedProgress={0.16} />
-    </div>
-  );
-}
-
-export function SwatchCard({ index, className = "" }: { index: number; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const active = useInViewport(ref, "0px");
-  return (
-    <div ref={ref} className={className}>
-      <SwatchCardScene index={index} active={active} />
+      <ServiceObjectScene index={index} active={active} />
     </div>
   );
 }

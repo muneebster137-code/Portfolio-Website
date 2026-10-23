@@ -66,14 +66,14 @@ html.lenis, html.lenis body {
   overflow: hidden;
 }
 
-html, body {
+/* Clip sideways overflow on the root only: overflow on <body> would make it a scroll container and break sticky scenes. */
+html {
   overflow-x: clip;
 }
 
 body {
   background-color: var(--void);
   color: var(--bone);
-  overflow-x: hidden;
   font-family: var(--font-geist), sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -84,11 +84,12 @@ body {
   color: var(--void);
 }
 
-/* Archivo width axis: 62% condensed to 125% expanded. In a layer so utilities can override. */
+/* One display voice: Archivo at normal width, sentence case. Weight carries the hierarchy, not width.
+   In a layer so utilities can override. */
 @layer components {
-  .type-x { font-family: var(--font-display); font-stretch: 125%; font-weight: 900; letter-spacing: -0.045em; text-transform: uppercase; }
-  .type-c { font-family: var(--font-display); font-stretch: 62%; letter-spacing: -0.01em; text-transform: uppercase; }
-  .type-m { font-family: var(--font-display); font-stretch: 75%; font-weight: 800; letter-spacing: -0.03em; text-transform: uppercase; }
+  .type-x { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.045em; }
+  .type-c { font-family: var(--font-display); font-weight: 300; letter-spacing: -0.04em; }
+  .type-m { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.03em; }
   .label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
   .outline-type { color: transparent; -webkit-text-stroke: 1.5px var(--stroke, var(--mist)); }
 
@@ -167,4 +168,13 @@ body {
   .custom-cursor-active * {
     cursor: none !important;
   }
+}
+
+/* Printing the resume page produces the CV PDF: paper colours, no site chrome. */
+@media print {
+  @page { margin: 16mm; }
+  html, body { background: #fff !important; color: #111 !important; }
+  body > *:not(main), .print\:hidden { display: none !important; }
+  .resume * { color: #111 !important; border-color: #ddd !important; opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .resume a { text-decoration: none !important; }
 }

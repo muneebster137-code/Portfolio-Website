@@ -61,7 +61,7 @@ export function ChapterHud() {
     return () => clearInterval(id);
   }, []);
 
-  if (markers.length === 0) return null;
+  if (markers.length < 3) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 hidden md:flex items-center gap-6 pl-8 pr-24 pb-4 pt-3 text-bone mix-blend-difference pointer-events-none">

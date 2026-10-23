@@ -26,7 +26,6 @@ export function OpeningVisual({ src, alt, accent, video, initials }: { src?: str
   return (
     <div ref={wrap} className="[perspective:2000px]">
       <div ref={plane} className="relative aspect-[16/9] md:aspect-[21/9] origin-bottom">
-        <span className="absolute inset-0 rounded-[26px] translate-x-4 translate-y-4" style={{ background: accent }} aria-hidden="true" />
         <div className="absolute inset-0 rounded-[26px] overflow-hidden border border-hair bg-carbon">
           {src ? (
             <Image src={src} alt={alt} fill priority sizes="100vw" className="object-cover" />

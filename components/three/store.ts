@@ -1,9 +1,8 @@
 // Mutable scroll and pointer state shared between GSAP (DOM) and react-three-fiber (render loop).
 // Plain objects on purpose: they change every frame and must not trigger React renders.
 
-export const heroState = { progress: 0, intro: 0 };
-export const servicesState = { progress: 0 };
-export const processState = { progress: 0 };
+export const dreamState = { progress: 0 };
+export const showcaseState = { head: 0 };
 export const pointer = { x: 0, y: 0 };
 
 if (typeof window !== "undefined") {

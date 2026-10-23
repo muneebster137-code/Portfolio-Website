@@ -7,7 +7,6 @@ export function CaseCard({ c, tall = false }: { c: CaseStudy; tall?: boolean }) 
   const n = String(caseIndex(c.slug) + 1).padStart(2, "0");
   return (
     <Link href={`/case-studies/${c.slug}`} className={`group relative block ${tall ? "h-[560px]" : "h-[440px]"}`} data-rise>
-      <span className="absolute inset-0 rounded-[22px] translate-x-3 translate-y-3 transition-transform duration-500 group-hover:translate-x-5 group-hover:translate-y-5" style={{ background: c.accent }} aria-hidden="true" />
       <span className="absolute inset-0 rounded-[22px] overflow-hidden border border-hair bg-carbon">
         {c.cover ? (
           <Image src={c.cover} alt={`${c.title} key visual`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.06]" />

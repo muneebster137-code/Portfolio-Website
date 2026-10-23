@@ -1,79 +1,46 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
 import { testimonials } from "@/lib/site";
-import { TiltCard } from "@/components/motion/TiltCard";
+import { featuredCerts } from "@/lib/profile";
+import { Reveal } from "@/components/motion/Reveal";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
-
+// What clients say, read slowly; the credentials sit underneath as a single line.
 export function Proof() {
-  const root = useRef<HTMLElement>(null);
   const [lead, ...rest] = testimonials;
-
-  useEffect(() => {
-    let split: SplitText | undefined;
-    const ctx = gsap.context(() => {
-      split = new SplitText(".pf-quote", { type: "lines", mask: "lines" });
-      gsap.from(split.lines, { yPercent: 105, stagger: 0.08, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: ".pf-quote", start: "top 80%" } });
-      gsap.from(".pf-cred", { yPercent: 100, duration: 1.4, ease: "expo.out", scrollTrigger: { trigger: ".pf-cred", start: "top 90%" } });
-      gsap.from(".pf-card", { y: 80, autoAlpha: 0, stagger: 0.12, duration: 1.1, ease: "expo.out", scrollTrigger: { trigger: ".pf-cards", start: "top 85%" } });
-    }, root);
-    return () => {
-      split?.revert();
-      ctx.revert();
-    };
-  }, []);
-
   return (
-    <section ref={root} id="proof" data-chapter="Proof" className="relative bg-void border-t border-hair" aria-labelledby="proof-h">
-      <div className="mx-auto max-w-[1600px] px-5 md:px-8 pt-28 md:pt-36 pb-28">
-        <div className="grid md:grid-cols-[5fr_7fr] gap-10 items-end border-b border-hair pb-14">
-          <div className="overflow-hidden">
-            <p className="pf-cred type-x text-[34vw] md:text-[17vw] leading-[0.78]">30+</p>
-          </div>
-          <div>
-            <p className="label text-fog">06 / Proof</p>
-            <p className="font-display [font-stretch:88%] text-[26px] md:text-[34px] leading-[1.15] mt-4 max-w-[640px]">
-              Certifications from international institutions. Six featured, each with its verification link.
-            </p>
-            <ul className="flex flex-wrap gap-2 mt-7">
-              {Array.from({ length: 6 }, (_, i) => (
-                <li key={i}>
-                  <a href="#" className="label inline-flex h-11 items-center rounded-full border border-bone/20 px-4 hover:border-bone">
-                    [Certification {i + 1}] ↗
-                  </a>
+    <section id="proof" data-chapter="Proof" className="relative bg-void border-t border-hair" aria-labelledby="proof-h">
+      <div className="mx-auto max-w-[1600px] px-5 md:px-10 py-36 md:py-44">
+        <Reveal>
+          <h2 id="proof-h" className="label text-fog" data-fade>What clients say</h2>
+          <figure className="mt-14">
+            <blockquote data-words className="type-c text-[30px] md:text-[clamp(40px,4.4vw,76px)] leading-[1.08] max-w-[1300px]">
+              &ldquo;{lead.quote}&rdquo;
+            </blockquote>
+            <figcaption className="label text-fog mt-8" data-fade>{lead.name} · {lead.title}</figcaption>
+          </figure>
+        </Reveal>
+
+        <Reveal className="mt-28 grid md:grid-cols-2 gap-14 md:gap-24">
+          {rest.map((t) => (
+            <figure key={t.name} data-fade>
+              <blockquote className="text-[18px] md:text-[20px] leading-[1.6] text-bone/85">&ldquo;{t.quote}&rdquo;</blockquote>
+              <figcaption className="label text-fog mt-6">{t.name} · {t.title}</figcaption>
+            </figure>
+          ))}
+        </Reveal>
+
+        <Reveal className="mt-32 pt-10 border-t border-hair grid md:grid-cols-[auto_1fr] gap-6 md:gap-16 items-baseline">
+          <p className="type-x text-[64px] md:text-[88px] leading-none" data-fade>30+</p>
+          <div data-fade>
+            <p className="text-[18px] text-bone/85">Certifications from international institutions. Six featured, each with its verification link.</p>
+            <ul className="mt-6 grid sm:grid-cols-2 gap-x-10">
+              {featuredCerts.map((c) => (
+                <li key={c.n} className="border-t border-hair py-3">
+                  <a href={c.url} target="_blank" rel="noreferrer" className="block text-[15px] leading-snug hover:text-signal transition-colors">{c.course}</a>
+                  <span className="label text-fog">{c.issuer}</span>
                 </li>
               ))}
             </ul>
           </div>
-        </div>
-
-        <h2 id="proof-h" className="label text-fog mt-24">What clients say</h2>
-        <figure className="relative mt-10">
-          <span className="type-x absolute -top-[0.35em] -left-[0.04em] text-signal text-[180px] md:text-[260px] leading-none select-none" aria-hidden="true">“</span>
-          <blockquote className="pf-quote relative font-display font-light [font-stretch:85%] text-[32px] md:text-[clamp(40px,4.6vw,76px)] leading-[1.04] tracking-[-0.02em] max-w-[1280px] pt-16 md:pt-24">
-            {lead.quote}
-          </blockquote>
-          <figcaption className="label text-fog mt-8">
-            {lead.name} · {lead.title} · {lead.source}
-          </figcaption>
-        </figure>
-
-        <div className="pf-cards grid md:grid-cols-2 gap-6 mt-20">
-          {rest.map((t) => (
-            <TiltCard key={t.name} className="pf-card h-full rounded-[22px] border border-hair bg-carbon p-7 md:p-9">
-              <figure>
-                <blockquote className="text-[17px] md:text-[19px] leading-[1.6] text-bone/85">{t.quote}</blockquote>
-                <figcaption className="label text-fog mt-7">
-                  {t.name} · {t.title}
-                </figcaption>
-              </figure>
-            </TiltCard>
-          ))}
-        </div>
+        </Reveal>
       </div>
     </section>
   );

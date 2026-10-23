@@ -25,7 +25,7 @@ export function SiteShowcase({ sites }: { sites: Website[] }) {
                   <span className="size-2 rounded-full bg-bone/20" /><span className="size-2 rounded-full bg-bone/20" /><span className="size-2 rounded-full bg-bone/20" />
                   <span className="label text-fog ml-3 truncate">{s.name}</span>
                 </div>
-                <div className="relative h-[460px] grid place-items-center text-center [background:repeating-linear-gradient(135deg,transparent_0_14px,rgba(238,234,225,0.04)_14px_15px)]">
+                <div className="relative h-[460px] grid place-items-center text-center">
                   <span>
                     <span className="label text-fog block">To supply</span>
                     <span className="block text-sm text-mist mt-2">Showcase image, 1440 × 3115 px{s.status === "Client mockup" ? " (mockup)" : ""}</span>

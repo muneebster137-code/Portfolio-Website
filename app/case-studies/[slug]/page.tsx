@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { cases, getCase, caseIndex, onColor } from "@/lib/cases";
 import { serviceBySlug, testimonials } from "@/lib/site";
 import { Reveal } from "@/components/motion/Reveal";
-import { TiltCard } from "@/components/motion/TiltCard";
 import { MediaFrame } from "@/components/ui/MediaFrame";
 import { OpeningVisual } from "@/components/case/OpeningVisual";
 import { CtaBand } from "@/components/page/CtaBand";
@@ -37,23 +36,21 @@ export default async function CaseStudy({ params }: Params) {
   const words = c.title.split(" ");
   const [first, rest] = [words[0], words.slice(1).join(" ")];
   const steps = c.steps ?? [];
+  const shownWork = c.work.filter((m) => m.src);
+  const pendingWork = c.work.length - shownWork.length;
   // Expanded caps run about 1.05em per letter; long single words shrink to fit the row.
   const titleVw = Math.min(13.5, 92 / first.length);
 
   return (
     <article style={{ ["--case" as string]: c.accent }}>
-      <Reveal as="header" immediate className="mx-auto max-w-[1600px] px-5 md:px-8 pt-32">
+      <Reveal as="header" immediate className="mx-auto max-w-[1600px] px-5 md:px-10 pt-32">
         <div className="flex flex-wrap justify-between gap-3 label text-fog" data-fade>
           <span>
             <Link href="/case-studies" className="hover:text-bone">Case studies</Link> / {n} of 11
           </span>
-          <span className="flex flex-wrap gap-2">
-            {c.major && <span className="rounded-full bg-bone px-3 py-1.5 text-void">Major case study</span>}
-            {c.via && <span className="rounded-full border border-bone/20 px-3 py-1.5">via Watch How Malaysia</span>}
-            <span className="rounded-full border border-bone/20 px-3 py-1.5 flex items-center gap-2"><span className="size-2 rounded-full" style={{ background: c.accent }} />{c.year}</span>
-          </span>
+          <span>{[c.major && "Major case study", c.via && "via Watch How Malaysia", c.year].filter(Boolean).join(" · ")}</span>
         </div>
-        <h1 className="uppercase leading-[0.82] mt-12">
+        <h1 className="leading-[0.82] mt-12">
           <span className="block overflow-hidden"><span data-line className="block type-x" style={{ fontSize: `${titleVw}vw` }}>{first}</span></span>
           <span className="flex flex-wrap items-end gap-x-[3vw] gap-y-4">
             {rest && <span className="block overflow-hidden"><span data-line className="block type-c font-light text-mist text-[15vw] md:text-[10vw]">{rest}</span></span>}
@@ -62,35 +59,35 @@ export default async function CaseStudy({ params }: Params) {
         </h1>
       </Reveal>
 
-      <section aria-label="Opening visual" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-16">
+      <section aria-label="Opening visual" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-16">
         <OpeningVisual src={c.cover || undefined} alt={`${c.title} opening visual`} accent={c.accent} video={c.opening === "video"} initials={c.shortTitle.slice(0, 2)} />
       </section>
 
-      <Reveal as="section" aria-label="Snapshot" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-24">
-        <dl className="grid md:grid-cols-[1.2fr_0.5fr_1.2fr_1.2fr] border border-hair rounded-[20px] overflow-hidden bg-carbon">
+      <Reveal as="section" aria-label="Snapshot" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-24">
+        <dl className="grid md:grid-cols-[1.2fr_0.5fr_1.2fr_1.2fr] gap-x-8 border-t border-hair">
           {[
             ["Client", c.client],
             ["Year", c.year],
             ["Role", c.role],
             ["Services", c.services],
           ].map(([k, v], idx) => (
-            <div key={k} data-rise className={`p-6 ${idx < 3 ? "border-b md:border-b-0 md:border-r border-hair" : ""}`}>
+            <div key={k} data-rise className={`pt-6 pb-2 ${idx < 3 ? "border-b md:border-b-0 border-hair pb-6 md:pb-2" : ""}`}>
               <dt className="label text-fog">{k}</dt>
-              <dd className={`mt-3 ${k === "Year" ? "type-x text-[36px] leading-none" : "text-[16px] leading-snug"}`}>{v}</dd>
+              <dd className="mt-3 text-[16px] leading-snug">{v}</dd>
             </div>
           ))}
         </dl>
       </Reveal>
 
       {c.intro && (
-        <Reveal as="section" aria-label={c.intro.label} className="mx-auto max-w-[1600px] px-5 md:px-8 mt-32 grid md:grid-cols-[260px_minmax(0,1fr)] gap-8">
+        <Reveal as="section" aria-label={c.intro.label} className="mx-auto max-w-[1600px] px-5 md:px-10 mt-32 grid md:grid-cols-[260px_minmax(0,1fr)] gap-8">
           <p className="label text-fog" data-fade>{c.intro.label}</p>
-          <p data-words className="font-display [font-stretch:88%] text-[28px] md:text-[clamp(32px,3.4vw,56px)] leading-[1.1] tracking-[-0.015em]">{c.intro.text}</p>
+          <p data-words className="font-display text-[28px] md:text-[clamp(32px,3.4vw,56px)] leading-[1.1] tracking-[-0.015em]">{c.intro.text}</p>
         </Reveal>
       )}
 
       {steps.length > 0 && (
-        <section aria-labelledby="story-h" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-32">
+        <section aria-labelledby="story-h" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-32">
           <Reveal>
             <h2 id="story-h" className="label text-fog" data-fade>The story · problem to result</h2>
           </Reveal>
@@ -124,70 +121,69 @@ export default async function CaseStudy({ params }: Params) {
       )}
 
       {c.did && (
-        <Reveal as="section" aria-label="What I did" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-32 grid md:grid-cols-[260px_minmax(0,1fr)] gap-8">
+        <Reveal as="section" aria-label="What I did" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-32 grid md:grid-cols-[260px_minmax(0,1fr)] gap-8">
           <p className="label text-fog" data-fade>What I did</p>
-          <p data-words className="font-display [font-stretch:88%] text-[28px] md:text-[clamp(32px,3.4vw,56px)] leading-[1.1] tracking-[-0.015em]">{c.did}</p>
+          <p data-words className="font-display text-[28px] md:text-[clamp(32px,3.4vw,56px)] leading-[1.1] tracking-[-0.015em]">{c.did}</p>
         </Reveal>
       )}
 
       {c.optionalLine && (
-        <Reveal as="figure" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-36">
-          <blockquote data-words className="font-display font-light [font-stretch:80%] text-[34px] md:text-[clamp(40px,5vw,84px)] leading-[1.02] tracking-[-0.02em] max-w-[1300px]">{c.optionalLine}</blockquote>
+        <Reveal as="figure" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-36">
+          <blockquote data-words className="font-display font-light text-[34px] md:text-[clamp(40px,5vw,84px)] leading-[1.02] tracking-[-0.02em] max-w-[1300px]">{c.optionalLine}</blockquote>
         </Reveal>
       )}
 
       {c.units && (
-        <section aria-labelledby="units-h" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-32">
+        <section aria-labelledby="units-h" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-32">
           <Reveal>
             <p className="label text-fog" data-fade>Five units, five voices</p>
             <h2 id="units-h" className="overflow-hidden mt-4"><span data-line className="block type-x text-[11vw] md:text-[5vw] leading-[0.9]">The units</span></h2>
           </Reveal>
-          <Reveal className="mt-10 grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <Reveal className="mt-10 grid sm:grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-10">
             {c.units.map((u, ui) => (
-              <TiltCard key={u.name} className="h-full">
-                <div data-rise className="h-full min-h-[240px] rounded-[20px] border border-hair bg-carbon p-6 flex flex-col justify-between">
-                  <span className="label text-fog">{String(ui + 1).padStart(2, "0")}</span>
-                  <span>
-                    <span className="type-m block text-[28px] leading-none">{u.name}</span>
-                    <span className="block text-mist mt-3 text-[15px] leading-snug">{u.text}</span>
-                  </span>
-                </div>
-              </TiltCard>
+              <div key={u.name} data-rise className="border-t border-hair pt-5">
+                <span className="label text-fog">{String(ui + 1).padStart(2, "0")}</span>
+                <span className="type-m block text-[26px] leading-none mt-6">{u.name}</span>
+                <span className="block text-mist mt-3 text-[15px] leading-snug">{u.text}</span>
+              </div>
             ))}
           </Reveal>
         </section>
       )}
 
-      <section aria-labelledby="work-h" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-36">
+      <section aria-labelledby="work-h" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-36">
         <Reveal className="flex flex-wrap items-end justify-between gap-6">
           <h2 id="work-h" className="overflow-hidden"><span data-line className="block type-x text-[13vw] md:text-[6vw] leading-[0.88]">The work</span></h2>
           <p className="label text-fog" data-fade>{c.workLabel}</p>
         </Reveal>
-        <Reveal className={`mt-12 grid gap-6 md:gap-8 ${c.work.every((m) => m.ratio === "tall") ? "grid-cols-2 md:grid-cols-4" : c.work.every((m) => m.ratio === "square") ? "sm:grid-cols-3" : "md:grid-cols-2"}`}>
-          {c.work.map((m, mi) => (
-            <div key={mi} data-rise className={mi % 2 && c.work.length > 2 ? "md:translate-y-16" : ""}>
-              <MediaFrame media={m} plate={mi === 0 ? c.accent : undefined} sizes="(min-width: 768px) 50vw, 100vw" />
+        {pendingWork > 0 && shownWork.length === 0 && (
+          <p className="mt-10 label text-fog">{pendingWork} pieces to come</p>
+        )}
+        <Reveal className={`mt-12 grid gap-6 md:gap-8 ${shownWork.every((m) => m.ratio === "tall") ? "grid-cols-2 md:grid-cols-4" : shownWork.every((m) => m.ratio === "square") ? "sm:grid-cols-3" : "md:grid-cols-2"}`}>
+          {shownWork.map((m, mi) => (
+            <div key={mi} data-rise className={mi % 2 && shownWork.length > 2 ? "md:translate-y-16" : ""}>
+              <MediaFrame media={m} sizes="(min-width: 768px) 50vw, 100vw" />
             </div>
           ))}
         </Reveal>
       </section>
 
       {(c.website || c.notes || c.clients) && (
-        <Reveal as="section" aria-label="Details" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-40 grid md:grid-cols-2 gap-6">
+        <Reveal as="section" aria-label="Details" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-40 grid md:grid-cols-2 gap-6">
           {c.website && (
-            <div data-rise className="rounded-[20px] border border-hair bg-carbon p-7">
+            <div data-rise className="border-t border-hair pt-7">
               <p className="label text-fog">Website</p>
               <p className="mt-4 text-[17px] leading-relaxed">{c.website}</p>
             </div>
           )}
           {c.notes?.map((note) => (
-            <div key={note.label} data-rise className="rounded-[20px] border border-hair bg-carbon p-7">
+            <div key={note.label} data-rise className="border-t border-hair pt-7">
               <p className="label text-fog">{note.label}</p>
               <p className="mt-4 text-[17px] leading-relaxed">{note.text}</p>
             </div>
           ))}
           {c.clients && (
-            <div data-rise className="rounded-[20px] border border-hair bg-carbon p-7 md:col-span-2">
+            <div data-rise className="border-t border-hair pt-7 md:col-span-2">
               <p className="label text-fog">Clients the studio won</p>
               {c.clients.map((cl) =>
                 cl.slug ? (
@@ -208,31 +204,29 @@ export default async function CaseStudy({ params }: Params) {
       )}
 
       {quote && (
-        <Reveal as="figure" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-40 relative">
+        <Reveal as="figure" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-40 relative">
           <span className="type-x absolute -top-10 left-3 md:left-6 text-[160px] md:text-[220px] leading-none" style={{ color: c.accent }} aria-hidden="true">“</span>
-          <blockquote data-words className="relative pt-20 font-display font-light [font-stretch:85%] text-[30px] md:text-[clamp(36px,4.2vw,68px)] leading-[1.05] tracking-[-0.02em] max-w-[1250px]">{quote.quote}</blockquote>
+          <blockquote data-words className="relative pt-20 font-display font-light text-[30px] md:text-[clamp(36px,4.2vw,68px)] leading-[1.05] tracking-[-0.02em] max-w-[1250px]">{quote.quote}</blockquote>
           <figcaption className="label text-fog mt-8" data-fade>{quote.name} · {quote.title} · {quote.source}</figcaption>
         </Reveal>
       )}
 
-      <Reveal as="section" aria-label="Related" className="mx-auto max-w-[1600px] px-5 md:px-8 mt-40 grid md:grid-cols-2 gap-6">
-        <div data-rise className="rounded-[20px] border border-hair p-7">
+      <Reveal as="section" aria-label="Related" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-40 grid md:grid-cols-2 gap-6">
+        <div data-rise className="border-t border-hair pt-7">
           <p className="label text-fog">Related services</p>
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
             {c.relatedServices.map(serviceBySlug).filter((s) => s !== undefined).map((s) => (
-              <Link key={s.code} href={s.href} className="inline-flex h-12 items-center gap-2.5 rounded-full border border-bone/20 px-4 hover:border-bone transition-colors">
-                <span className="size-3 rounded-[3px]" style={{ background: s.color }} />
+              <Link key={s.code} href={s.href} className="text-[17px] underline decoration-bone/25 underline-offset-4 hover:decoration-bone">
                 {s.name}
               </Link>
             ))}
           </div>
         </div>
-        <div data-rise className="rounded-[20px] border border-hair p-7">
+        <div data-rise className="border-t border-hair pt-7">
           <p className="label text-fog">Related cases</p>
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
             {c.relatedCases.map(getCase).filter((x) => x !== undefined).map((x) => (
-              <Link key={x.slug} href={`/case-studies/${x.slug}`} className="inline-flex h-12 items-center gap-2.5 rounded-full border border-bone/20 px-4 hover:border-bone transition-colors">
-                <span className="size-2.5 rotate-45" style={{ background: x.accent }} />
+              <Link key={x.slug} href={`/case-studies/${x.slug}`} className="text-[17px] underline decoration-bone/25 underline-offset-4 hover:decoration-bone">
                 {x.title}
               </Link>
             ))}
@@ -241,7 +235,7 @@ export default async function CaseStudy({ params }: Params) {
       </Reveal>
 
       <Link href={`/case-studies/${next.slug}`} className="group block mt-32 border-y border-hair">
-        <span className="mx-auto max-w-[1600px] px-5 md:px-8 py-14 md:py-20 flex flex-wrap items-end justify-between gap-6">
+        <span className="mx-auto max-w-[1600px] px-5 md:px-10 py-14 md:py-20 flex flex-wrap items-end justify-between gap-6">
           <span>
             <span className="label text-fog block">Next case · {String(caseIndex(next.slug) + 1).padStart(2, "0")} · {next.year}</span>
             <span className="type-x block text-[13vw] md:text-[8vw] leading-[0.84] mt-4 transition-colors duration-500 group-hover:text-[var(--next)]" style={{ ["--next" as string]: next.accent }}>{next.title}</span>

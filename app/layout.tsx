@@ -6,7 +6,7 @@ import { Preloader } from "@/components/shell/Preloader";
 import { SiteNav } from "@/components/shell/SiteNav";
 import { ChapterHud } from "@/components/shell/ChapterHud";
 import { SiteFooter } from "@/components/shell/SiteFooter";
-import { Chatbot } from "@/components/Chatbot";
+import { DreamTransition } from "@/components/shell/DreamTransition";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -52,7 +52,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <main>{children}</main>
             <SiteFooter />
             <ChapterHud />
-            <Chatbot />
+            <DreamTransition />
           </SmoothScroll>
         </AccentProvider>
       </body>
