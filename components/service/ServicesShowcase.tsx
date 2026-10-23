@@ -70,20 +70,20 @@ export function ServicesShowcase({ label, textures, intro = false }: { label?: s
         <h2 className="type-x mt-6 text-[12vw] md:text-[clamp(48px,6.4vw,116px)] leading-[0.92] max-w-[1200px]">One engine. Seven ways to bring your vision to life.</h2>
       </header>
     )}
-    <section ref={wrap} id="services" data-chapter="Engine" aria-labelledby="shelf-h" className="relative h-[720vh] bg-void text-bone">
+    <section ref={wrap} id="services" data-chapter="Engine" aria-labelledby="shelf-h" className="relative h-[720svh] bg-void text-bone">
       <div className="sticky top-0 h-svh overflow-hidden">
         <div className="absolute inset-0">
           <ServiceObjects active={active} textures={textures} />
         </div>
 
-        <div ref={meta} key={index} className="absolute inset-0 px-5 md:px-10 pt-24 pb-10 md:pb-16 flex flex-col justify-between pointer-events-none">
+        <div ref={meta} key={index} className="absolute inset-0 px-5 md:px-10 pt-24 pb-24 md:pb-16 flex flex-col justify-between pointer-events-none">
           <div className="max-w-[min(820px,62vw)]">
             <p className="label text-fog overflow-hidden"><span data-in className="block">{label ? `${label} · ` : ""}{String(index + 1).padStart(2, "0")} / 07 · {s.code}</span></p>
             <h2 id="shelf-h" className="overflow-hidden mt-4"><span data-in className="block type-x text-[11vw] md:text-[clamp(44px,5.6vw,104px)] leading-[0.92]">{s.name}</span></h2>
             <p className="overflow-hidden mt-4"><span data-in className="block type-c text-[6vw] md:text-[clamp(22px,2.4vw,40px)] leading-[1.1] text-mist">&ldquo;{s.hook}&rdquo;</span></p>
           </div>
           <div className="flex flex-wrap items-end justify-between gap-8">
-            <div className="hidden md:block text-[14px] text-bone/75">
+            <div className="hidden lg:block text-[14px] text-bone/75">
               <p className="label text-fog mb-3 overflow-hidden"><span data-in className="block">Segments</span></p>
               <ul className="columns-2 gap-10">
                 {segs.map((g) => <li key={g} className="overflow-hidden"><span data-in className="block py-0.5">{g}</span></li>)}

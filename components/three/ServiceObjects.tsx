@@ -244,12 +244,13 @@ function Arc({ textures }: { textures: ShelfTextures }) {
       const a = d * 0.62;
       const R = 7;
       const near = Math.max(0, 1 - Math.abs(d));
-      target.set(Math.sin(a) * R, Math.abs(d) * -0.1 + Math.sin(t * 0.8 + i) * 0.05, Math.cos(a) * R - R);
+      // Portrait screens: the object sits a little lower, between the heading and the number.
+      target.set(Math.sin(a) * R, Math.abs(d) * -0.1 + Math.sin(t * 0.8 + i) * 0.05 - (viewport.aspect < 1 ? 0.35 : 0), Math.cos(a) * R - R);
       g.position.lerp(target, k);
       const spin = near * Math.sin(t * 0.5) * 0.35;
       g.rotation.set(0.12 - pointer.y * 0.1 * near, -a * 0.9 + spin + pointer.x * 0.25 * near, (1 - near) * -0.18 * Math.sign(d));
       // Smaller windows get smaller objects so the credits and proof lines stay clear.
-      const fit = Math.min(1, viewport.width / 8.5);
+      const fit = Math.min(1, viewport.width / 8.5 + (viewport.aspect < 1 ? 0.2 : 0), viewport.height / 4.6);
       const s = (0.82 + 0.3 * smooth(0, 1, near)) * fit;
       g.scale.lerp(target.set(s, s, s), k);
 

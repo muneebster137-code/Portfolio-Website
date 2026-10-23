@@ -19,6 +19,8 @@ function Sheet({ backSrc }: { backSrc?: string }) {
   const { camera, viewport } = useThree();
   const [workTex, setWorkTex] = useState<THREE.Texture | null>(null);
   const lastCurl = useRef(-1);
+  const started = useRef(false);
+  const curlCentre = useRef(0);
 
   const sketch = useMemo(() => new SketchSheet(), []);
   const geo = useMemo(() => new THREE.PlaneGeometry(W, H, SEG, 1), []);
@@ -48,7 +50,10 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     const t = state.clock.elapsedTime;
     // Below roughly 5:4 there is no room beside the headline, so the sheet waits underneath it.
     const narrow = viewport.aspect < 1.25;
-    const k = 1 - Math.pow(0.0015, dt);
+    // Progress is already smoothed by the scroll timeline; only a light damping on top, and none
+    // on the first frame so the sheet starts where it belongs instead of flying in from the centre.
+    const k = started.current ? 1 - Math.pow(0.00002, dt) : 1;
+    started.current = true;
 
     const center = smooth(0.1, 0.22, p);
     const turn = smooth(0.62, 0.86, p);
@@ -63,12 +68,15 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     const idleScale = narrow ? 0.45 : Math.min(0.74, viewport.height / 5.2);
 
     // While the page turns, the sheet leans a little so the curl reads in depth.
-    tmp.pc.set(0, narrow ? 0.2 : 0.22, 0);
+    tmp.pc.set(0, narrow ? 0.26 : 0.22, 0);
     tmp.e.set(pointer.y * 0.04 + turn * (1 - turn) * 0.5, pointer.x * 0.06 - turn * (1 - turn) * 0.9, Math.sin(t * 0.5) * 0.01);
     tmp.qc.setFromEuler(tmp.e);
     idlePos.lerp(tmp.pc, center);
     tmp.q.slerp(tmp.qc, center);
-    const scale = THREE.MathUtils.lerp(idleScale, narrow ? 0.66 : 0.8, center);
+    const turnShrink = narrow ? 1 - 0.32 * Math.sin(Math.PI * turn) : 1;
+    const scale = THREE.MathUtils.lerp(idleScale, narrow ? 0.66 : 0.8, center) * turnShrink;
+    // Keep the sheet's visible middle on screen while it curls (its shape shifts sideways as it turns).
+    idlePos.x -= curlCentre.current * scale * center;
 
     g.position.lerp(idlePos, k);
     g.quaternion.slerp(tmp.q, k);
@@ -106,6 +114,9 @@ function Sheet({ backSrc }: { backSrc?: string }) {
       }
       geo.attributes.position.needsUpdate = true;
       geo.computeVertexNormals();
+      geo.computeBoundingBox();
+      const box = geo.boundingBox!;
+      curlCentre.current = (box.min.x + box.max.x) / 2;
     }
   });
 

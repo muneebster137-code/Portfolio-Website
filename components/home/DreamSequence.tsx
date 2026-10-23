@@ -43,7 +43,10 @@ export function DreamSequence({ sheetBack }: { sheetBack?: string }) {
           start: "top top",
           end: "bottom bottom",
           scrub: 0.6,
-          onUpdate: (self) => (dreamState.progress = self.progress),
+        },
+        // The sheet reads the timeline's own (smoothed) progress, so captions and 3D move as one.
+        onUpdate() {
+          dreamState.progress = this.progress();
         },
       });
       tl.set({}, {}, 1)
@@ -75,7 +78,7 @@ export function DreamSequence({ sheetBack }: { sheetBack?: string }) {
   }, []);
 
   return (
-    <section ref={wrap} id="intro" data-chapter="Reality" className="relative h-[780vh]" aria-label="Introduction">
+    <section ref={wrap} id="intro" data-chapter="Reality" className="relative h-[780svh]" aria-label="Introduction">
       <div className="sticky top-0 h-svh overflow-hidden bg-void">
         <div className="absolute inset-0">
           <PaperScene active={active} backSrc={sheetBack} />
