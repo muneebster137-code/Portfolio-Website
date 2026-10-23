@@ -4,7 +4,11 @@ import Link from "next/link";
 import { about, allTestimonials, education } from "@/lib/profile";
 import { processSteps } from "@/lib/site";
 import { Reveal } from "@/components/motion/Reveal";
+import { SectionHead } from "@/components/page/SectionHead";
 import { CtaBand } from "@/components/page/CtaBand";
+import { Placeholder } from "@/components/ui/Slot";
+import { aboutPortrait } from "@/lib/media-manifest";
+import { resolveSlot } from "@/lib/media.server";
 
 export const metadata: Metadata = {
   title: "About | Muhammad Muneeb Bilal",
@@ -16,6 +20,7 @@ const tilt = ["-rotate-[1.4deg]", "rotate-[0.8deg]", "-rotate-[0.4deg]"];
 
 export default function AboutPage() {
   const [first, ...rest] = about.copy;
+  const portrait = resolveSlot(aboutPortrait);
   return (
     <>
       <Reveal as="header" immediate className="mx-auto max-w-[1600px] px-5 md:px-10 pt-36 pb-24 grid lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] gap-14 items-end">
@@ -28,13 +33,13 @@ export default function AboutPage() {
           <p data-fade className="mt-10 max-w-[460px] text-[18px] leading-[1.6] text-mist">{about.intro}</p>
         </div>
         <figure data-fade className="relative aspect-[4/5] w-full max-w-[460px] lg:justify-self-end overflow-hidden rounded-[6px] bg-carbon">
-          <Image src="/images/muneeb-bilal.webp" alt="Portrait of Muhammad Muneeb Bilal" fill priority sizes="(min-width: 1024px) 34vw, 100vw" className="object-cover grayscale" />
+          {portrait.src ? <Image src={portrait.src} alt="Portrait of Muhammad Muneeb Bilal" fill priority sizes="(min-width: 1024px) 34vw, 100vw" className="object-cover grayscale" /> : <Placeholder slot={portrait} />}
         </figure>
       </Reveal>
 
       <section aria-labelledby="facts-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24">
         <Reveal>
-          <h2 id="facts-h" className="label text-fog" data-fade>Seven facts</h2>
+          <SectionHead id="facts-h" label="01" title="Seven facts" />
         </Reveal>
         <Reveal as="ol" className="mt-10 border-t border-hair">
           {about.facts.map((f, i) => (
@@ -54,7 +59,7 @@ export default function AboutPage() {
 
       <section aria-labelledby="about-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24 md:py-36">
         <Reveal>
-          <h2 id="about-h" className="label text-fog" data-fade>About</h2>
+          <SectionHead id="about-h" label="02" title="About me" />
           <p data-words className="type-c mt-10 text-[32px] md:text-[clamp(40px,4.6vw,80px)] leading-[1.05] max-w-[1200px]">{first}</p>
         </Reveal>
         <Reveal className="mt-20 grid md:grid-cols-2 gap-10 md:gap-16 md:pl-[25%]">
@@ -75,7 +80,7 @@ export default function AboutPage() {
 
       <section aria-labelledby="story-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24 md:py-36">
         <Reveal>
-          <h2 id="story-h" className="label text-fog" data-fade>My story</h2>
+          <SectionHead id="story-h" label="03" title="My story" />
         </Reveal>
         <Reveal className="mt-12 grid md:grid-cols-3 gap-6 md:gap-8">
           {about.story.map((part, i) => (
@@ -93,7 +98,7 @@ export default function AboutPage() {
 
       <section aria-labelledby="quotes-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24 md:py-36">
         <Reveal>
-          <h2 id="quotes-h" className="label text-fog" data-fade>What clients say</h2>
+          <SectionHead id="quotes-h" label="04" title="What clients say" />
         </Reveal>
         <Reveal as="ul" className="mt-10 border-t border-hair">
           {allTestimonials.map((t) => (
@@ -111,7 +116,7 @@ export default function AboutPage() {
 
       <section aria-labelledby="edu-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24 md:py-32">
         <Reveal className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-8 border-t border-hair pt-10">
-          <h2 id="edu-h" className="label text-fog" data-fade>Education</h2>
+          <SectionHead id="edu-h" label="05" title="Education" />
           <div data-fade>
             <p className="type-x text-[30px] md:text-[clamp(32px,3.2vw,52px)] leading-[1.05]">{education.degree}</p>
             <p className="text-mist mt-4 text-[17px]">{education.detail}</p>

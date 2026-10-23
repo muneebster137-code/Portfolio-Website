@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const Section = ({ id, title, children }: { id?: string; title: string; children: React.ReactNode }) => (
   <Reveal as="section" id={id} aria-label={title} className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] gap-6 md:gap-12 border-t border-hair pt-8 mt-20 print:mt-8 print:break-inside-avoid-page">
-    <h2 className="label text-fog" data-fade>{title}</h2>
+    <h2 className="type-x text-[28px] md:text-[clamp(28px,2.6vw,44px)] leading-[1.05]" data-fade>{title}</h2>
     <div data-fade>{children}</div>
   </Reveal>
 );

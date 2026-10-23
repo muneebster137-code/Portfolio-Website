@@ -1,6 +1,7 @@
 import { testimonials } from "@/lib/site";
 import { featuredCerts } from "@/lib/profile";
 import { Reveal } from "@/components/motion/Reveal";
+import { SectionHead } from "@/components/page/SectionHead";
 
 // What clients say, read slowly; the credentials sit underneath as a single line.
 export function Proof() {
@@ -9,7 +10,7 @@ export function Proof() {
     <section id="proof" data-chapter="Proof" className="relative bg-void border-t border-hair" aria-labelledby="proof-h">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 py-36 md:py-44">
         <Reveal>
-          <h2 id="proof-h" className="label text-fog" data-fade>What clients say</h2>
+          <SectionHead id="proof-h" label="Testimonials" title="What clients say" />
           <figure className="mt-14">
             <blockquote data-words className="type-c text-[30px] md:text-[clamp(40px,4.4vw,76px)] leading-[1.08] max-w-[1300px]">
               &ldquo;{lead.quote}&rdquo;

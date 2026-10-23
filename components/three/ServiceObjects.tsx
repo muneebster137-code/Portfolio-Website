@@ -8,16 +8,23 @@ import { pointer, showcaseState, smooth } from "./store";
 import { useSwatchTextures } from "./useSwatchTextures";
 import { CARD_H, CARD_W } from "./swatchTexture";
 
-const IMG = {
-  social: "/images/anebos-studios-artifact-1.webp",
-  video: "/images/trenddeck.webp",
-  print: "/images/facingnorth.webp",
-  web: "/images/beatrix-konnect.webp",
-  pack: "/images/treats-for-life.webp",
-  deck1: "/images/aba-group.webp",
-  deck2: "/images/anebos-studios.webp",
-  deck3: "/images/trenddeck-artifact-1.webp",
-};
+// What an object shows before its picture is supplied: a quiet graphite card.
+let placeholderUrl = "";
+function placeholder() {
+  if (placeholderUrl) return placeholderUrl;
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#1B1E24";
+  ctx.fillRect(0, 0, 256, 256);
+  ctx.strokeStyle = "rgba(238,234,225,0.25)";
+  ctx.strokeRect(12, 12, 232, 232);
+  placeholderUrl = c.toDataURL();
+  return placeholderUrl;
+}
+
+// Pictures for each object, in shelf order; they come from the media/home/engine slots.
+export type ShelfTextures = (string | undefined)[][];
 
 // Crop a 16:9 image to fill a surface of the given aspect.
 function cover(tex: THREE.Texture, aspect: number) {
@@ -70,8 +77,8 @@ function discTexture(img: HTMLImageElement, label: string) {
   return t;
 }
 
-function Phone() {
-  const tex = useTexture(IMG.social);
+function Phone({ src }: { src?: string }) {
+  const tex = useTexture(src ?? placeholder());
   const map = useMemo(() => cover(tex.clone(), 1.12 / 2.36), [tex]);
   return (
     <group>
@@ -86,8 +93,8 @@ function Phone() {
   );
 }
 
-function Disc() {
-  const tex = useTexture(IMG.video);
+function Disc({ src }: { src?: string }) {
+  const tex = useTexture(src ?? placeholder());
   const top = useMemo(() => discTexture(tex.image as HTMLImageElement, "REELS"), [tex]);
   const disc = useRef<THREE.Mesh>(null);
   useFrame((_, dt) => {
@@ -105,8 +112,8 @@ function Disc() {
   );
 }
 
-function Magazine() {
-  const tex = useTexture(IMG.print);
+function Magazine({ src }: { src?: string }) {
+  const tex = useTexture(src ?? placeholder());
   const map = useMemo(() => cover(tex.clone(), 1.7 / 2.3), [tex]);
   return (
     <group>
@@ -149,8 +156,8 @@ function SwatchFan() {
   );
 }
 
-function Browser() {
-  const tex = useTexture(IMG.web);
+function Browser({ src }: { src?: string }) {
+  const tex = useTexture(src ?? placeholder());
   const map = useMemo(() => cover(tex.clone(), 2.7 / 1.5), [tex]);
   return (
     <group>
@@ -171,8 +178,8 @@ function Browser() {
   );
 }
 
-function PackBox() {
-  const tex = useTexture(IMG.pack);
+function PackBox({ src }: { src?: string }) {
+  const tex = useTexture(src ?? placeholder());
   const front = useMemo(() => cover(tex.clone(), 1.5 / 2), [tex]);
   return (
     <mesh rotation={[0, 0.5, 0]}>
@@ -187,8 +194,8 @@ function PackBox() {
   );
 }
 
-function Slides() {
-  const [a, b, c] = useTexture([IMG.deck1, IMG.deck2, IMG.deck3]);
+function Slides({ srcs = [] }: { srcs?: (string | undefined)[] }) {
+  const [a, b, c] = useTexture([0, 1, 2].map((k) => srcs[k] ?? placeholder()));
   const maps = useMemo(() => [c, b, a].map((t) => cover(t.clone(), 16 / 9)), [a, b, c]);
   return (
     <group>
@@ -207,10 +214,22 @@ function Slides() {
   );
 }
 
-export const OBJECTS = [Phone, Disc, Magazine, SwatchFan, Browser, PackBox, Slides];
+// One shelf object by index, with its pictures.
+export function ShelfObject({ index, textures = [] }: { index: number; textures?: (string | undefined)[] }) {
+  const [a] = textures;
+  switch (index) {
+    case 0: return <Phone src={a} />;
+    case 1: return <Disc src={a} />;
+    case 2: return <Magazine src={a} />;
+    case 3: return <SwatchFan />;
+    case 4: return <Browser src={a} />;
+    case 5: return <PackBox src={a} />;
+    default: return <Slides srcs={textures} />;
+  }
+}
 
 // Seven objects on an arc, like a shelf of records; the one in front turns slowly to show itself.
-function Arc() {
+function Arc({ textures }: { textures: ShelfTextures }) {
   const groups = useRef<(THREE.Group | null)[]>([]);
   const target = useMemo(() => new THREE.Vector3(), []);
   const { viewport } = useThree();
@@ -252,10 +271,10 @@ function Arc() {
 
   return (
     <>
-      {OBJECTS.map((Obj, i) => (
+      {Array.from({ length: 7 }, (_, i) => (
         <group key={i} ref={(g) => { groups.current[i] = g; }} position={[i * 3, 0, -6]}>
           <Suspense fallback={null}>
-            <Obj />
+            <ShelfObject index={i} textures={textures[i]} />
           </Suspense>
         </group>
       ))}
@@ -264,13 +283,13 @@ function Arc() {
   );
 }
 
-export default function ServiceObjects({ active }: { active: boolean }) {
+export default function ServiceObjects({ active, textures }: { active: boolean; textures: ShelfTextures }) {
   return (
     <Canvas flat dpr={[1, 1.75]} frameloop={active ? "always" : "never"} camera={{ position: [0, 0.35, 7.6], fov: 32 }} gl={{ antialias: true, alpha: true }} aria-hidden="true">
       <ambientLight intensity={0.9} />
       <spotLight position={[0, 6, 6]} angle={0.45} penumbra={0.9} intensity={60} distance={20} />
       <directionalLight position={[-5, 2, 3]} intensity={0.35} color="#EEEAE1" />
-      <Arc />
+      <Arc textures={textures} />
     </Canvas>
   );
 }

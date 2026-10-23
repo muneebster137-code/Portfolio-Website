@@ -19,7 +19,7 @@ const PaperScene = dynamic(() => import("@/components/three/PaperScene"), { ssr:
 const SUB_START = 0.24;
 const SUB_LEN = 0.065;
 
-export function DreamSequence() {
+export function DreamSequence({ sheetBack }: { sheetBack?: string }) {
   const wrap = useRef<HTMLElement>(null);
   const active = useInViewport(wrap, "0px");
 
@@ -78,7 +78,7 @@ export function DreamSequence() {
     <section ref={wrap} id="intro" data-chapter="Reality" className="relative h-[780vh]" aria-label="Introduction">
       <div className="sticky top-0 h-svh overflow-hidden bg-void">
         <div className="absolute inset-0">
-          <PaperScene active={active} />
+          <PaperScene active={active} backSrc={sheetBack} />
         </div>
 
         {/* 01 · Reality */}

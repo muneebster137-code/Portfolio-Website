@@ -1,5 +1,6 @@
 import { processSteps } from "@/lib/site";
 import { Reveal } from "@/components/motion/Reveal";
+import { SectionHead } from "@/components/page/SectionHead";
 
 // A quiet interlude: three lines, one motion each.
 export function Process() {
@@ -7,7 +8,7 @@ export function Process() {
     <section id="process" data-chapter="Process" className="relative bg-void" aria-labelledby="process-h">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 py-36 md:py-48">
         <Reveal>
-          <h2 id="process-h" className="label text-fog" data-fade>How I work</h2>
+          <SectionHead id="process-h" label="Process" title="How I work" />
         </Reveal>
         <ol className="mt-16 space-y-20 md:space-y-28">
           {processSteps.map((s) => (

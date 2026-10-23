@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { services, serviceBySlug } from "@/lib/site";
@@ -7,7 +6,10 @@ import { getServicePage, servicePages } from "@/lib/services-content";
 import { getCase, onColor } from "@/lib/cases";
 import { Reveal } from "@/components/motion/Reveal";
 import { ServiceObject, PackagingModel } from "@/components/three/LazyScenes";
-import { MediaFrame } from "@/components/ui/MediaFrame";
+import { MediaSlot } from "@/components/ui/Slot";
+import { VideoSlot } from "@/components/ui/VideoSlot";
+import { brandMedia, homeMedia, packagingModel, serviceMedia, videographyHook, websiteShowcase, type Slot } from "@/lib/media-manifest";
+import { resolveAll, resolveSlot, type Resolved } from "@/lib/media.server";
 import { CaseCard } from "@/components/page/CaseCard";
 import { CtaBand } from "@/components/page/CtaBand";
 import { SegmentRail } from "@/components/service/SegmentRail";
@@ -24,8 +26,29 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return page ? { title: page.metaTitle, description: page.metaDescription } : {};
 }
 
-const spanFor = (ratio: string | undefined, allSquare: boolean) =>
-  allSquare ? "" : ratio === "tall" ? "col-span-1" : "col-span-2";
+const WIDE = new Set(["16/9", "a4-land", "7/4", "16/10"]);
+
+// A segment's slots laid out by their shape: wide pieces get more room, reels and posts sit in rows.
+function SlotGrid({ slots }: { slots: Resolved[] }) {
+  const mixed = slots.some((x) => WIDE.has(x.ratio)) && slots.some((x) => !WIDE.has(x.ratio));
+  const allWide = slots.every((x) => WIDE.has(x.ratio));
+  const cols = slots.length === 2 && !mixed ? "md:grid-cols-2" : "md:grid-cols-3";
+  return (
+    <div className={`mt-10 grid gap-5 md:gap-6 items-start ${allWide ? "grid-cols-1" : "grid-cols-2"} ${cols}`}>
+      {slots.map((m) => (
+        <div key={m.path} data-rise className={mixed && WIDE.has(m.ratio) ? "col-span-2" : ""}>
+          {m.kind === "video" ? <VideoSlot slot={m} /> : <MediaSlot slot={m} sizes="(min-width: 768px) 33vw, 50vw" />}
+          <p className="label text-fog mt-3">{m.label}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const engineFor = (i: number): Slot[] => {
+  const e = homeMedia.engine;
+  return [[e.social], [e.video], [e.print], [], [e.web], [e.packaging], e.decks][i];
+};
 
 export default async function ServiceDetail({ params }: Params) {
   const { slug } = await params;
@@ -37,7 +60,12 @@ export default async function ServiceDetail({ params }: Params) {
   const next = services[(i + 1) % services.length];
   const tint = `color-mix(in srgb, ${s.color} 11%, #060708)`;
   const swatchText = s.color === "#EEEAE1" ? "#EEEAE1" : s.color;
-  const related = page.relatedCases.map(getCase).filter((c) => c !== undefined);
+  // Branding shows each brand's own material instead of case-study cards.
+  const related = page.brands ? [] : page.relatedCases.map(getCase).filter((c) => c !== undefined);
+  const media = resolveAll(serviceMedia[slug] ?? {});
+  const hook = page.hookVideo ? resolveSlot(videographyHook) : undefined;
+  const model = page.model3d ? resolveSlot(packagingModel) : undefined;
+  const objectTextures = (resolveAll(engineFor(i)) as Resolved[]).map((x) => x.src);
 
   return (
     <>
@@ -63,18 +91,13 @@ export default async function ServiceDetail({ params }: Params) {
               </ul>
             )}
           </div>
-          <ServiceObject index={i} className="relative h-[52vh] lg:h-[78vh]" />
+          <ServiceObject index={i} textures={objectTextures} className="relative h-[52vh] lg:h-[78vh]" />
         </div>
       </Reveal>
 
       {page.hookVideo && (
         <Reveal as="section" aria-label="Opening clip" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24">
-          <div data-rise className="relative aspect-[16/9] rounded-[22px] border border-hair bg-carbon overflow-hidden grid place-items-center text-center">
-            <span className="px-6">
-              <span className="label text-fog block">Opening clip · 5 seconds · to supply</span>
-              <span className="block text-mist mt-3 max-w-[460px]">A bullet is fired and hits a balloon. It slows right before impact as the camera fades in. No music, only action sound.</span>
-            </span>
-          </div>
+          {hook && <div data-rise><VideoSlot slot={hook} /></div>}
           <p data-words className="mt-16 font-display font-light text-[30px] md:text-[clamp(36px,4.4vw,72px)] leading-[1.05] tracking-[-0.02em] max-w-[1300px]">{page.hookVideo.line}</p>
         </Reveal>
       )}
@@ -86,10 +109,10 @@ export default async function ServiceDetail({ params }: Params) {
               <p className="label text-fog" data-fade>Segment 00 · 3D models</p>
               <h2 id="model-h" className="overflow-hidden mt-4"><span data-line className="block type-x text-[11vw] md:text-[5vw] leading-[0.9]">Turn it in your hands</span></h2>
             </div>
-            <p className="label text-fog" data-fade>Drag to rotate · placeholder until the model is supplied</p>
+            <p className="label text-fog" data-fade>Drag to rotate</p>
           </Reveal>
           <div className="mt-10 h-[70vh] rounded-[22px] border border-hair overflow-hidden" style={{ background: tint }}>
-            <PackagingModel className="size-full cursor-grab active:cursor-grabbing" />
+            <PackagingModel modelSrc={model?.src} boxTexture={objectTextures[0]} className="size-full cursor-grab active:cursor-grabbing" />
           </div>
         </section>
       )}
@@ -99,9 +122,7 @@ export default async function ServiceDetail({ params }: Params) {
           <SegmentRail names={page.segments.map((g) => g.name)} color={s.color} />
           <div className="space-y-32">
             {page.segments.map((g, gi) => {
-              const shown = g.media.filter((m) => m.src);
-              const pending = g.media.length - shown.length;
-              const allSquare = shown.every((m) => m.ratio === "square");
+              const slots = (media[g.id] ?? []) as Resolved[];
               return (
                 <Reveal key={g.name} as="article" id={`seg-${gi}`} aria-labelledby={`seg-h-${gi}`}>
                   <div className="flex flex-wrap items-end justify-between gap-6 border-t border-hair pt-8">
@@ -117,21 +138,7 @@ export default async function ServiceDetail({ params }: Params) {
                       <Link data-fade href={`/case-studies/${g.caseSlug}`} className="text-[15px] underline decoration-bone/25 underline-offset-4 hover:decoration-bone">View case study</Link>
                     )}
                   </div>
-                  {shown.length > 0 && (
-                    <div className={`mt-10 grid gap-5 md:gap-6 ${allSquare ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2 md:grid-cols-4"}`}>
-                      {shown.map((m, mi) => (
-                        <div key={mi} data-rise className={spanFor(m.ratio, allSquare)}>
-                          <MediaFrame media={m} sizes="(min-width: 768px) 40vw, 100vw" />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {/* Work not supplied yet: one quiet line instead of rows of empty frames. */}
-                  {pending > 0 && (
-                    <p className="mt-6 label text-fog" data-fade>
-                      {shown.length ? `${pending} more to come` : `${pending} ${pending === 1 ? "piece" : "pieces"} to come`}
-                    </p>
-                  )}
+                  {slots.length > 0 && <SlotGrid slots={slots} />}
                 </Reveal>
               );
             })}
@@ -139,37 +146,44 @@ export default async function ServiceDetail({ params }: Params) {
         </section>
       )}
 
-      {page.websites && <SiteShowcase sites={page.websites} />}
+      {page.websites && <SiteShowcase sites={page.websites.map((w) => ({ ...w, showcase: resolveSlot(websiteShowcase[w.slug]) }))} />}
 
       {page.brands && (
         <section aria-labelledby="brands-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24">
           <Reveal>
-            <p className="label text-fog" data-fade>A curated selection · 6 brands</p>
+            <p className="label text-fog" data-fade>A curated selection · 6 brands · logo, palette and guidelines for each</p>
             <h2 id="brands-h" className="overflow-hidden mt-4"><span data-line className="block type-x text-[12vw] md:text-[6vw] leading-[0.88]">Brands built</span></h2>
           </Reveal>
-          <Reveal className="mt-14 grid md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-14">
-            {page.brands.map((b) => {
+          <div className="mt-16 space-y-28">
+            {page.brands.map((b, bi) => {
+              const m = resolveAll(brandMedia[b.slug]);
               return (
-                <article key={b.name} data-rise className="flex flex-col">
-                  <div className="relative aspect-[16/10] overflow-hidden rounded-[6px] bg-carbon">
-                    {b.image ? (
-                      <Image src={b.image} alt={`${b.name} brand work`} fill sizes="(min-width: 1280px) 33vw, 50vw" className="object-cover" />
-                    ) : (
-                      <span className="absolute inset-0 grid place-items-center label text-fog">Brand work to come</span>
-                    )}
+                <Reveal as="article" key={b.slug} aria-labelledby={`brand-${b.slug}`}>
+                  <div className="flex flex-wrap items-end justify-between gap-6 border-t border-hair pt-6">
+                    <h3 id={`brand-${b.slug}`} className="type-x text-[10vw] md:text-[clamp(40px,4.4vw,76px)] leading-[0.95]">
+                      <span className="label text-fog block mb-3">{String(bi + 1).padStart(2, "0")}</span>
+                      {b.name}
+                    </h3>
+                    <p className="flex flex-wrap gap-x-6 gap-y-2 text-[15px]" data-fade>
+                      {b.guidelinesPdf && (
+                        <a href={b.guidelinesPdf} target="_blank" rel="noreferrer" className="underline decoration-bone/25 underline-offset-4 hover:decoration-bone">Brand guidelines (PDF)</a>
+                      )}
+                      <Link href={`/case-studies/${b.caseSlug}`} className="underline decoration-bone/25 underline-offset-4 hover:decoration-bone">Read the case study</Link>
+                    </p>
                   </div>
-                  <h3 className="type-m text-[26px] leading-none mt-5">{b.name}</h3>
-                  <p className="text-mist text-[15px] mt-2">Logo, colour palette, guidelines and brand assets.</p>
-                  <p className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
-                    <Link href={`/case-studies/${b.caseSlug}`} className="underline decoration-bone/25 underline-offset-4 hover:decoration-bone">Case study</Link>
-                    {b.guidelinesPdf && (
-                      <a href={b.guidelinesPdf} target="_blank" rel="noreferrer" className="underline decoration-bone/25 underline-offset-4 hover:decoration-bone">Brand guidelines (PDF)</a>
-                    )}
-                  </p>
-                </article>
+                  <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-5 items-start">
+                    {m.logos.map((l) => (
+                      <div key={l.path} data-rise><MediaSlot slot={l} sizes="25vw" /><p className="label text-fog mt-3">{l.label}</p></div>
+                    ))}
+                    <div data-rise className="col-span-2"><MediaSlot slot={m.palette} sizes="50vw" /><p className="label text-fog mt-3">{m.palette.label}</p></div>
+                    {m.guidelines.map((g) => (
+                      <div key={g.path} data-rise className="col-span-2"><MediaSlot slot={g} sizes="50vw" /><p className="label text-fog mt-3">{g.label}</p></div>
+                    ))}
+                  </div>
+                </Reveal>
               );
             })}
-          </Reveal>
+          </div>
         </section>
       )}
 

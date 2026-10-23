@@ -2,14 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CaseStudy } from "@/lib/cases";
 import { caseIndex } from "@/lib/cases";
+import { caseCovers } from "@/lib/media-manifest";
+import { resolveSlot } from "@/lib/media.server";
 
 export function CaseCard({ c, tall = false }: { c: CaseStudy; tall?: boolean }) {
   const n = String(caseIndex(c.slug) + 1).padStart(2, "0");
+  const cover = resolveSlot(caseCovers[c.slug]).src;
   return (
     <Link href={`/case-studies/${c.slug}`} className={`group relative block ${tall ? "h-[560px]" : "h-[440px]"}`} data-rise>
       <span className="absolute inset-0 rounded-[22px] overflow-hidden border border-hair bg-carbon">
-        {c.cover ? (
-          <Image src={c.cover} alt={`${c.title} key visual`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.06]" />
+        {cover ? (
+          <Image src={cover} alt={`${c.title} key visual`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.06]" />
         ) : (
           <span className="absolute inset-0 grid place-items-center type-x text-[18vw] md:text-[7vw] opacity-90" style={{ color: c.accent }} aria-hidden="true">
             {c.shortTitle.slice(0, 2)}

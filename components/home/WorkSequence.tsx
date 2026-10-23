@@ -9,11 +9,11 @@ import { featuredWork } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SLIDES = [...featuredWork.map((w) => ({ ...w, end: false })), { slug: "all", title: "All eleven case studies", summary: "From a first internship to a five-unit education group.", year: "2022 to 2026", index: "", image: "", end: true, tag: undefined, via: undefined, plate: "" }];
+const SLIDES = [...featuredWork.map((w) => ({ ...w, end: false })), { slug: "all", title: "All eleven case studies", summary: "From a first internship to a five-unit education group.", year: "2022 to 2026", index: "", end: true, tag: undefined, via: undefined, plate: "" }];
 
 // Shot 04, inside the dream: one case at a time, full size. Only the one in focus has colour;
 // the others wait in the dark, turned away.
-export function WorkSequence() {
+export function WorkSequence({ images }: { images: Record<string, string | undefined> }) {
   const wrap = useRef<HTMLElement>(null);
   const cards = useRef<(HTMLElement | null)[]>([]);
   const caption = useRef<HTMLDivElement>(null);
@@ -88,7 +88,11 @@ export function WorkSequence() {
                   </span>
                 </span>
               ) : (
-                <Image src={w.image} alt="" fill sizes="(min-width: 768px) 64vw, 86vw" className="object-cover" priority={i === 0} />
+                images[w.slug] ? (
+                  <Image src={images[w.slug]!} alt="" fill sizes="(min-width: 768px) 64vw, 86vw" className="object-cover" priority={i === 0} />
+                ) : (
+                  <span className="absolute inset-0 grid place-items-center text-center label text-fog">Image to come</span>
+                )
               )}
             </Link>
           ))}
