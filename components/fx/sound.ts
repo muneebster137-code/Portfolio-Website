@@ -69,3 +69,45 @@ export function tone(i: number) {
     o.stop(t + 1.5);
   });
 }
+
+// Graphite on paper: one looping, grainy noise that is only heard while the pencil is moving. Each call
+// sets the loudness from how fast the line is being drawn (px of line per second); if the calls stop,
+// it fades out by itself a moment later.
+let scratch: GainNode | null = null;
+function scratchVoice(c: AudioContext) {
+  if (scratch) return scratch;
+  const buf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate);
+  const d = buf.getChannelData(0);
+  let grain = 0;
+  for (let i = 0; i < d.length; i++) {
+    // Paper tooth: steady hiss with little catches where the point skips over a fibre.
+    if (Math.random() < 0.002) grain = 1;
+    grain *= 0.996;
+    d[i] = (Math.random() * 2 - 1) * (0.35 + grain * 0.9);
+  }
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  src.loop = true;
+  const high = c.createBiquadFilter();
+  high.type = "highpass";
+  high.frequency.value = 1800;
+  const band = c.createBiquadFilter();
+  band.type = "bandpass";
+  band.frequency.value = 4200;
+  band.Q.value = 0.6;
+  scratch = c.createGain();
+  scratch.gain.value = 0;
+  src.connect(high).connect(band).connect(scratch).connect(c.destination);
+  src.start();
+  return scratch;
+}
+
+export function pencil(speed: number) {
+  if (!enabled || !ctx) return;
+  const g = scratchVoice(ctx);
+  const t = ctx.currentTime;
+  const level = Math.min(1, speed / 1400) * 0.16;
+  g.gain.cancelScheduledValues(t);
+  g.gain.setTargetAtTime(level, t, 0.025);
+  g.gain.setTargetAtTime(0, t + 0.12, 0.05);
+}

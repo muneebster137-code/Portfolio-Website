@@ -13,8 +13,8 @@ export function TiltSheen({ max = 6, className = "rounded-[22px]" }: { max?: num
     const host = sheen?.parentElement;
     if (!sheen || !host || !window.matchMedia("(hover: hover) and (pointer: fine)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     gsap.set(host, { transformPerspective: 1000 });
-    const rx = gsap.quickTo(host, "rotationX", { duration: 0.6, ease: "power3.out" });
-    const ry = gsap.quickTo(host, "rotationY", { duration: 0.6, ease: "power3.out" });
+    const rx = gsap.quickTo(host, "rotationX", { duration: 0.35, ease: "power3.out" });
+    const ry = gsap.quickTo(host, "rotationY", { duration: 0.35, ease: "power3.out" });
     const move = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       const r = host.getBoundingClientRect();
@@ -43,7 +43,7 @@ export function TiltSheen({ max = 6, className = "rounded-[22px]" }: { max?: num
     <span
       ref={ref}
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-500 mix-blend-soft-light ${className}`}
+      className={`pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-200 mix-blend-soft-light ${className}`}
       style={{ background: "radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,250,240,0.55), rgba(255,250,240,0) 55%)" }}
     />
   );

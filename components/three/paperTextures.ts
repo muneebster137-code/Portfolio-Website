@@ -36,7 +36,7 @@ const STROKES: { pts: Pt[]; light?: boolean }[] = [
 ];
 
 const lengthOf = (pts: Pt[]) => pts.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]), 0);
-const TOTAL = STROKES.reduce((s, st) => s + lengthOf(st.pts), 0);
+export const TOTAL = STROKES.reduce((s, st) => s + lengthOf(st.pts), 0);
 
 // The first construction line: where the preloader's pencil line lands, and how much of the sketch it is.
 export const FIRST_LINE = STROKES[0].pts as [Pt, Pt];
@@ -86,6 +86,8 @@ export class SketchSheet {
   private dctx: CanvasRenderingContext2D;
   private doodleRev = 0;
   private lastDoodle: Pt | null = null;
+  // Pixels of line the visitor has drawn since the last frame read it (for the pencil sound).
+  doodleInk = 0;
   private last = "";
 
   constructor() {
@@ -126,6 +128,7 @@ export class SketchSheet {
       d.lineTo(p[0], p[1]);
       d.stroke();
       this.doodleRev++;
+      this.doodleInk += Math.hypot(p[0] - this.lastDoodle[0], p[1] - this.lastDoodle[1]);
     }
     this.lastDoodle = p;
   }

@@ -52,7 +52,7 @@ function AnimatedWork({ images }: { images: Record<string, string | undefined> }
       trigger: wrap.current,
       start: "top top",
       end: "bottom bottom",
-      scrub: 0.5,
+      scrub: true,
       onUpdate: (self) => {
         const head = self.progress * (n - 1);
         place(head);

@@ -67,7 +67,7 @@ export function SketchHover({ src, className = "" }: { src?: string; className?:
     <span
       ref={ref}
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-0 bg-cover bg-center transition-opacity duration-500 ${on ? "opacity-100" : "opacity-0"} ${className}`}
+      className={`pointer-events-none absolute inset-0 bg-cover bg-center transition-opacity duration-200 ${on ? "opacity-100" : "opacity-0"} ${className}`}
       style={{ backgroundImage: armed ? `url(${src})` : undefined, filter: armed ? "url(#mmb-pencil)" : undefined, maskImage: mask, WebkitMaskImage: mask }}
     />
   );

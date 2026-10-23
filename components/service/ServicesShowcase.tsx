@@ -75,7 +75,7 @@ function AnimatedShowcase({ label, textures, intro = false }: Props) {
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY;
     const span = el.offsetHeight - window.innerHeight;
-    getLenis()?.scrollTo(top + (span * Math.max(0, Math.min(6, i))) / 6, { duration: 1.2 });
+    getLenis()?.scrollTo(top + (span * Math.max(0, Math.min(6, i))) / 6, { duration: 0.8 });
   };
 
   return (

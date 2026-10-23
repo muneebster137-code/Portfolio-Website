@@ -19,8 +19,8 @@ export function SiteNav() {
       tl.current = gsap
         .timeline({ paused: true })
         .set(overlay.current, { autoAlpha: 1 })
-        .fromTo(overlay.current, { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: 0.8, ease: "expo.inOut" })
-        .from(".menu-link", { yPercent: 110, duration: 0.8, stagger: 0.06, ease: "expo.out" }, "-=0.35")
+        .fromTo(overlay.current, { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: 0.55, ease: "expo.inOut" })
+        .from(".menu-link", { yPercent: 110, duration: 0.6, stagger: 0.04, ease: "expo.out" }, "-=0.3")
         .from(".menu-aside > *", { autoAlpha: 0, y: 16, duration: 0.5, stagger: 0.04 }, "<0.1");
     }, overlay);
     return () => ctx.revert();

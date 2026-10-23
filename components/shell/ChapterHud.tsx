@@ -76,7 +76,7 @@ export function ChapterHud() {
             key={m.id}
             type="button"
             aria-label={`Go to ${m.label}`}
-            onClick={() => getLenis()?.scrollTo(`#${m.id}`, { duration: 1.6 })}
+            onClick={() => getLenis()?.scrollTo(`#${m.id}`, { duration: 1 })}
             className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 size-2.5 rotate-45 border border-bone transition-colors ${i <= current ? "bg-bone" : "bg-transparent"}`}
             style={{ left: `${m.at * 100}%` }}
           />

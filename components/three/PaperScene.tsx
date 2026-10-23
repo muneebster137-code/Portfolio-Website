@@ -4,7 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { dreamState, pointer, smooth } from "./store";
-import { FIRST, FIRST_LINE, SketchSheet, makeWorkSide, toSheet } from "./paperTextures";
+import { FIRST, FIRST_LINE, SketchSheet, TOTAL, makeWorkSide, toSheet } from "./paperTextures";
+import { pencil as pencilSound } from "@/components/fx/sound";
 
 const W = 2.1;
 const H = 2.97;
@@ -85,6 +86,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
   // The cursor on the sheet, in sheet units, while the visitor draws.
   const hover = useRef<{ x: number; y: number } | null>(null);
   const hoverW = useRef(0);
+  const lastDrawn = useRef(0);
 
   const sketch = useMemo(() => new SketchSheet(), []);
   const geo = useMemo(() => new THREE.PlaneGeometry(W, H, SEG, 1), []);
@@ -124,7 +126,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     const narrow = viewport.aspect < 1.25;
     // Progress is already smoothed by the scroll timeline; only a light damping on top, and none
     // on the first frame so the sheet starts where it belongs instead of flying in from the centre.
-    const k = started.current ? 1 - Math.pow(0.00002, dt) : 1;
+    const k = started.current ? 1 - Math.pow(1e-9, dt) : 1;
     started.current = true;
 
     const center = smooth(0.1, 0.22, p);
@@ -133,6 +135,12 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     const sketchDrawn = Math.max(FIRST * dreamState.first, smooth(0.24, 0.5, p));
 
     sketch.draw(sketchDrawn, smooth(0.5, 0.56, p), 1 - smooth(0.12, 0.22, p));
+
+    // The pencil is heard while it draws: the sketch as you scroll, or your own marks.
+    const inked = Math.abs(sketchDrawn - lastDrawn.current) * TOTAL + sketch.doodleInk;
+    lastDrawn.current = sketchDrawn;
+    sketch.doodleInk = 0;
+    if (dt > 0) pencilSound(inked / dt);
 
     // Idle: off to the side, turning slowly. Centre: square to the viewer, ready to be drawn on.
     const idlePos = narrow ? tmp.p.set(viewport.width * 0.18, -viewport.height * 0.8, -1) : tmp.p.set(viewport.width * 0.29, -0.05, 0);
@@ -168,7 +176,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     if (pen) {
       const engage = smooth(0.14, 0.24, p) * (1 - smooth(0.5, 0.58, p));
       const wantHover = hover.current && p < 0.1 ? 1 : 0;
-      hoverW.current += (wantHover - hoverW.current) * (1 - Math.pow(0.002, dt));
+      hoverW.current += (wantHover - hoverW.current) * (1 - Math.pow(0.0001, dt));
       const drawW = Math.max(engage, hoverW.current);
       if (engage > 0.001) {
         const [x, y] = toSheet(sketch.tipAt(sketchDrawn), W, H);
@@ -178,7 +186,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
       const target = tmp.a.copy(REST_TIP).lerp(tmp.aim, drawW);
       const leave = smooth(0.5, 0.6, p);
       target.addScaledVector(LEAVE, leave);
-      tmp.tip.copy(pen.position).lerp(target, started.current ? 1 - Math.pow(0.0004, dt) : 1);
+      tmp.tip.copy(pen.position).lerp(target, started.current ? 1 - Math.pow(1e-7, dt) : 1);
       pen.position.copy(tmp.tip);
       tmp.dir.copy(REST_DIR).lerp(DRAW_DIR, drawW).normalize();
       pen.quaternion.setFromUnitVectors(UP, tmp.dir);

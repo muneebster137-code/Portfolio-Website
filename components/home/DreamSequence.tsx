@@ -54,7 +54,7 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
           trigger: wrap.current,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.6,
+          scrub: true,
         },
         // The sheet reads the timeline's own (smoothed) progress, so captions and 3D move as one.
         onUpdate() {

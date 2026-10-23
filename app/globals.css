@@ -189,3 +189,6 @@ body {
 html { transition: filter 0.9s ease; }
 html.limbo { filter: invert(1) hue-rotate(180deg); }
 @keyframes eq { 0%, 100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+
+/* Press feedback: pills and buttons give a little under the finger, straight away. */
+a.rounded-full:active, button.rounded-full:active { scale: 0.96; }

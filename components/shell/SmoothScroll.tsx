@@ -21,9 +21,9 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // A light lerp keeps the glide but answers the wheel straight away; scenes follow it directly.
     lenis = new Lenis({
-      duration: reduced ? 0 : 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: reduced ? 1 : 0.16,
       smoothWheel: !reduced,
       touchMultiplier: 1.4,
     });

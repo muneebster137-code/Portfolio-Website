@@ -28,7 +28,7 @@ export function SegmentRail({ names, color }: { names: string[]; color: string }
           <li key={n}>
             <button
               type="button"
-              onClick={() => getLenis()?.scrollTo(`#seg-${i}`, { offset: -110, duration: 1.4 })}
+              onClick={() => getLenis()?.scrollTo(`#seg-${i}`, { offset: -110, duration: 0.9 })}
               aria-current={i === active}
               className={`flex items-center gap-3 text-left text-sm transition-colors ${i === active ? "text-bone" : "text-fog hover:text-mist"}`}
             >

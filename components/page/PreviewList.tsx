@@ -33,10 +33,10 @@ export function PreviewList({ items }: { items: PreviewItem[] }) {
     }, root);
     if (!el || window.matchMedia("(hover: none)").matches) return () => ctx.revert();
     gsap.set(el, { transformPerspective: 900 });
-    const x = gsap.quickTo(el, "x", { duration: 0.55, ease: "power3.out" });
-    const y = gsap.quickTo(el, "y", { duration: 0.55, ease: "power3.out" });
-    const ry = gsap.quickTo(el, "rotationY", { duration: 0.6, ease: "power3.out" });
-    const rz = gsap.quickTo(el, "rotation", { duration: 0.6, ease: "power3.out" });
+    const x = gsap.quickTo(el, "x", { duration: 0.32, ease: "power3.out" });
+    const y = gsap.quickTo(el, "y", { duration: 0.32, ease: "power3.out" });
+    const ry = gsap.quickTo(el, "rotationY", { duration: 0.4, ease: "power3.out" });
+    const rz = gsap.quickTo(el, "rotation", { duration: 0.4, ease: "power3.out" });
     let lastX = 0;
     const move = (e: PointerEvent) => {
       setTracking(true);
@@ -67,7 +67,7 @@ export function PreviewList({ items }: { items: PreviewItem[] }) {
           onFocus={() => setHover(i)}
           className="group relative grid grid-cols-[48px_minmax(0,1fr)] md:grid-cols-[80px_minmax(0,1.3fr)_minmax(0,1fr)_120px] gap-x-6 gap-y-2 items-center border-t border-hair py-6 md:py-8"
         >
-          <span className="absolute inset-0 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)]" style={{ background: `color-mix(in srgb, ${it.color} 7%, transparent)` }} aria-hidden="true" />
+          <span className="absolute inset-0 origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-300 ease-[cubic-bezier(.16,1,.3,1)]" style={{ background: `color-mix(in srgb, ${it.color} 7%, transparent)` }} aria-hidden="true" />
           <span className="relative label text-fog flex items-center gap-2">
             {it.index}
           </span>

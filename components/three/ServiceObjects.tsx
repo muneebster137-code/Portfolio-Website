@@ -359,7 +359,7 @@ function Arc({ textures }: { textures: ShelfTextures }) {
   useFrame((state, dt) => {
     const head = showcaseState.head;
     const t = state.clock.elapsedTime;
-    const k = 1 - Math.pow(0.002, dt);
+    const k = 1 - Math.pow(0.00002, dt);
     groups.current.forEach((g, i) => {
       if (!g) return;
       const d = i - head;

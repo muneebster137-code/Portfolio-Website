@@ -15,8 +15,8 @@ export function CaseCard({ c, tall = false }: { c: CaseStudy; tall?: boolean }) 
       <span className="absolute inset-0 rounded-[22px] overflow-hidden border border-hair bg-carbon">
         {cover ? (
           <>
-            <Image src={cover} alt={`${c.title} key visual`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.06]" />
-            <SketchHover src={cover} className="transition-[opacity,transform] duration-[1.2s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.06]" />
+            <Image src={cover} alt={`${c.title} key visual`} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.06]" />
+            <SketchHover src={cover} className="transition-[opacity,transform] duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.06]" />
           </>
         ) : (
           <span className="absolute inset-0 grid place-items-center type-x text-[18vw] md:text-[7vw] opacity-90" style={{ color: c.accent }} aria-hidden="true">

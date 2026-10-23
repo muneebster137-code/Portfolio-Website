@@ -39,6 +39,7 @@ export function DreamTransition() {
       if (pending.current) return;
       pending.current = true;
       const go = () => router.push(url.pathname + url.search + url.hash);
+      router.prefetch(url.pathname);
 
       const img = /^\/case-studies\/[^/]+$/.test(url.pathname) ? a.querySelector("img") : null;
       if (img) {
@@ -50,7 +51,7 @@ export function DreamTransition() {
         gsap
           .timeline({ onComplete: go })
           .set(el, { x: r.left, y: r.top, width: r.width, height: r.height })
-          .to(el, { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight, borderRadius: 0, duration: 0.85, ease: "power3.inOut" });
+          .to(el, { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight, borderRadius: 0, duration: 0.55, ease: "power3.inOut" });
         return;
       }
 
@@ -60,8 +61,8 @@ export function DreamTransition() {
       gsap
         .timeline({ onComplete: go })
         .set(root.current, { autoAlpha: 1 })
-        .fromTo(root.current, { clipPath: `circle(0% at ${at})` }, { clipPath: `circle(150% at ${at})`, duration: 0.9, ease: "power3.inOut" })
-        .fromTo(".it-text", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.05 }, "-=0.35");
+        .fromTo(root.current, { clipPath: `circle(0% at ${at})` }, { clipPath: `circle(150% at ${at})`, duration: 0.5, ease: "power2.in" })
+        .fromTo(".it-text", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.25, stagger: 0.04 }, "-=0.2");
     };
     window.addEventListener("click", onClick, true);
     return () => window.removeEventListener("click", onClick, true);
@@ -77,14 +78,14 @@ export function DreamTransition() {
       const raf = requestAnimationFrame(() => {
         const target = document.querySelector("[data-opening]")?.getBoundingClientRect();
         tl = gsap.timeline({
-          delay: 0.1,
+          delay: 0.05,
           onComplete: () => {
             el.remove();
             pending.current = false;
           },
         });
         if (target && target.top < window.innerHeight * 0.7) {
-          tl.to(el, { x: target.left, y: target.top, width: target.width, height: target.height, borderRadius: 26, duration: 0.9, ease: "power3.inOut" }).to(el, { autoAlpha: 0, duration: 0.35 });
+          tl.to(el, { x: target.left, y: target.top, width: target.width, height: target.height, borderRadius: 26, duration: 0.6, ease: "power3.inOut" }).to(el, { autoAlpha: 0, duration: 0.25 });
         } else {
           tl.to(el, { autoAlpha: 0, scale: 1.04, duration: 0.6, ease: "power2.out" });
         }
@@ -96,14 +97,14 @@ export function DreamTransition() {
     }
     const tl = gsap
       .timeline({
-        delay: 0.2,
+        delay: 0.05,
         onComplete: () => {
           pending.current = false;
           gsap.set(root.current, { autoAlpha: 0 });
         },
       })
-      .to(".it-text", { autoAlpha: 0, y: -10, duration: 0.3 })
-      .to(root.current, { clipPath: "circle(0% at 50% 50%)", duration: 0.9, ease: "power3.inOut" }, "-=0.05");
+      .to(".it-text", { autoAlpha: 0, y: -10, duration: 0.2 })
+      .to(root.current, { clipPath: "circle(0% at 50% 50%)", duration: 0.55, ease: "power2.out" }, "-=0.1");
     return () => {
       tl.kill();
     };
