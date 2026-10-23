@@ -7,6 +7,8 @@ import { SiteNav } from "@/components/shell/SiteNav";
 import { ChapterHud } from "@/components/shell/ChapterHud";
 import { SiteFooter } from "@/components/shell/SiteFooter";
 import { DreamTransition } from "@/components/shell/DreamTransition";
+import { PencilTrail } from "@/components/fx/PencilTrail";
+import { SketchFilter } from "@/components/fx/SketchHover";
 import { identity } from "@/lib/site";
 import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
@@ -67,6 +69,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${archivo.variable} ${geist.variable} ${geistMono.variable}`}>
       <body className="font-sans bg-void text-bone antialiased">
+        <SketchFilter />
+        <PencilTrail />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
         <AccentProvider>
           <SmoothScroll>

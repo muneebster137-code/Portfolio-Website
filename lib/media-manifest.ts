@@ -150,6 +150,7 @@ export const homeMedia = {
     social: one(`${H}/engine/social`, "phone", "Phone screen (Social media)"),
     video: one(`${H}/engine/video`, "1/1", "Disc artwork (Videography)"),
     print: one(`${H}/engine/print`, "a4", "Magazine cover (Print)"),
+    branding: one(`${H}/engine/branding`, "3/4", "Story book cover, loops on the book (Branding)", "video"),
     web: one(`${H}/engine/web`, "web", "Browser screen (Websites)"),
     packaging: one(`${H}/engine/packaging`, "3/4", "Box front (Packaging)"),
     decks: many(`${H}/engine`, "deck", 3, "16/9", "Deck slide (Pitch decks)"),

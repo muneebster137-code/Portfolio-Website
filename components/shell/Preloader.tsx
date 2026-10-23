@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { getLenis } from "./SmoothScroll";
+import { dreamState } from "@/components/three/store";
 
 export const PRELOADER_DONE = "mmb:preloader-done";
 
-// A single pencil line crosses the dark while the counter runs, then the dark lifts.
+// A single pencil line crosses the dark while the counter runs. Then the dark lifts and, on the home page,
+// the line flies onto the sheet and becomes its first pencil stroke.
 export function Preloader() {
   const root = useRef<HTMLDivElement>(null);
   const [count, setCount] = useState(0);
@@ -15,26 +17,44 @@ export function Preloader() {
   useEffect(() => {
     const seen = sessionStorage.getItem("mmb-loaded");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const finish = () => {
-      sessionStorage.setItem("mmb-loaded", "1");
-      setVisible(false);
+    const reveal = () => {
       getLenis()?.start();
       (window as unknown as { __mmbReady?: boolean }).__mmbReady = true;
       window.dispatchEvent(new Event(PRELOADER_DONE));
     };
+    const remove = () => {
+      sessionStorage.setItem("mmb-loaded", "1");
+      setVisible(false);
+    };
     if (seen || reduced) {
-      finish();
+      reveal();
+      remove();
       return;
     }
+
+    // The ending depends on whether the sheet is on screen to land on.
+    const end = () => {
+      const l = dreamState.line;
+      const tl = gsap.timeline({ onComplete: remove });
+      if (l && window.scrollY < 10) {
+        const len = Math.hypot(l.bx - l.ax, l.by - l.ay);
+        root.current!.style.pointerEvents = "none";
+        tl.to(root.current, { backgroundColor: "rgba(6,7,8,0)", duration: 0.6, ease: "power2.inOut" }, 0)
+          .to(".pl-svg", { x: l.ax, y: l.ay - window.innerHeight / 2, scaleX: len / window.innerWidth, rotation: (Math.atan2(l.by - l.ay, l.bx - l.ax) * 180) / Math.PI, transformOrigin: "0% 50%", duration: 0.6, ease: "power3.inOut" }, 0)
+          .add(reveal)
+          .to(".pl-svg", { autoAlpha: 0, duration: 0.5 }, ">-0.05");
+      } else {
+        tl.to(".pl-svg", { autoAlpha: 0, duration: 0.3 }).add(reveal).to(root.current, { autoAlpha: 0, duration: 0.6, ease: "power2.inOut" }, "-=0.1");
+      }
+    };
 
     const counter = { v: 0 };
     const ctx = gsap.context(() => {
       gsap
-        .timeline({ onComplete: finish })
+        .timeline({ onComplete: end })
         .to(counter, { v: 100, duration: 1.2, ease: "power2.inOut", onUpdate: () => setCount(Math.round(counter.v)) }, 0)
         .fromTo(".pl-line", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut" }, 0)
-        .to(".pl-meta, .pl-svg", { autoAlpha: 0, duration: 0.3 }, "+=0.05")
-        .to(root.current, { autoAlpha: 0, duration: 0.6, ease: "power2.inOut" }, "-=0.1");
+        .to(".pl-meta", { autoAlpha: 0, duration: 0.25 }, "+=0.05");
     }, root);
     return () => ctx.revert();
   }, []);

@@ -47,7 +47,7 @@ function SlotGrid({ slots }: { slots: Resolved[] }) {
 
 const engineFor = (i: number): Slot[] => {
   const e = homeMedia.engine;
-  return [[e.social], [e.video], [e.print], [], [e.web], [e.packaging], e.decks][i];
+  return [[e.social], [e.video], [e.print], [e.branding], [e.web], [e.packaging], e.decks][i];
 };
 
 export default async function ServiceDetail({ params }: Params) {

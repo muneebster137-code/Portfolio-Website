@@ -6,6 +6,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { featuredWork } from "@/lib/site";
+import { SketchHover } from "@/components/fx/SketchHover";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { StillWork } from "./StillScenes";
 
@@ -96,7 +97,10 @@ function AnimatedWork({ images }: { images: Record<string, string | undefined> }
                 </span>
               ) : (
                 images[w.slug] ? (
-                  <Image src={images[w.slug]!} alt="" fill sizes="(min-width: 768px) 64vw, 86vw" className="object-cover" priority={i === 0} />
+                  <>
+                    <Image src={images[w.slug]!} alt="" fill sizes="(min-width: 768px) 64vw, 86vw" className="object-cover" priority={i === 0} />
+                    <SketchHover src={images[w.slug]} />
+                  </>
                 ) : (
                   <span className="absolute inset-0 grid place-items-center text-center label text-fog">Image to come</span>
                 )

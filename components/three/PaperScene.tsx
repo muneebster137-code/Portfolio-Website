@@ -1,30 +1,96 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { dreamState, pointer, smooth } from "./store";
-import { SketchSheet, makeWorkSide } from "./paperTextures";
+import { FIRST, FIRST_LINE, SketchSheet, makeWorkSide, toSheet } from "./paperTextures";
 
 const W = 2.1;
 const H = 2.97;
 const SEG = 160;
 const RADIUS = 0.2; // curl radius of the turning page, local units
 const CAM_Z = 6.5;
+const BOW = 0.045; // paper never lies quite flat: a slight bow across the sheet
 
-// One sheet of A4 carries the whole intro: it floats, gets sketched on, then turns like a page
-// to show the work printed on its back, and the camera dives into it.
+const bowAt = (x: number) => BOW * (1 - (2 * x / W) ** 2);
+
+// Soft-edged textures for the lamp's pool of light and the sheet's shadow.
+function glowTexture(inner: string, outer: string, round = false) {
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const ctx = c.getContext("2d")!;
+  if (round) {
+    const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    g.addColorStop(0, inner);
+    g.addColorStop(1, outer);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 256, 256);
+  } else {
+    ctx.filter = "blur(18px)";
+    ctx.fillStyle = inner;
+    ctx.fillRect(40, 40, 176, 176);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+// A half-sharpened pencil, built point first along +y so it can be placed by its tip.
+function PencilModel() {
+  return (
+    <group>
+      <mesh position={[0, 0.025, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.014, 0.05, 6]} />
+        <meshStandardMaterial color="#2A2C31" roughness={0.4} metalness={0.3} />
+      </mesh>
+      <mesh position={[0, 0.13, 0]}>
+        <cylinderGeometry args={[0.042, 0.014, 0.16, 6]} />
+        <meshStandardMaterial color="#D8B48A" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 0.76, 0]}>
+        <cylinderGeometry args={[0.042, 0.042, 1.1, 6]} />
+        <meshStandardMaterial color="#1B1E24" roughness={0.45} metalness={0.2} flatShading />
+      </mesh>
+      <mesh position={[0, 1.35, 0]}>
+        <cylinderGeometry args={[0.045, 0.045, 0.08, 18]} />
+        <meshStandardMaterial color="#B9BDC4" roughness={0.3} metalness={0.8} />
+      </mesh>
+      <mesh position={[0, 1.435, 0]}>
+        <cylinderGeometry args={[0.04, 0.04, 0.09, 18]} />
+        <meshStandardMaterial color="#FF4A1C" roughness={0.8} />
+      </mesh>
+    </group>
+  );
+}
+
+// Where the pencil lies before the story starts, and the angle it is held at while drawing.
+const REST_TIP = new THREE.Vector3(-0.55, -0.98, 0.05);
+const REST_DIR = new THREE.Vector3(0.92, -0.12, 0.04).normalize();
+const DRAW_DIR = new THREE.Vector3(0.4, -0.36, 0.84).normalize();
+const UP = new THREE.Vector3(0, 1, 0);
+const LEAVE = new THREE.Vector3(1.1, -0.6, 2.2);
+
+// One sheet of A4 carries the whole intro: it waits under a lamp with a pencil on it, gets sketched on,
+// then turns like a page to show the work printed on its back, and the camera dives into it.
 function Sheet({ backSrc }: { backSrc?: string }) {
   const group = useRef<THREE.Group>(null);
-  const { camera, viewport } = useThree();
+  const pencil = useRef<THREE.Group>(null);
+  const extras = useRef<THREE.Group>(null);
+  const { camera, viewport, size, gl } = useThree();
   const [workTex, setWorkTex] = useState<THREE.Texture | null>(null);
   const lastCurl = useRef(-1);
   const started = useRef(false);
   const curlCentre = useRef(0);
+  // The cursor on the sheet, in sheet units, while the visitor draws.
+  const hover = useRef<{ x: number; y: number } | null>(null);
+  const hoverW = useRef(0);
 
   const sketch = useMemo(() => new SketchSheet(), []);
   const geo = useMemo(() => new THREE.PlaneGeometry(W, H, SEG, 1), []);
   const base = useMemo(() => Float32Array.from(geo.attributes.position.array), [geo]);
+  const glow = useMemo(() => glowTexture("rgba(255,236,206,0.17)", "rgba(255,236,206,0)", true), []);
+  const shadow = useMemo(() => glowTexture("rgba(0,0,0,0.75)", "rgba(0,0,0,0)"), []);
 
   useEffect(() => {
     // A supplied back image (media/home/sheet/back) wins; otherwise the sheet shows a contact sheet of the work.
@@ -37,11 +103,17 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     return () => {
       t.dispose();
       sketch.texture.dispose();
+      sketch.mask.dispose();
       geo.dispose();
+      glow.dispose();
+      shadow.dispose();
     };
-  }, [sketch, geo, backSrc]);
+  }, [sketch, geo, backSrc, glow, shadow]);
 
-  const tmp = useMemo(() => ({ p: new THREE.Vector3(), q: new THREE.Quaternion(), e: new THREE.Euler(), pc: new THREE.Vector3(), qc: new THREE.Quaternion() }), []);
+  const tmp = useMemo(
+    () => ({ p: new THREE.Vector3(), q: new THREE.Quaternion(), e: new THREE.Euler(), pc: new THREE.Vector3(), qc: new THREE.Quaternion(), tip: new THREE.Vector3(), aim: new THREE.Vector3(), dir: new THREE.Vector3(), a: new THREE.Vector3(), b: new THREE.Vector3() }),
+    []
+  );
 
   useFrame((state, dt) => {
     const g = group.current;
@@ -58,12 +130,13 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     const center = smooth(0.1, 0.22, p);
     const turn = smooth(0.62, 0.86, p);
     const dive = smooth(0.86, 1, p);
+    const sketchDrawn = Math.max(FIRST * dreamState.first, smooth(0.24, 0.5, p));
 
-    sketch.draw(smooth(0.24, 0.5, p), smooth(0.5, 0.56, p));
+    sketch.draw(sketchDrawn, smooth(0.5, 0.56, p), 1 - smooth(0.12, 0.22, p));
 
     // Idle: off to the side, turning slowly. Centre: square to the viewer, ready to be drawn on.
     const idlePos = narrow ? tmp.p.set(viewport.width * 0.18, -viewport.height * 0.8, -1) : tmp.p.set(viewport.width * 0.29, -0.05, 0);
-    tmp.e.set(0.1 + pointer.y * 0.08, -0.42 + Math.sin(t * 0.4) * 0.12 + pointer.x * 0.15, -0.05);
+    tmp.e.set(0.1 + pointer.y * 0.12, -0.42 + Math.sin(t * 0.4) * 0.12 + pointer.x * 0.22, -0.05);
     tmp.q.setFromEuler(tmp.e);
     const idleScale = narrow ? 0.45 : Math.min(0.74, viewport.height / 5.2);
 
@@ -81,6 +154,51 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     g.position.lerp(idlePos, k);
     g.quaternion.slerp(tmp.q, k);
     g.scale.setScalar(THREE.MathUtils.lerp(g.scale.x, scale, k));
+
+    // Lamp light and shadow belong to the desk, not the dream: they go before the page turns.
+    if (extras.current) {
+      const fade = 1 - smooth(0.56, 0.64, p);
+      extras.current.visible = fade > 0.01;
+      extras.current.children.forEach((m) => (((m as THREE.Mesh).material as THREE.MeshBasicMaterial).opacity = fade));
+    }
+
+    // The pencil: resting on the sheet, following the cursor while the visitor draws, drawing the sketch
+    // as the story is told, then lifted away before the page turns.
+    const pen = pencil.current;
+    if (pen) {
+      const engage = smooth(0.14, 0.24, p) * (1 - smooth(0.5, 0.58, p));
+      const wantHover = hover.current && p < 0.1 ? 1 : 0;
+      hoverW.current += (wantHover - hoverW.current) * (1 - Math.pow(0.002, dt));
+      const drawW = Math.max(engage, hoverW.current);
+      if (engage > 0.001) {
+        const [x, y] = toSheet(sketch.tipAt(sketchDrawn), W, H);
+        tmp.aim.set(x, y, 0);
+      } else if (hover.current) tmp.aim.set(hover.current.x, hover.current.y, 0);
+      tmp.aim.z = bowAt(tmp.aim.x) + 0.006;
+      const target = tmp.a.copy(REST_TIP).lerp(tmp.aim, drawW);
+      const leave = smooth(0.5, 0.6, p);
+      target.addScaledVector(LEAVE, leave);
+      tmp.tip.copy(pen.position).lerp(target, started.current ? 1 - Math.pow(0.0004, dt) : 1);
+      pen.position.copy(tmp.tip);
+      tmp.dir.copy(REST_DIR).lerp(DRAW_DIR, drawW).normalize();
+      pen.quaternion.setFromUnitVectors(UP, tmp.dir);
+      pen.scale.setScalar(Math.max(0.0001, 1 - leave));
+      pen.visible = leave < 0.999;
+    }
+
+    // Where the opening line sits on screen, for the preloader to land its own line on it.
+    if (dreamState.first < 1 && p < 0.02) {
+      const rect = gl.domElement.getBoundingClientRect();
+      const [ax, ay] = toSheet(FIRST_LINE[0], W, H);
+      const [bx, by] = toSheet(FIRST_LINE[1], W, H);
+      const project = (v: THREE.Vector3) => {
+        g.localToWorld(v).project(camera);
+        return [rect.left + ((v.x + 1) / 2) * size.width, rect.top + ((1 - v.y) / 2) * size.height];
+      };
+      const [sax, say] = project(tmp.a.set(ax, ay, bowAt(ax)));
+      const [sbx, sby] = project(tmp.b.set(bx, by, bowAt(bx)));
+      dreamState.line = { ax: sax, ay: say, bx: sbx, by: sby };
+    }
 
     // Dive: the camera falls into the work on the back of the page.
     camera.position.set(0, THREE.MathUtils.lerp(0, 0.22, dive), THREE.MathUtils.lerp(CAM_Z, 0.9, dive * dive));
@@ -110,7 +228,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
           }
         }
         pos[i] = nx + shift;
-        pos[i + 2] = nz;
+        pos[i + 2] = nz + bowAt(x) * (1 - curl);
       }
       geo.attributes.position.needsUpdate = true;
       geo.computeVertexNormals();
@@ -120,16 +238,44 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     }
   });
 
+  // Drawing on the sheet with the cursor (mouse only, and only before the story starts).
+  const onMove = (e: ThreeEvent<PointerEvent>) => {
+    if (e.pointerType !== "mouse" || dreamState.progress > 0.1 || !e.uv) {
+      hover.current = null;
+      return;
+    }
+    e.stopPropagation();
+    const fresh = !hover.current;
+    hover.current = { x: (e.uv.x - 0.5) * W, y: (e.uv.y - 0.5) * H };
+    sketch.scribble(e.uv.x, e.uv.y, fresh);
+  };
+  const onLeave = () => {
+    hover.current = null;
+  };
+
   return (
     <group ref={group} scale={0.74}>
-      <mesh geometry={geo}>
-        <meshStandardMaterial map={sketch.texture} roughness={0.92} metalness={0} side={THREE.FrontSide} />
+      <group ref={extras}>
+        <mesh position={[0.15, -0.1, -0.6]} renderOrder={-2}>
+          <planeGeometry args={[7, 7]} />
+          <meshBasicMaterial map={glow} transparent depthWrite={false} toneMapped={false} />
+        </mesh>
+        <mesh position={[0.1, -0.13, -0.09]} renderOrder={-1}>
+          <planeGeometry args={[W * 1.45, H * 1.4]} />
+          <meshBasicMaterial map={shadow} transparent depthWrite={false} toneMapped={false} />
+        </mesh>
+      </group>
+      <mesh geometry={geo} onPointerMove={onMove} onPointerOut={onLeave}>
+        <meshStandardMaterial map={sketch.texture} alphaMap={sketch.mask} transparent alphaTest={0.02} roughness={0.92} metalness={0} side={THREE.FrontSide} />
       </mesh>
       {workTex && (
         <mesh geometry={geo}>
-          <meshStandardMaterial map={workTex} emissiveMap={workTex} emissive="#ffffff" emissiveIntensity={0.55} roughness={0.7} side={THREE.BackSide} />
+          <meshStandardMaterial map={workTex} emissiveMap={workTex} emissive="#ffffff" emissiveIntensity={0.55} alphaMap={sketch.mask} transparent alphaTest={0.02} roughness={0.7} side={THREE.BackSide} />
         </mesh>
       )}
+      <group ref={pencil} position={REST_TIP.toArray()}>
+        <PencilModel />
+      </group>
     </group>
   );
 }
@@ -145,7 +291,7 @@ export default function PaperScene({ active, backSrc }: { active: boolean; backS
       aria-hidden="true"
     >
       <ambientLight intensity={1.05} />
-      <directionalLight position={[2.5, 4, 5]} intensity={2.1} />
+      <directionalLight position={[2.5, 4, 5]} intensity={2.1} color="#FFF6E8" />
       <directionalLight position={[-4, 1, -2]} intensity={0.5} color="#EEEAE1" />
       <Sheet backSrc={backSrc} />
     </Canvas>

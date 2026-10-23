@@ -25,8 +25,8 @@ export function resolveAll<T>(value: T): T {
   return value;
 }
 
-// Pictures for the seven shelf objects, in shelf order (branding's swatch fan needs none).
+// Pictures for the seven shelf objects, in shelf order (branding's is the story book's cover video).
 export function shelfTextures(): (string | undefined)[][] {
   const e = homeMedia.engine;
-  return [[e.social], [e.video], [e.print], [], [e.web], [e.packaging], e.decks].map((group) => group.map((s) => resolveSlot(s).src));
+  return [[e.social], [e.video], [e.print], [e.branding], [e.web], [e.packaging], e.decks].map((group) => group.map((s) => resolveSlot(s).src));
 }

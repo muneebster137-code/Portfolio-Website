@@ -1,12 +1,10 @@
 "use client";
 
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, RoundedBox, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { pointer, showcaseState, smooth } from "./store";
-import { useSwatchTextures } from "./useSwatchTextures";
-import { CARD_H, CARD_W } from "./swatchTexture";
 
 // What an object shows before its picture is supplied: a quiet graphite card.
 let placeholderUrl = "";
@@ -136,22 +134,146 @@ function Magazine({ src }: { src?: string }) {
   );
 }
 
-function SwatchFan() {
-  const textures = useSwatchTextures();
-  if (!textures) return null;
+// The cover of the brand book: a looping video once one is supplied, until then a quiet cloth cover.
+function bookCoverTexture() {
+  const c = document.createElement("canvas");
+  c.width = 768;
+  c.height = 1024;
+  const ctx = c.getContext("2d")!;
+  const mono = getComputedStyle(document.body).getPropertyValue("--font-geist-mono").trim() || "monospace";
+  const display = getComputedStyle(document.body).getPropertyValue("--font-archivo").trim() || "sans-serif";
+  ctx.fillStyle = "#12B07F";
+  ctx.fillRect(0, 0, 768, 1024);
+  ctx.strokeStyle = "rgba(6,7,8,0.55)";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(48, 48, 672, 928);
+  ctx.fillStyle = "#060708";
+  ctx.font = `500 26px ${mono}`;
+  ctx.fillText("MMB 04-C", 84, 112);
+  ctx.textAlign = "right";
+  ctx.fillText("N°04", 684, 112);
+  ctx.textAlign = "left";
+  ctx.font = `900 112px ${display}`;
+  ctx.fontStretch = "expanded";
+  ["The", "brand", "book"].forEach((w, i) => ctx.fillText(w, 80, 600 + i * 108));
+  ctx.font = `500 24px ${mono}`;
+  ctx.fillText("10+ BRANDS FROM SCRATCH", 84, 930);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+const isVideo = (src?: string) => !!src && /\.(mp4|webm|mov)$/i.test(src);
+
+function useCoverTexture(src: string | undefined, aspect: number) {
+  const [tex, setTex] = useState<THREE.Texture | null>(null);
+  useEffect(() => {
+    if (!isVideo(src)) {
+      const t = bookCoverTexture();
+      setTex(t);
+      return () => t.dispose();
+    }
+    const v = document.createElement("video");
+    Object.assign(v, { src, muted: true, loop: true, playsInline: true, crossOrigin: "anonymous", preload: "auto" });
+    const t = new THREE.VideoTexture(v);
+    t.colorSpace = THREE.SRGBColorSpace;
+    const fit = () => {
+      t.image = v;
+      const ratio = v.videoWidth / v.videoHeight || aspect;
+      if (ratio > aspect) {
+        t.repeat.set(aspect / ratio, 1);
+        t.offset.set((1 - aspect / ratio) / 2, 0);
+      } else {
+        t.repeat.set(1, ratio / aspect);
+        t.offset.set(0, (1 - ratio / aspect) / 2);
+      }
+      setTex(t);
+    };
+    v.addEventListener("loadedmetadata", fit, { once: true });
+    v.play().catch(() => {});
+    return () => {
+      v.pause();
+      v.removeAttribute("src");
+      v.load();
+      t.dispose();
+    };
+  }, [src, aspect]);
+  return tex;
+}
+
+// Page edges: fine stripes so the block reads as paper, not a slab.
+let edgeTex: THREE.CanvasTexture | null = null;
+function pageEdges() {
+  if (edgeTex) return edgeTex;
+  const c = document.createElement("canvas");
+  c.width = 64;
+  c.height = 256;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#EEEAE1";
+  ctx.fillRect(0, 0, 64, 256);
+  for (let x = 0; x < 64; x += 3) {
+    ctx.fillStyle = `rgba(120,110,95,${0.12 + Math.random() * 0.18})`;
+    ctx.fillRect(x, 0, 1, 256);
+  }
+  edgeTex = new THREE.CanvasTexture(c);
+  edgeTex.colorSpace = THREE.SRGBColorSpace;
+  return edgeTex;
+}
+
+const BW = 1.72;
+const BH = 2.3;
+const BD = 0.34;
+
+// Branding: a hardback story book, standing upright and centred like the others. The cover swings open a little
+// and closes again, as if someone is about to start reading.
+function StoryBook({ src }: { src?: string }) {
+  const map = useCoverTexture(src, (BW - 0.02) / (BH - 0.02));
+  const board = useRef<THREE.Group>(null);
+  useFrame((state) => {
+    if (board.current) board.current.rotation.y = -(0.1 + 0.32 * (0.5 - 0.5 * Math.cos(state.clock.elapsedTime * 0.7)));
+  });
+  const cloth = "#0E8A63";
+  const edges = pageEdges();
   return (
-    <group scale={0.72} position={[-0.3, -0.2, 0]}>
-      {textures.slice(0, 5).map((t, i) => {
-        const a = -i * 0.22;
-        const px = CARD_W / 2 - 0.19;
-        const py = -CARD_H / 2 + 0.19;
-        return (
-          <mesh key={i} position={[-px * Math.cos(a) + py * Math.sin(a), -px * Math.sin(a) - py * Math.cos(a), -i * 0.05]} rotation={[0, 0, a]}>
-            <planeGeometry args={[CARD_W, CARD_H]} />
-            <meshStandardMaterial map={t} transparent alphaTest={0.02} side={THREE.DoubleSide} roughness={0.6} />
+    <group rotation={[0, 0.32, 0]}>
+      {/* Back board */}
+      <mesh position={[0, 0, -BD / 2 + 0.02]}>
+        <boxGeometry args={[BW, BH, 0.04]} />
+        <meshStandardMaterial color={cloth} roughness={0.85} />
+      </mesh>
+      {/* Pages */}
+      <mesh position={[0.02, 0, 0]}>
+        <boxGeometry args={[BW - 0.08, BH - 0.08, BD - 0.08]} />
+        <meshStandardMaterial attach="material-0" map={edges} roughness={0.95} />
+        <meshStandardMaterial attach="material-1" color="#E6E1D6" roughness={0.95} />
+        <meshStandardMaterial attach="material-2" map={edges} roughness={0.95} />
+        <meshStandardMaterial attach="material-3" map={edges} roughness={0.95} />
+        <meshStandardMaterial attach="material-4" color="#F2EFE7" roughness={0.95} />
+        <meshStandardMaterial attach="material-5" color="#F2EFE7" roughness={0.95} />
+      </mesh>
+      {/* Spine */}
+      <mesh position={[-BW / 2, 0, 0]} rotation={[0, 0, 0]}>
+        <cylinderGeometry args={[BD / 2, BD / 2, BH, 24, 1, false, Math.PI, Math.PI]} />
+        <meshStandardMaterial color={cloth} roughness={0.85} side={THREE.DoubleSide} />
+      </mesh>
+      {/* Front board, hinged at the spine */}
+      <group ref={board} position={[-BW / 2, 0, BD / 2 - 0.02]}>
+        <mesh position={[BW / 2, 0, 0]}>
+          <boxGeometry args={[BW, BH, 0.04]} />
+          <meshStandardMaterial attach="material-0" color={cloth} roughness={0.85} />
+          <meshStandardMaterial attach="material-1" color={cloth} roughness={0.85} />
+          <meshStandardMaterial attach="material-2" color={cloth} roughness={0.85} />
+          <meshStandardMaterial attach="material-3" color={cloth} roughness={0.85} />
+          <meshStandardMaterial attach="material-4" color={cloth} roughness={0.85} />
+          <meshStandardMaterial attach="material-5" color="#E9E4D8" roughness={0.9} />
+        </mesh>
+        {map && (
+          <mesh position={[BW / 2, 0, 0.021]}>
+            <planeGeometry args={[BW - 0.02, BH - 0.02]} />
+            <meshStandardMaterial map={map} roughness={0.55} toneMapped={false} />
           </mesh>
-        );
-      })}
+        )}
+      </group>
     </group>
   );
 }
@@ -221,7 +343,7 @@ export function ShelfObject({ index, textures = [] }: { index: number; textures?
     case 0: return <Phone src={a} />;
     case 1: return <Disc src={a} />;
     case 2: return <Magazine src={a} />;
-    case 3: return <SwatchFan />;
+    case 3: return <StoryBook src={a} />;
     case 4: return <Browser src={a} />;
     case 5: return <PackBox src={a} />;
     default: return <Slides srcs={textures} />;

@@ -355,7 +355,7 @@ refresh. Until a file exists, the site shows a placeholder in the right shape.
 
 | | Path (no extension) | What | Format and size | Extensions |
 |---|---|---|---|---|
-|   | `media/home/sheet/back` | Back of the A4 sheet (the work it turns into) | A4 portrait, 2480 × 3508 | .webp .jpg .jpeg .png .avif |
+| ✓ | `media/home/sheet/back` | Back of the A4 sheet (the work it turns into) | A4 portrait, 2480 × 3508 | .webp .jpg .jpeg .png .avif |
 
 ## home / inside-the-dream
 
@@ -373,6 +373,7 @@ refresh. Until a file exists, the site shows a placeholder in the right shape.
 | ✓ | `media/home/engine/social` | Phone screen (Social media) | phone screen, 1080 × 2280 | .webp .jpg .jpeg .png .avif |
 | ✓ | `media/home/engine/video` | Disc artwork (Videography) | 1:1 square, 1080 × 1080 | .webp .jpg .jpeg .png .avif |
 | ✓ | `media/home/engine/print` | Magazine cover (Print) | A4 portrait, 2480 × 3508 | .webp .jpg .jpeg .png .avif |
+|   | `media/home/engine/branding` | Story book cover, loops on the book (Branding) | video, 3:4 (1080 × 1440) | .mp4 .webm .mov |
 | ✓ | `media/home/engine/web` | Browser screen (Websites) | browser screen, 1800 × 1000 | .webp .jpg .jpeg .png .avif |
 | ✓ | `media/home/engine/packaging` | Box front (Packaging) | 3:4, 1080 × 1440 | .webp .jpg .jpeg .png .avif |
 | ✓ | `media/home/engine/deck-01` | Deck slide (Pitch decks) 1 | 16:9, 1920 × 1080 | .webp .jpg .jpeg .png .avif |

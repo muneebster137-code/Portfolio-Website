@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SketchHover } from "@/components/fx/SketchHover";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,9 +27,12 @@ export function OpeningVisual({ src, alt, accent, video, initials }: { src?: str
   return (
     <div ref={wrap} className="[perspective:2000px]">
       <div ref={plane} className="relative aspect-[16/9] md:aspect-[21/9] origin-bottom">
-        <div className="absolute inset-0 rounded-[26px] overflow-hidden border border-hair bg-carbon">
+        <div data-opening className="absolute inset-0 rounded-[26px] overflow-hidden border border-hair bg-carbon">
           {src ? (
-            <Image src={src} alt={alt} fill priority sizes="100vw" className="object-cover" />
+            <>
+              <Image src={src} alt={alt} fill priority sizes="100vw" className="object-cover" />
+              {!video && <SketchHover src={src} />}
+            </>
           ) : (
             <span className="absolute inset-0 grid place-items-center type-x text-[30vw] md:text-[16vw] leading-none" style={{ color: accent }} aria-hidden="true">{initials}</span>
           )}

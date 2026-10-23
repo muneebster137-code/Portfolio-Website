@@ -15,12 +15,14 @@ function nameFor(path: string, fallback: string) {
 }
 
 // Between pages the dark closes in from where you clicked, like an iris, names where you are going,
-// and opens again on the next page.
+// and opens again on the next page. Opening a case from its picture is different: the picture itself
+// grows until it fills the screen, and on the case page it settles into the opening visual.
 export function DreamTransition() {
   const router = useRouter();
   const pathname = usePathname();
   const root = useRef<HTMLDivElement>(null);
   const pending = useRef(false);
+  const cover = useRef<HTMLDivElement | null>(null);
   const [name, setName] = useState("");
 
   useEffect(() => {
@@ -36,11 +38,27 @@ export function DreamTransition() {
       e.stopPropagation();
       if (pending.current) return;
       pending.current = true;
+      const go = () => router.push(url.pathname + url.search + url.hash);
+
+      const img = /^\/case-studies\/[^/]+$/.test(url.pathname) ? a.querySelector("img") : null;
+      if (img) {
+        const r = (img.parentElement ?? img).getBoundingClientRect();
+        const el = document.createElement("div");
+        Object.assign(el.style, { position: "fixed", left: "0", top: "0", zIndex: "95", pointerEvents: "none", backgroundImage: `url("${img.currentSrc || img.src}")`, backgroundSize: "cover", backgroundPosition: "center", borderRadius: "20px" });
+        document.body.appendChild(el);
+        cover.current = el;
+        gsap
+          .timeline({ onComplete: go })
+          .set(el, { x: r.left, y: r.top, width: r.width, height: r.height })
+          .to(el, { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight, borderRadius: 0, duration: 0.85, ease: "power3.inOut" });
+        return;
+      }
+
       setName(nameFor(url.pathname, a.textContent?.trim() || ""));
 
       const at = `${e.clientX}px ${e.clientY}px`;
       gsap
-        .timeline({ onComplete: () => router.push(url.pathname + url.search + url.hash) })
+        .timeline({ onComplete: go })
         .set(root.current, { autoAlpha: 1 })
         .fromTo(root.current, { clipPath: `circle(0% at ${at})` }, { clipPath: `circle(150% at ${at})`, duration: 0.9, ease: "power3.inOut" })
         .fromTo(".it-text", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.05 }, "-=0.35");
@@ -51,6 +69,31 @@ export function DreamTransition() {
 
   useEffect(() => {
     if (!pending.current) return;
+    const el = cover.current;
+    if (el) {
+      // Settle the grown picture into the case page's opening visual, then let the real one take over.
+      cover.current = null;
+      let tl: gsap.core.Timeline | undefined;
+      const raf = requestAnimationFrame(() => {
+        const target = document.querySelector("[data-opening]")?.getBoundingClientRect();
+        tl = gsap.timeline({
+          delay: 0.1,
+          onComplete: () => {
+            el.remove();
+            pending.current = false;
+          },
+        });
+        if (target && target.top < window.innerHeight * 0.7) {
+          tl.to(el, { x: target.left, y: target.top, width: target.width, height: target.height, borderRadius: 26, duration: 0.9, ease: "power3.inOut" }).to(el, { autoAlpha: 0, duration: 0.35 });
+        } else {
+          tl.to(el, { autoAlpha: 0, scale: 1.04, duration: 0.6, ease: "power2.out" });
+        }
+      });
+      return () => {
+        cancelAnimationFrame(raf);
+        tl?.progress(1);
+      };
+    }
     const tl = gsap
       .timeline({
         delay: 0.2,

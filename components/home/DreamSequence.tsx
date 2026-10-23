@@ -38,6 +38,8 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
         .timeline()
         .from(q(".ds-line"), { yPercent: 110, duration: 1.4, stagger: 0.1, ease: "expo.out" })
         .from(q(".ds-fade"), { autoAlpha: 0, y: 14, duration: 1, stagger: 0.08, ease: "power3.out" }, "-=1");
+      // The first pencil stroke on the sheet (where the preloader's line just landed).
+      if (dreamState.first < 1) gsap.to(dreamState, { first: 1, duration: 0.9, ease: "power2.inOut" });
     };
     if ((window as unknown as { __mmbReady?: boolean }).__mmbReady) play();
     else window.addEventListener(PRELOADER_DONE, play, { once: true });
@@ -107,7 +109,7 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
               <Link href="/contact" className="inline-flex h-12 items-center rounded-full px-6 text-[15px] ring-1 ring-bone/25 hover:ring-bone transition">Start a project</Link>
             </div>
           </div>
-          <p className="ds-fade label text-fog">Scroll</p>
+          <p className="ds-fade label text-fog">Scroll<span className="hidden [@media(hover:hover)]:inline"> · or draw on the page</span></p>
         </div>
 
         {/* 02 · The sketch */}

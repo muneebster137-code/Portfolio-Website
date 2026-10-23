@@ -38,17 +38,63 @@ const STROKES: { pts: Pt[]; light?: boolean }[] = [
 const lengthOf = (pts: Pt[]) => pts.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]), 0);
 const TOTAL = STROKES.reduce((s, st) => s + lengthOf(st.pts), 0);
 
+// The first construction line: where the preloader's pencil line lands, and how much of the sketch it is.
+export const FIRST_LINE = STROKES[0].pts as [Pt, Pt];
+export const FIRST = lengthOf(STROKES[0].pts) / TOTAL;
+
+// Sheet pixels to the sheet's own units (centre origin, y up).
+export const toSheet = ([x, y]: Pt, w: number, h: number): Pt => [(x / PW - 0.5) * w, (0.5 - y / PH) * h];
+
+// Real paper is never a perfect rectangle: an alpha mask with slightly uneven edges and soft corners.
+function deckleMask() {
+  const c = document.createElement("canvas");
+  c.width = 1024;
+  c.height = 1448;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, 1024, 1448);
+  const m = 5;
+  let i = 0;
+  // Smooth irregularity (a few gentle waves plus a little grit), never a saw-tooth.
+  const jag = () => {
+    i++;
+    return Math.sin(i * 0.21) * 0.7 + Math.sin(i * 0.67 + 2) * 0.35 + (Math.random() - 0.5) * 0.4;
+  };
+  const pts: Pt[] = [];
+  for (let x = m; x <= 1024 - m; x += 6) pts.push([x, m + jag()]);
+  for (let y = m; y <= 1448 - m; y += 6) pts.push([1024 - m + jag(), y]);
+  for (let x = 1024 - m; x >= m; x -= 6) pts.push([x, 1448 - m + jag()]);
+  for (let y = 1448 - m; y >= m; y -= 6) pts.push([m + jag(), y]);
+  ctx.filter = "blur(0.8px)";
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  pts.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+  ctx.closePath();
+  ctx.fill();
+  const t = new THREE.CanvasTexture(c);
+  return t;
+}
+
 export class SketchSheet {
   canvas = document.createElement("canvas");
   ctx: CanvasRenderingContext2D;
   base = document.createElement("canvas");
   texture: THREE.CanvasTexture;
+  mask = deckleMask();
+  // Marks the visitor makes with the cursor before the story starts.
+  doodle = document.createElement("canvas");
+  private dctx: CanvasRenderingContext2D;
+  private doodleRev = 0;
+  private lastDoodle: Pt | null = null;
   private last = "";
 
   constructor() {
     this.canvas.width = this.base.width = PW;
     this.canvas.height = this.base.height = PH;
     this.ctx = this.canvas.getContext("2d")!;
+    this.doodle.width = PW;
+    this.doodle.height = PH;
+    this.dctx = this.doodle.getContext("2d")!;
     const b = this.base.getContext("2d")!;
     b.fillStyle = "#F2EFE7";
     b.fillRect(0, 0, PW, PH);
@@ -67,13 +113,56 @@ export class SketchSheet {
     this.draw(0, 0);
   }
 
-  // drawn: 0..1 of the total pencil length; ink: 0..1 for the colour that replaces the pencil.
-  draw(drawn: number, ink: number) {
-    const key = `${drawn.toFixed(3)}|${ink.toFixed(3)}`;
+  // A faint pencil mark at a point on the sheet (uv, 0..1); `fresh` starts a new stroke.
+  scribble(u: number, v: number, fresh: boolean) {
+    const p: Pt = [u * PW, (1 - v) * PH];
+    const d = this.dctx;
+    if (!fresh && this.lastDoodle && Math.hypot(p[0] - this.lastDoodle[0], p[1] - this.lastDoodle[1]) < 160) {
+      d.strokeStyle = "rgba(38,40,46,0.55)";
+      d.lineWidth = 3;
+      d.lineCap = "round";
+      d.beginPath();
+      d.moveTo(this.lastDoodle[0], this.lastDoodle[1]);
+      d.lineTo(p[0], p[1]);
+      d.stroke();
+      this.doodleRev++;
+    }
+    this.lastDoodle = p;
+  }
+
+  // Where the pencil point is when `drawn` of the sketch is done, in sheet pixels.
+  tipAt(drawn: number): Pt {
+    let budget = drawn * TOTAL;
+    for (const st of STROKES) {
+      const len = lengthOf(st.pts);
+      if (budget <= len) {
+        for (let i = 1; i < st.pts.length; i++) {
+          const [x0, y0] = st.pts[i - 1];
+          const [x1, y1] = st.pts[i];
+          const seg = Math.hypot(x1 - x0, y1 - y0);
+          if (budget <= seg) return [x0 + ((x1 - x0) * budget) / seg, y0 + ((y1 - y0) * budget) / seg];
+          budget -= seg;
+        }
+      }
+      budget -= len;
+    }
+    const end = STROKES[STROKES.length - 1].pts;
+    return end[end.length - 1];
+  }
+
+  // drawn: 0..1 of the total pencil length; ink: 0..1 for the colour that replaces the pencil;
+  // doodle: how much of the visitor's own marks still show (they are rubbed out as the story starts).
+  draw(drawn: number, ink: number, doodle = 1) {
+    const key = `${drawn.toFixed(3)}|${ink.toFixed(3)}|${doodle.toFixed(2)}|${this.doodleRev}`;
     if (key === this.last) return;
     this.last = key;
     const c = this.ctx;
     c.drawImage(this.base, 0, 0);
+    if (doodle > 0 && this.doodleRev) {
+      c.globalAlpha = doodle;
+      c.drawImage(this.doodle, 0, 0);
+      c.globalAlpha = 1;
+    }
 
     if (ink > 0) {
       c.globalAlpha = ink;
