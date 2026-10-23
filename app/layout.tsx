@@ -1,72 +1,59 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Archivo, Geist, Geist_Mono } from "next/font/google";
 import { AccentProvider } from "@/components/AccentProvider";
-import { LenisScroll } from "@/components/LenisScroll";
-import { CustomCursor } from "@/components/CustomCursor";
-import { PageLoader } from "@/components/PageLoader";
-import { Nav } from "@/components/Nav";
-import { Footer } from "@/components/Footer";
+import { SmoothScroll } from "@/components/shell/SmoothScroll";
+import { Preloader } from "@/components/shell/Preloader";
+import { SiteNav } from "@/components/shell/SiteNav";
+import { ChapterHud } from "@/components/shell/ChapterHud";
+import { SiteFooter } from "@/components/shell/SiteFooter";
 import { Chatbot } from "@/components/Chatbot";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  style: ["normal", "italic"],
-  display: "swap"
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const geist = Geist({
+  variable: "--font-geist",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap"
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Muhammad Muneeb Bilal — Visual Designer & Digital Strategist",
-  description: "Personal portfolio of Muhammad Muneeb Bilal, exhibiting visual identity systems, digital branding strategy, dynamic video campaigns, and user interface designs.",
-  keywords: ["Visual Design", "Digital Strategy", "Brand Identity", "Islamabad", "Social Media Marketing", "Content Strategy"],
+  title: "Muhammad Muneeb Bilal | Founder and Creative Specialist",
+  description:
+    "Founder and creative specialist bringing visions to life: social media, video, print, branding, websites, packaging and pitch decks. 4+ years, 1,000+ creatives, 16+ brands.",
   authors: [{ name: "Muhammad Muneeb Bilal" }],
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1.0,
+  themeColor: "#060708",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body
-        className={`${fraunces.variable} ${inter.variable} font-sans bg-paper text-ink selection:bg-accent-primary/20 selection:text-ink antialiased`}
-      >
+    <html lang="en" className={`${archivo.variable} ${geist.variable} ${geistMono.variable}`}>
+      <body className="font-sans bg-void text-bone antialiased">
         <AccentProvider>
-          <CustomCursor />
-          <LenisScroll>
-            {/* Morphing Loader Reveal */}
-            <PageLoader />
-            
-            {/* Organic Grain Texture Overlay */}
-            <div className="grain-overlay" />
-
-            {/* Main Framework Grid */}
-            <div className="min-h-screen flex flex-col justify-between">
-              <div>
-                <Nav />
-                <main>{children}</main>
-              </div>
-              <Footer />
-            </div>
-            
-            {/* AI Clone Chatbot Widget */}
+          <SmoothScroll>
+            <Preloader />
+            <SiteNav />
+            <main>{children}</main>
+            <SiteFooter />
+            <ChapterHud />
             <Chatbot />
-          </LenisScroll>
+          </SmoothScroll>
         </AccentProvider>
       </body>
     </html>

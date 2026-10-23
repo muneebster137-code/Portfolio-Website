@@ -1,22 +1,48 @@
 @import "tailwindcss";
 
+/* Deep Field: dark, spatial, maximal, premium */
 :root {
-  /* Default shell variables */
-  --ink: #15171B;
-  --paper: #F6F4EF;
-  --graphite: #4A4D52;
-  --line: #D8D4C9;
-  --accent: #C24E2B;
+  --void: #060708;
+  --carbon: #0E1013;
+  --panel: #15181D;
+  --bone: #EEEAE1;
+  --mist: #A9ADB5;
+  --fog: #8E929B;
+  --hair: rgba(238, 234, 225, 0.12);
+  --signal: #FF4A1C;
 
-  /* Dynamic case study accent fallbacks */
-  --accent-primary: #C24E2B;
-  --accent-secondary: #4A4D52;
+  /* Service swatches (MMB 01-C to 07-C) */
+  --sw-social: #FF4A1C;
+  --sw-video: #3346FF;
+  --sw-print: #FFC21A;
+  --sw-brand: #12B07F;
+  --sw-web: #8E63FF;
+  --sw-pack: #FF5FA2;
+  --sw-deck: #EEEAE1;
 
-  --background: var(--paper);
-  --foreground: var(--ink);
-} 
+  /* Legacy names, remapped so older pages render on the dark shell */
+  --ink: var(--bone);
+  --paper: var(--void);
+  --graphite: var(--mist);
+  --line: var(--hair);
+  --accent: var(--signal);
+  --accent-primary: var(--signal);
+  --accent-secondary: var(--mist);
+
+  --background: var(--void);
+  --foreground: var(--bone);
+}
 
 @theme {
+  --color-void: var(--void);
+  --color-carbon: var(--carbon);
+  --color-panel: var(--panel);
+  --color-bone: var(--bone);
+  --color-mist: var(--mist);
+  --color-fog: var(--fog);
+  --color-hair: var(--hair);
+  --color-signal: var(--signal);
+
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --color-graphite: var(--graphite);
@@ -25,17 +51,50 @@
   --color-accent-primary: var(--accent-primary);
   --color-accent-secondary: var(--accent-secondary);
 
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-geist), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 body {
-  background-color: var(--paper);
-  color: var(--ink);
+  background-color: var(--void);
+  color: var(--bone);
   overflow-x: hidden;
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-geist), sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--signal);
+  color: var(--void);
+}
+
+/* Archivo width axis: 62% condensed to 125% expanded. In a layer so utilities can override. */
+@layer components {
+  .type-x { font-family: var(--font-display); font-stretch: 125%; font-weight: 900; letter-spacing: -0.045em; text-transform: uppercase; }
+  .type-c { font-family: var(--font-display); font-stretch: 62%; letter-spacing: -0.01em; text-transform: uppercase; }
+  .type-m { font-family: var(--font-display); font-stretch: 75%; font-weight: 800; letter-spacing: -0.03em; text-transform: uppercase; }
+  .label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .outline-type { color: transparent; -webkit-text-stroke: 1.5px var(--stroke, var(--mist)); }
+
+  .marquee-track { display: flex; width: max-content; animation: marquee var(--marquee-speed, 30s) linear infinite; }
+  .marquee-track[data-reverse] { animation-direction: reverse; }
+}
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
 }
 /* Custom transitions and scroll effects */
 .custom-transition {
