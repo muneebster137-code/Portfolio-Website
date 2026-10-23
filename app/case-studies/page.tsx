@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { cases } from "@/lib/cases";
+import { caseCovers } from "@/lib/media-manifest";
+import { resolveSlot } from "@/lib/media.server";
 import { Reveal } from "@/components/motion/Reveal";
 import { PreviewList } from "@/components/page/PreviewList";
 import { CtaBand } from "@/components/page/CtaBand";
@@ -39,7 +41,7 @@ export default function CaseStudiesPage() {
             summary: c.summary,
             meta: c.year,
             color: c.accent,
-            image: c.cover || undefined,
+            image: resolveSlot(caseCovers[c.slug]).src,
             tags: [...(c.major ? ["Major case study"] : []), ...(c.via ? ["via Watch How Malaysia"] : [])],
           }))}
         />

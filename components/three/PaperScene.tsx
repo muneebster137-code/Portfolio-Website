@@ -14,10 +14,10 @@ const CAM_Z = 6.5;
 
 // One sheet of A4 carries the whole intro: it floats, gets sketched on, then turns like a page
 // to show the work printed on its back, and the camera dives into it.
-function Sheet() {
+function Sheet({ backSrc }: { backSrc?: string }) {
   const group = useRef<THREE.Group>(null);
   const { camera, viewport } = useThree();
-  const [workTex, setWorkTex] = useState<THREE.CanvasTexture | null>(null);
+  const [workTex, setWorkTex] = useState<THREE.Texture | null>(null);
   const lastCurl = useRef(-1);
 
   const sketch = useMemo(() => new SketchSheet(), []);
@@ -25,7 +25,9 @@ function Sheet() {
   const base = useMemo(() => Float32Array.from(geo.attributes.position.array), [geo]);
 
   useEffect(() => {
-    const t = makeWorkSide(() => {});
+    // A supplied back image (media/home/sheet/back) wins; otherwise the sheet shows a contact sheet of the work.
+    const t = backSrc ? new THREE.TextureLoader().load(backSrc) : makeWorkSide(() => {});
+    t.colorSpace = THREE.SRGBColorSpace;
     // The back is seen mirrored once the page has turned, so flip it to read the right way round.
     t.wrapS = THREE.RepeatWrapping;
     t.repeat.x = -1;
@@ -35,7 +37,7 @@ function Sheet() {
       sketch.texture.dispose();
       geo.dispose();
     };
-  }, [sketch, geo]);
+  }, [sketch, geo, backSrc]);
 
   const tmp = useMemo(() => ({ p: new THREE.Vector3(), q: new THREE.Quaternion(), e: new THREE.Euler(), pc: new THREE.Vector3(), qc: new THREE.Quaternion() }), []);
 
@@ -121,7 +123,7 @@ function Sheet() {
   );
 }
 
-export default function PaperScene({ active }: { active: boolean }) {
+export default function PaperScene({ active, backSrc }: { active: boolean; backSrc?: string }) {
   return (
     <Canvas
       flat
@@ -134,7 +136,7 @@ export default function PaperScene({ active }: { active: boolean }) {
       <ambientLight intensity={1.05} />
       <directionalLight position={[2.5, 4, 5]} intensity={2.1} />
       <directionalLight position={[-4, 1, -2]} intensity={0.5} color="#EEEAE1" />
-      <Sheet />
+      <Sheet backSrc={backSrc} />
     </Canvas>
   );
 }

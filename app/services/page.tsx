@@ -4,6 +4,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { PreviewList } from "@/components/page/PreviewList";
 import { CtaBand } from "@/components/page/CtaBand";
 import { ServicesShowcase } from "@/components/service/ServicesShowcase";
+import { shelfTextures } from "@/lib/media.server";
 
 export const metadata: Metadata = {
   title: "Services | Muhammad Muneeb Bilal",
@@ -24,7 +25,7 @@ export default function ServicesPage() {
         </p>
       </Reveal>
 
-      <ServicesShowcase />
+      <ServicesShowcase textures={shelfTextures()} />
 
       <section aria-label="All services" className="mx-auto max-w-[1600px] px-5 md:px-10 pt-32 pb-10">
         <p className="label text-fog mb-8">Index</p>

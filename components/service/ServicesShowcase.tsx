@@ -25,7 +25,7 @@ const segmentsOf = (href: string) => {
 
 // The seven services as objects on a shelf (after the A24 film library): scroll turns the arc,
 // the object in front gets its credits top-left and two lines of proof below.
-export function ServicesShowcase({ label }: { label?: string }) {
+export function ServicesShowcase({ label, textures, intro = false }: { label?: string; textures: (string | undefined)[][]; intro?: boolean }) {
   const wrap = useRef<HTMLElement>(null);
   const meta = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -63,35 +63,37 @@ export function ServicesShowcase({ label }: { label?: string }) {
   };
 
   return (
+    <>
+    {intro && (
+      <header className="mx-auto max-w-[1600px] px-5 md:px-10 pt-36 pb-16 bg-void">
+        <p className="label text-fog">{label}</p>
+        <h2 className="type-x mt-6 text-[12vw] md:text-[clamp(48px,6.4vw,116px)] leading-[0.92] max-w-[1200px]">One engine. Seven ways to bring your vision to life.</h2>
+      </header>
+    )}
     <section ref={wrap} id="services" data-chapter="Engine" aria-labelledby="shelf-h" className="relative h-[720vh] bg-void text-bone">
       <div className="sticky top-0 h-svh overflow-hidden">
         <div className="absolute inset-0">
-          <ServiceObjects active={active} />
+          <ServiceObjects active={active} textures={textures} />
         </div>
 
-        <div className="absolute inset-x-0 top-0 pt-24 px-5 md:px-8 flex justify-between items-start pointer-events-none">
-          <div ref={meta} key={index} className="w-[300px] max-w-[46vw] text-[12px]">
-            {label && <p className="label text-fog mb-6">{label}</p>}
-            <h2 id="shelf-h" className="overflow-hidden"><span data-in className="block type-x text-[22px] md:text-[28px] leading-none">{s.short}</span></h2>
-            <dl className="mt-4 border-t border-bone/15">
-              {[
-                ["Service", s.name],
-                ["Code", s.code],
-                ["Output", `${s.number} ${s.unit}`],
-              ].map(([k, v]) => (
-                <div key={k} className="grid grid-cols-[90px_1fr] border-b border-bone/15 py-1.5 overflow-hidden">
-                  <dt data-in className="label text-fog">{k}</dt>
-                  <dd data-in>{v}</dd>
-                </div>
-              ))}
-              <div className="grid grid-cols-[90px_1fr] border-b border-bone/15 py-1.5 overflow-hidden">
-                <dt data-in className="label text-fog">Segments</dt>
-                <dd data-in className="hidden md:block">{segs.slice(0, 7).map((g) => <span key={g} className="block">{g}</span>)}</dd>
-                <dd data-in className="md:hidden">{segs.length}</dd>
-              </div>
-            </dl>
+        <div ref={meta} key={index} className="absolute inset-0 px-5 md:px-10 pt-24 pb-10 md:pb-16 flex flex-col justify-between pointer-events-none">
+          <div className="max-w-[min(820px,62vw)]">
+            <p className="label text-fog overflow-hidden"><span data-in className="block">{label ? `${label} · ` : ""}{String(index + 1).padStart(2, "0")} / 07 · {s.code}</span></p>
+            <h2 id="shelf-h" className="overflow-hidden mt-4"><span data-in className="block type-x text-[11vw] md:text-[clamp(44px,5.6vw,104px)] leading-[0.92]">{s.name}</span></h2>
+            <p className="overflow-hidden mt-4"><span data-in className="block type-c text-[6vw] md:text-[clamp(22px,2.4vw,40px)] leading-[1.1] text-mist">&ldquo;{s.hook}&rdquo;</span></p>
           </div>
-          <p className="label text-fog tabular-nums">{String(index + 1).padStart(2, "0")} / 07</p>
+          <div className="flex flex-wrap items-end justify-between gap-8">
+            <div className="hidden md:block text-[14px] text-bone/75">
+              <p className="label text-fog mb-3 overflow-hidden"><span data-in className="block">Segments</span></p>
+              <ul className="columns-2 gap-10">
+                {segs.map((g) => <li key={g} className="overflow-hidden"><span data-in className="block py-0.5">{g}</span></li>)}
+              </ul>
+            </div>
+            <div className="text-right ml-auto">
+              <p className="overflow-hidden"><span data-in className="block type-x text-[16vw] md:text-[clamp(56px,7vw,124px)] leading-[0.85]">{s.number}</span></p>
+              <p className="label text-fog mt-2 overflow-hidden"><span data-in className="block">{s.unit}</span></p>
+            </div>
+          </div>
         </div>
 
         <Link
@@ -100,30 +102,17 @@ export function ServicesShowcase({ label }: { label?: string }) {
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[46vh] rounded-full"
         />
 
-        <div className="absolute inset-x-0 bottom-0 pb-14 md:pb-16 px-5 md:px-8 pointer-events-none">
-          <div className="mx-auto max-w-[760px] grid grid-cols-2 gap-6 md:gap-16 text-center">
-            <div>
-              <p className="label text-fog mt-2">Hook</p>
-              <p className="type-c font-bold text-[18px] md:text-[22px] leading-[1.05] mt-1">&ldquo;{s.hook}&rdquo;</p>
-            </div>
-            <div>
-              <p className="label text-fog mt-2">Proof</p>
-              <p className="type-c font-bold text-[18px] md:text-[22px] leading-[1.05] mt-1">&ldquo;{s.number} {s.unit}&rdquo;</p>
-            </div>
-          </div>
-          <div className="mt-6 flex items-center justify-between pointer-events-auto">
-            <p className="label text-fog hidden md:block">Click the object to open</p>
-            <div className="flex gap-2 ml-auto">
-              <button type="button" onClick={() => go(index - 1)} aria-label="Previous service" className="grid place-items-center size-11 rounded-full border border-bone/25 hover:bg-bone hover:text-void transition-colors">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
-              </button>
-              <button type="button" onClick={() => go(index + 1)} aria-label="Next service" className="grid place-items-center size-11 rounded-full border border-bone/25 hover:bg-bone hover:text-void transition-colors">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
-              </button>
-            </div>
-          </div>
+        <div className="absolute left-1/2 bottom-6 md:bottom-16 -translate-x-1/2 flex items-center gap-3">
+          <button type="button" onClick={() => go(index - 1)} aria-label="Previous service" className="grid place-items-center size-11 rounded-full border border-bone/25 hover:bg-bone hover:text-void transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+          </button>
+          <Link href={s.href} className="label text-bone/80 hover:text-bone px-2">Open</Link>
+          <button type="button" onClick={() => go(index + 1)} aria-label="Next service" className="grid place-items-center size-11 rounded-full border border-bone/25 hover:bg-bone hover:text-void transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+          </button>
         </div>
       </div>
     </section>
+    </>
   );
 }

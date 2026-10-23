@@ -4,7 +4,10 @@ import { notFound } from "next/navigation";
 import { cases, getCase, caseIndex, onColor } from "@/lib/cases";
 import { serviceBySlug, testimonials } from "@/lib/site";
 import { Reveal } from "@/components/motion/Reveal";
-import { MediaFrame } from "@/components/ui/MediaFrame";
+import { SectionHead } from "@/components/page/SectionHead";
+import { CaseGallery } from "@/components/case/CaseGallery";
+import { caseCovers, caseGalleries } from "@/lib/media-manifest";
+import { resolveAll, resolveSlot } from "@/lib/media.server";
 import { OpeningVisual } from "@/components/case/OpeningVisual";
 import { CtaBand } from "@/components/page/CtaBand";
 
@@ -36,8 +39,8 @@ export default async function CaseStudy({ params }: Params) {
   const words = c.title.split(" ");
   const [first, rest] = [words[0], words.slice(1).join(" ")];
   const steps = c.steps ?? [];
-  const shownWork = c.work.filter((m) => m.src);
-  const pendingWork = c.work.length - shownWork.length;
+  const gallery = resolveAll(caseGalleries[c.slug]);
+  const cover = resolveSlot(caseCovers[c.slug]);
   // Expanded caps run about 1.05em per letter; long single words shrink to fit the row.
   const titleVw = Math.min(13.5, 92 / first.length);
 
@@ -60,7 +63,7 @@ export default async function CaseStudy({ params }: Params) {
       </Reveal>
 
       <section aria-label="Opening visual" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-16">
-        <OpeningVisual src={c.cover || undefined} alt={`${c.title} opening visual`} accent={c.accent} video={c.opening === "video"} initials={c.shortTitle.slice(0, 2)} />
+        <OpeningVisual src={cover.src} alt={`${c.title} opening visual`} accent={c.accent} video={c.opening === "video"} initials={c.shortTitle.slice(0, 2)} />
       </section>
 
       <Reveal as="section" aria-label="Snapshot" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-24">
@@ -89,7 +92,7 @@ export default async function CaseStudy({ params }: Params) {
       {steps.length > 0 && (
         <section aria-labelledby="story-h" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-32">
           <Reveal>
-            <h2 id="story-h" className="label text-fog" data-fade>The story · problem to result</h2>
+            <SectionHead id="story-h" label="Problem to result" title="The story" />
           </Reveal>
           <div className="mt-8 border-t border-hair">
             {steps.map((st, si) => {
@@ -133,38 +136,13 @@ export default async function CaseStudy({ params }: Params) {
         </Reveal>
       )}
 
-      {c.units && (
-        <section aria-labelledby="units-h" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-32">
-          <Reveal>
-            <p className="label text-fog" data-fade>Five units, five voices</p>
-            <h2 id="units-h" className="overflow-hidden mt-4"><span data-line className="block type-x text-[11vw] md:text-[5vw] leading-[0.9]">The units</span></h2>
-          </Reveal>
-          <Reveal className="mt-10 grid sm:grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-10">
-            {c.units.map((u, ui) => (
-              <div key={u.name} data-rise className="border-t border-hair pt-5">
-                <span className="label text-fog">{String(ui + 1).padStart(2, "0")}</span>
-                <span className="type-m block text-[26px] leading-none mt-6">{u.name}</span>
-                <span className="block text-mist mt-3 text-[15px] leading-snug">{u.text}</span>
-              </div>
-            ))}
-          </Reveal>
-        </section>
-      )}
-
       <section aria-labelledby="work-h" className="mx-auto max-w-[1600px] px-5 md:px-10 mt-36">
         <Reveal className="flex flex-wrap items-end justify-between gap-6">
           <h2 id="work-h" className="overflow-hidden"><span data-line className="block type-x text-[13vw] md:text-[6vw] leading-[0.88]">The work</span></h2>
           <p className="label text-fog" data-fade>{c.workLabel}</p>
         </Reveal>
-        {pendingWork > 0 && shownWork.length === 0 && (
-          <p className="mt-10 label text-fog">{pendingWork} pieces to come</p>
-        )}
-        <Reveal className={`mt-12 grid gap-6 md:gap-8 ${shownWork.every((m) => m.ratio === "tall") ? "grid-cols-2 md:grid-cols-4" : shownWork.every((m) => m.ratio === "square") ? "sm:grid-cols-3" : "md:grid-cols-2"}`}>
-          {shownWork.map((m, mi) => (
-            <div key={mi} data-rise className={mi % 2 && shownWork.length > 2 ? "md:translate-y-16" : ""}>
-              <MediaFrame media={m} sizes="(min-width: 768px) 50vw, 100vw" />
-            </div>
-          ))}
+        <Reveal className="mt-12">
+          <CaseGallery gallery={gallery} unitText={Object.fromEntries((c.units ?? []).map((u) => [u.name, u.text]))} />
         </Reveal>
       </section>
 
@@ -174,6 +152,11 @@ export default async function CaseStudy({ params }: Params) {
             <div data-rise className="border-t border-hair pt-7">
               <p className="label text-fog">Website</p>
               <p className="mt-4 text-[17px] leading-relaxed">{c.website}</p>
+              {c.liveUrl && (
+                <a href={c.liveUrl} target="_blank" rel="noreferrer" className="inline-block mt-4 text-[15px] underline decoration-bone/30 underline-offset-4 hover:decoration-bone">
+                  Visit the live site
+                </a>
+              )}
             </div>
           )}
           {c.notes?.map((note) => (

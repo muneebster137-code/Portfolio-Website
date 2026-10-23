@@ -9,20 +9,20 @@ import { useInViewport } from "./useInViewport";
 const ServiceObjectScene = dynamic(() => import("./ServiceObjectScene"), { ssr: false });
 const PackagingScene = dynamic(() => import("./PackagingScene"), { ssr: false });
 
-export function ServiceObject({ index, className = "" }: { index: number; className?: string }) {
+export function ServiceObject({ index, textures, className = "" }: { index: number; textures?: (string | undefined)[]; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const active = useInViewport(ref, "0px");
   return (
     <div ref={ref} className={className}>
-      <ServiceObjectScene index={index} active={active} />
+      <ServiceObjectScene index={index} active={active} textures={textures} />
     </div>
   );
 }
 
-export function PackagingModel({ className = "" }: { className?: string }) {
+export function PackagingModel({ modelSrc, boxTexture, className = "" }: { modelSrc?: string; boxTexture?: string; className?: string }) {
   return (
     <div className={className}>
-      <PackagingScene />
+      <PackagingScene modelSrc={modelSrc} boxTexture={boxTexture} />
     </div>
   );
 }

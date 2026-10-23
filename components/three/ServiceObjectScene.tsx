@@ -4,7 +4,7 @@ import { Suspense, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
-import { OBJECTS } from "./ServiceObjects";
+import { ShelfObject } from "./ServiceObjects";
 import { pointer } from "./store";
 
 // A service page's own object from the shelf, lit alone and turning slowly toward the pointer.
@@ -21,8 +21,7 @@ function Turntable({ children }: { children: React.ReactNode }) {
   return <group ref={g}>{children}</group>;
 }
 
-export default function ServiceObjectScene({ index, active }: { index: number; active: boolean }) {
-  const Obj = OBJECTS[index];
+export default function ServiceObjectScene({ index, active, textures }: { index: number; active: boolean; textures?: (string | undefined)[] }) {
   return (
     <Canvas flat dpr={[1, 1.75]} frameloop={active ? "always" : "never"} camera={{ position: [0, 0.3, 6.6], fov: 32 }} gl={{ antialias: true, alpha: true }} aria-hidden="true">
       <ambientLight intensity={0.95} />
@@ -30,7 +29,7 @@ export default function ServiceObjectScene({ index, active }: { index: number; a
       <directionalLight position={[-5, 2, 3]} intensity={0.35} color="#EEEAE1" />
       <Turntable>
         <Suspense fallback={null}>
-          <Obj />
+          <ShelfObject index={index} textures={textures} />
         </Suspense>
       </Turntable>
       <ContactShadows position={[0, -1.85, 0]} opacity={0.7} scale={12} blur={2.4} far={4} color="#000000" />
