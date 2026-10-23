@@ -12,7 +12,7 @@ import { Dust } from "./Dust";
 const PIVOT = new THREE.Vector2(CARD_W / 2 - 0.193, -CARD_H / 2 + 0.193);
 const CAM_Z = 8;
 
-function SwatchBook({ textures }: { textures: THREE.CanvasTexture[] }) {
+function SwatchBook({ textures, fixedProgress }: { textures: THREE.CanvasTexture[]; fixedProgress?: number }) {
   const meshes = useRef<(THREE.Mesh | null)[]>([]);
   const { camera, viewport } = useThree();
   const t = useMemo(
@@ -32,8 +32,9 @@ function SwatchBook({ textures }: { textures: THREE.CanvasTexture[] }) {
   const n = textures.length;
 
   useFrame((state, dt) => {
-    const p = heroState.progress;
-    const intro = heroState.intro;
+    // A fixed progress freezes the book open, for pages that show it without the scroll story.
+    const p = fixedProgress ?? heroState.progress;
+    const intro = fixedProgress === undefined ? heroState.intro : 1;
     const time = state.clock.elapsedTime;
     const narrow = viewport.aspect < 1;
 
@@ -111,7 +112,7 @@ function SwatchBook({ textures }: { textures: THREE.CanvasTexture[] }) {
   );
 }
 
-export default function HeroScene({ active }: { active: boolean }) {
+export default function HeroScene({ active, fixedProgress }: { active: boolean; fixedProgress?: number }) {
   const textures = useSwatchTextures();
   return (
     <Canvas
@@ -125,8 +126,8 @@ export default function HeroScene({ active }: { active: boolean }) {
       <ambientLight intensity={1.1} />
       <directionalLight position={[3, 5, 6]} intensity={1.6} />
       <pointLight position={[-4, -2, 4]} intensity={18} color="#FF4A1C" distance={14} />
-      <Dust count={1600} progress={() => heroState.progress} />
-      {textures && <SwatchBook textures={textures} />}
+      <Dust count={1600} progress={() => fixedProgress ?? heroState.progress} />
+      {textures && <SwatchBook textures={textures} fixedProgress={fixedProgress} />}
     </Canvas>
   );
 }

@@ -66,6 +66,10 @@ html.lenis, html.lenis body {
   overflow: hidden;
 }
 
+html, body {
+  overflow-x: clip;
+}
+
 body {
   background-color: var(--void);
   color: var(--bone);

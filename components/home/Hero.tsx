@@ -102,7 +102,7 @@ export function Hero() {
                 Start a project
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9" /></svg>
               </Link>
-              <Link href="/work" className="inline-flex h-14 items-center rounded-full border border-bone/30 px-7 hover:border-bone transition-colors">
+              <Link href="/case-studies" className="inline-flex h-14 items-center rounded-full border border-bone/30 px-7 hover:border-bone transition-colors">
                 View case studies
               </Link>
             </div>

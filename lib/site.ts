@@ -15,8 +15,8 @@ export const identity = {
 export const navLinks = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Services", href: "/#services" },
-  { label: "Case Studies", href: "/work" },
+  { label: "Services", href: "/services" },
+  { label: "Case Studies", href: "/case-studies" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -53,7 +53,7 @@ export const featuredWork = [
   { index: "01", slug: "anebos-studios", title: "Anebos Studios", year: "2024", summary: "My own studio: standout creative, delivered the same day.", tag: "Major case study", image: "/images/anebos-studios.webp", plate: "#EEEAE1" },
   { index: "04", slug: "aba-group", title: "ABA Group Türkiye", year: "2026", summary: "Five units, five voices, one steady hand.", tag: "Major case study", via: true, image: "/images/aba-group.webp", plate: "#FF8A1F" },
   { index: "02", slug: "trenddeck", title: "TrendDeck Türkiye", year: "2026", summary: "From unknown to unmissable: a WPC decking brand built from zero.", via: true, image: "/images/trenddeck.webp", plate: "#8A6A4A" },
-  { index: "03", slug: "treats-for-life", title: "Treatsforlife", year: "2024", summary: "Natural foods, a Shopify store and a brand built in three months.", image: "/images/treats-for-life.webp", plate: "#C8862E" },
+  { index: "03", slug: "treatsforlife", title: "Treatsforlife", year: "2024", summary: "Natural foods, a Shopify store and a brand built in three months.", image: "/images/treats-for-life.webp", plate: "#C8862E" },
 ];
 
 export const processSteps = [
@@ -84,3 +84,6 @@ export const chapters = [
   { id: "proof", label: "Proof" },
   { id: "contact", label: "Contact" },
 ];
+
+export const serviceSlug = (s: Service) => s.href.split("/").pop() as string;
+export const serviceBySlug = (slug: string) => services.find((s) => serviceSlug(s) === slug);

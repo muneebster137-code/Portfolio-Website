@@ -463,7 +463,7 @@ export default function About() {
               >
                 <div>
                   <h3 className="font-display font-bold text-lg md:text-xl text-ink flex items-center gap-2 group-hover:text-accent-primary transition-colors">
-                    <Link href={`/work/${item.slug}`} className="hover:underline flex items-center gap-1">
+                    <Link href={`/case-studies/${item.slug}`} className="hover:underline flex items-center gap-1">
                       {item.client}
                       {item.isNested && (
                         <span className="text-[9px] font-sans font-semibold tracking-wider text-graphite uppercase normal-case px-1.5 py-0.5 rounded border border-line bg-paper/50">

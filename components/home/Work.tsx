@@ -60,7 +60,7 @@ export function Work() {
         {featuredWork.map((w) => (
           <Link
             key={w.slug}
-            href={`/work/${w.slug}`}
+            href={`/case-studies/${w.slug}`}
             className="wk-card group relative block shrink-0 w-full md:w-[42vw] h-[62vh] md:h-[68vh] [transform-style:preserve-3d]"
           >
             <span className="absolute inset-0 rounded-[22px] translate-x-3.5 translate-y-3.5 transition-transform duration-500 group-hover:translate-x-5 group-hover:translate-y-5" style={{ background: w.plate }} />
@@ -88,7 +88,7 @@ export function Work() {
           </Link>
         ))}
 
-        <Link href="/work" className="group shrink-0 grid place-items-center size-[64vw] md:size-[26vw] rounded-full border border-bone/25 hover:bg-signal hover:border-signal hover:text-void transition-colors md:mr-[6vw]">
+        <Link href="/case-studies" className="group shrink-0 grid place-items-center size-[64vw] md:size-[26vw] rounded-full border border-bone/25 hover:bg-signal hover:border-signal hover:text-void transition-colors md:mr-[6vw]">
           <span className="text-center">
             <span className="type-x block text-[9vw] md:text-[3.6vw] leading-[0.9]">All 11</span>
             <span className="label block mt-3">Case studies</span>
