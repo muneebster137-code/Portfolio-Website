@@ -10,6 +10,8 @@ import { servicePages } from "@/lib/services-content";
 import { useInViewport } from "@/components/three/useInViewport";
 import { getLenis } from "@/components/shell/SmoothScroll";
 import { showcaseState } from "@/components/three/store";
+import { useReducedMotion } from "@/components/motion/useReducedMotion";
+import { StillServices } from "@/components/home/StillScenes";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,7 +27,14 @@ const segmentsOf = (href: string) => {
 
 // The seven services as objects on a shelf (after the A24 film library): scroll turns the arc,
 // the object in front gets its credits top-left and two lines of proof below.
-export function ServicesShowcase({ label, textures, intro = false }: { label?: string; textures: (string | undefined)[][]; intro?: boolean }) {
+type Props = { label?: string; textures: (string | undefined)[][]; intro?: boolean };
+
+export function ServicesShowcase(props: Props) {
+  const reduced = useReducedMotion();
+  return reduced ? <StillServices label={props.label} intro={props.intro} /> : <AnimatedShowcase {...props} />;
+}
+
+function AnimatedShowcase({ label, textures, intro = false }: Props) {
   const wrap = useRef<HTMLElement>(null);
   const meta = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);

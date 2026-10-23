@@ -17,7 +17,8 @@ export function Reveal({ as: Tag = "div", className, children, immediate = false
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    // Less motion asked for: everything is simply there.
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const splits: SplitText[] = [];
     const ctx = gsap.context(() => {
       const trigger = (t: Element, start = "top 85%") => (immediate ? undefined : { trigger: t, start });

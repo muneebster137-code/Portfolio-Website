@@ -9,6 +9,8 @@ import { keyNumbers, story } from "@/lib/site";
 import { dreamState } from "@/components/three/store";
 import { useInViewport } from "@/components/three/useInViewport";
 import { PRELOADER_DONE } from "@/components/shell/Preloader";
+import { useReducedMotion } from "@/components/motion/useReducedMotion";
+import { StillIntro } from "./StillScenes";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -20,6 +22,11 @@ const SUB_START = 0.24;
 const SUB_LEN = 0.065;
 
 export function DreamSequence({ sheetBack }: { sheetBack?: string }) {
+  const reduced = useReducedMotion();
+  return reduced ? <StillIntro sheetBack={sheetBack} /> : <AnimatedIntro sheetBack={sheetBack} />;
+}
+
+function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
   const wrap = useRef<HTMLElement>(null);
   const active = useInViewport(wrap, "0px");
 

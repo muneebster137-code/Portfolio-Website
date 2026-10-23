@@ -31,10 +31,10 @@ export function Preloader() {
     const ctx = gsap.context(() => {
       gsap
         .timeline({ onComplete: finish })
-        .to(counter, { v: 100, duration: 2.2, ease: "power2.inOut", onUpdate: () => setCount(Math.round(counter.v)) }, 0)
-        .fromTo(".pl-line", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 2.2, ease: "power2.inOut" }, 0)
-        .to(".pl-meta, .pl-svg", { autoAlpha: 0, duration: 0.4 }, "+=0.1")
-        .to(root.current, { autoAlpha: 0, duration: 0.8, ease: "power2.inOut" }, "-=0.1");
+        .to(counter, { v: 100, duration: 1.2, ease: "power2.inOut", onUpdate: () => setCount(Math.round(counter.v)) }, 0)
+        .fromTo(".pl-line", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut" }, 0)
+        .to(".pl-meta, .pl-svg", { autoAlpha: 0, duration: 0.3 }, "+=0.05")
+        .to(root.current, { autoAlpha: 0, duration: 0.6, ease: "power2.inOut" }, "-=0.1");
     }, root);
     return () => ctx.revert();
   }, []);

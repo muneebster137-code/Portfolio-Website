@@ -6,6 +6,8 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { featuredWork } from "@/lib/site";
+import { useReducedMotion } from "@/components/motion/useReducedMotion";
+import { StillWork } from "./StillScenes";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +16,11 @@ const SLIDES = [...featuredWork.map((w) => ({ ...w, end: false })), { slug: "all
 // Shot 04, inside the dream: one case at a time, full size. Only the one in focus has colour;
 // the others wait in the dark, turned away.
 export function WorkSequence({ images }: { images: Record<string, string | undefined> }) {
+  const reduced = useReducedMotion();
+  return reduced ? <StillWork images={images} /> : <AnimatedWork images={images} />;
+}
+
+function AnimatedWork({ images }: { images: Record<string, string | undefined> }) {
   const wrap = useRef<HTMLElement>(null);
   const cards = useRef<(HTMLElement | null)[]>([]);
   const caption = useRef<HTMLDivElement>(null);

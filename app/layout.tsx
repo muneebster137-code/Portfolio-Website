@@ -7,6 +7,8 @@ import { SiteNav } from "@/components/shell/SiteNav";
 import { ChapterHud } from "@/components/shell/ChapterHud";
 import { SiteFooter } from "@/components/shell/SiteFooter";
 import { DreamTransition } from "@/components/shell/DreamTransition";
+import { identity } from "@/lib/site";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const archivo = Archivo({
@@ -28,11 +30,31 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+const description =
+  "Founder and creative specialist bringing visions to life: social media, video, print, branding, websites, packaging and pitch decks. 4+ years, 1,000+ creatives, 16+ brands.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Muhammad Muneeb Bilal | Founder and Creative Specialist",
-  description:
-    "Founder and creative specialist bringing visions to life: social media, video, print, branding, websites, packaging and pitch decks. 4+ years, 1,000+ creatives, 16+ brands.",
-  authors: [{ name: "Muhammad Muneeb Bilal" }],
+  description,
+  authors: [{ name: identity.name }],
+  openGraph: { type: "website", siteName: identity.name, locale: "en_GB", title: "Muhammad Muneeb Bilal | Founder and Creative Specialist", description },
+  twitter: { card: "summary_large_image", title: "Muhammad Muneeb Bilal | Founder and Creative Specialist", description },
+};
+
+// Tells search engines who the site belongs to (name, role, contact, LinkedIn).
+const person = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: identity.name,
+  jobTitle: identity.role,
+  description: "I bring visions to life.",
+  url: siteUrl,
+  email: `mailto:${identity.email}`,
+  telephone: identity.phone,
+  address: { "@type": "PostalAddress", addressLocality: "Islamabad", addressCountry: "PK" },
+  alumniOf: { "@type": "CollegeOrUniversity", name: "SZABIST Islamabad" },
+  sameAs: [identity.linkedin],
 };
 
 export const viewport = {
@@ -45,6 +67,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${archivo.variable} ${geist.variable} ${geistMono.variable}`}>
       <body className="font-sans bg-void text-bone antialiased">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
         <AccentProvider>
           <SmoothScroll>
             <Preloader />

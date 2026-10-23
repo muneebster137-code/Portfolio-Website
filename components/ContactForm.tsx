@@ -2,10 +2,14 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { services, serviceSlug } from "@/lib/site";
+import { identity, services, serviceSlug } from "@/lib/site";
 import { contact } from "@/lib/profile";
 
 type Status = "idle" | "sending" | "sent" | "error";
+
+// Briefs go straight to the inbox through FormSubmit (no server needed). The first submission sends
+// FormSubmit's one-time activation email to this address; the form delivers once that link is clicked.
+const FORMSUBMIT = "https://formsubmit.co/ajax/muneebster137@gmail.com";
 
 const field = "w-full bg-transparent border-0 border-b border-bone/25 rounded-none px-0 py-3 text-[18px] text-bone placeholder:text-fog focus:outline-none focus:border-bone transition-colors";
 
@@ -18,16 +22,32 @@ export function ContactForm() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.currentTarget));
+    const form = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+    if (form._honey) return; // filled only by bots
+    const service = services.find((s) => serviceSlug(s) === form.service)?.name ?? "Not chosen";
     setStatus("sending");
     setError("");
     try {
-      const res = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.message || "Something went wrong.");
+      const res = await fetch(FORMSUBMIT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          _subject: `New project brief from ${form.name}${form.brand ? ` (${form.brand})` : ""}`,
+          _template: "table",
+          _replyto: form.email,
+          Name: form.name,
+          email: form.email,
+          "Brand or company": form.brand || "Not given",
+          Service: service,
+          Brief: form.brief,
+          Timeline: form.timeline || "Not given",
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || String(body.success) !== "true") throw new Error();
       setStatus("sent");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } catch {
+      setError(`Couldn't send that. Email ${identity.email} instead.`);
       setStatus("error");
     }
   }
@@ -41,7 +61,8 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-10" noValidate={false}>
+    <form onSubmit={onSubmit} className="grid gap-10">
+      <input type="text" name="_honey" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
       <div className="grid md:grid-cols-2 gap-10">
         <label className="block">
           <span className="label text-fog">Name</span>

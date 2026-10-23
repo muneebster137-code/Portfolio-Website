@@ -15,6 +15,11 @@ export function CtaBand({ line, sub = "Let's bring it to life.", service }: { li
   const href = service ? `/contact?service=${service}` : "/contact";
 
   useEffect(() => {
+    // Less motion asked for: the eyes are already open.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set(root.current!.querySelectorAll(".kick-lid-top, .kick-lid-bottom"), { autoAlpha: 0 });
+      return;
+    }
     const ctx = gsap.context(() => {
       const lids = { trigger: root.current, start: "top 80%", end: "top 10%", scrub: true };
       gsap.fromTo(".kick-lid-top", { yPercent: 0 }, { yPercent: -101, ease: "power1.in", scrollTrigger: lids });
