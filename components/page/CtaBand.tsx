@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { identity } from "@/lib/site";
+import { braam } from "@/components/fx/sound";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,6 +27,22 @@ export function CtaBand({ line, sub = "Let's bring it to life.", service }: { li
       gsap.fromTo(".kick-lid-bottom", { yPercent: 0 }, { yPercent: 101, ease: "power1.in", scrollTrigger: lids });
       gsap.from(".kick-line", { yPercent: 110, duration: 1.3, stagger: 0.08, ease: "expo.out", scrollTrigger: { trigger: root.current, start: "top 40%" } });
       gsap.from(".kick-fade", { autoAlpha: 0, y: 16, duration: 1, stagger: 0.08, ease: "power3.out", scrollTrigger: { trigger: root.current, start: "top 35%" } });
+      // The kick: the moment you reach "Wake up", the world tips and drops, like falling out of a dream.
+      ScrollTrigger.create({
+        trigger: root.current,
+        start: "top 70%",
+        onEnter: () => {
+          const main = document.querySelector("main");
+          if (!main) return;
+          braam();
+          gsap
+            .timeline()
+            .set(main, { transformOrigin: `50% ${window.scrollY + window.innerHeight / 2}px` })
+            .to(main, { y: 34, rotation: 0.9, duration: 0.16, ease: "power2.in" })
+            .to(main, { y: -10, rotation: -0.3, duration: 0.2, ease: "power2.out" })
+            .to(main, { y: 0, rotation: 0, duration: 0.5, ease: "elastic.out(1, 0.5)", clearProps: "transform,transformOrigin" });
+        },
+      });
     }, root);
     return () => ctx.revert();
   }, []);

@@ -5,14 +5,15 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
 import { ShelfObject } from "./ServiceObjects";
-import { pointer } from "./store";
+import { pointer, time } from "./store";
 
 // A service page's own object from the shelf, lit alone and turning slowly toward the pointer.
 function Turntable({ children }: { children: React.ReactNode }) {
   const g = useRef<THREE.Group>(null);
-  useFrame((state, dt) => {
+  useFrame((_, rawDt) => {
+    const dt = rawDt * time.scale;
     if (!g.current) return;
-    const t = state.clock.elapsedTime;
+    const t = time.t;
     const k = 1 - Math.pow(0.003, dt);
     g.current.rotation.y += (Math.sin(t * 0.35) * 0.45 + pointer.x * 0.35 - g.current.rotation.y) * k;
     g.current.rotation.x += (0.08 - pointer.y * 0.12 - g.current.rotation.x) * k;

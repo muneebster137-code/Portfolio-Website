@@ -4,6 +4,7 @@ import Link from "next/link";
 import { about, allTestimonials, education } from "@/lib/profile";
 import { processSteps } from "@/lib/site";
 import { Reveal } from "@/components/motion/Reveal";
+import { FoldCity } from "@/components/fx/FoldCity";
 import { SectionHead } from "@/components/page/SectionHead";
 import { CtaBand } from "@/components/page/CtaBand";
 import { Placeholder } from "@/components/ui/Slot";
@@ -27,8 +28,8 @@ export default function AboutPage() {
         <div>
           <p className="label text-fog" data-fade>About</p>
           <h1 className="type-x mt-8 text-[14vw] md:text-[clamp(56px,7.4vw,132px)] leading-[0.92]">
-            <span className="block overflow-hidden"><span data-line className="block">{about.heading[0]}</span></span>
-            <span className="block overflow-hidden"><span data-line className="block text-mist">{about.heading[1]}</span></span>
+            <span className="block overflow-hidden"><span data-line data-ink className="block">{about.heading[0]}</span></span>
+            <span className="block overflow-hidden"><span data-line data-ink className="block text-mist">{about.heading[1]}</span></span>
           </h1>
           <p data-fade className="mt-10 max-w-[460px] text-[18px] leading-[1.6] text-mist">{about.intro}</p>
         </div>
@@ -79,21 +80,26 @@ export default function AboutPage() {
       </section>
 
       <section aria-labelledby="story-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24 md:py-36">
-        <Reveal>
-          <SectionHead id="story-h" label="03" title="My story" />
-        </Reveal>
-        <Reveal className="mt-12 grid md:grid-cols-3 gap-6 md:gap-8">
-          {about.story.map((part, i) => (
-            <article key={i} data-rise className={`min-h-[56svh] md:min-h-0 md:aspect-[1/1.414] bg-[#F2EFE7] text-void p-7 md:p-9 flex flex-col justify-between shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9)] ${tilt[i]}`}>
-              <p className="label text-void/50">Part {i + 1}</p>
-              <p className="type-c text-[22px] md:text-[clamp(20px,1.8vw,30px)] leading-[1.25] text-void/85">{part}</p>
-              <p className="label text-void/35 self-end">{i + 1} / 3</p>
-            </article>
-          ))}
-        </Reveal>
-        <Reveal className="mt-24 md:mt-32">
-          <p data-words className="type-c text-[30px] md:text-[clamp(36px,4vw,68px)] leading-[1.08] max-w-[1250px]">{about.storyClose}</p>
-        </Reveal>
+        {/* As the story scrolls up, it folds over like the city in Inception. */}
+        <FoldCity>
+          <Reveal data-fold>
+            <SectionHead id="story-h" label="03" title="My story" />
+          </Reveal>
+          <Reveal className="mt-12 grid md:grid-cols-3 gap-6 md:gap-8">
+            {about.story.map((part, i) => (
+              <div key={i} data-fold>
+                <article data-rise className={`min-h-[56svh] md:min-h-0 md:aspect-[1/1.414] bg-[#F2EFE7] text-void p-7 md:p-9 flex flex-col justify-between shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9)] ${tilt[i]}`}>
+                  <p className="label text-void/50">Part {i + 1}</p>
+                  <p className="type-c text-[22px] md:text-[clamp(20px,1.8vw,30px)] leading-[1.25] text-void/85">{part}</p>
+                  <p className="label text-void/35 self-end">{i + 1} / 3</p>
+                </article>
+              </div>
+            ))}
+          </Reveal>
+          <Reveal data-fold className="mt-24 md:mt-32">
+            <p data-words className="type-c text-[30px] md:text-[clamp(36px,4vw,68px)] leading-[1.08] max-w-[1250px]">{about.storyClose}</p>
+          </Reveal>
+        </FoldCity>
       </section>
 
       <section aria-labelledby="quotes-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24 md:py-36">

@@ -16,8 +16,8 @@ export default function ContactPage() {
       <Reveal as="header" immediate className="mx-auto max-w-[1600px] px-5 md:px-10 pt-36 pb-16">
         <p className="label text-fog" data-fade>Contact</p>
         <h1 className="type-x mt-8 text-[14vw] md:text-[clamp(56px,7.4vw,132px)] leading-[0.92]">
-          <span className="block overflow-hidden"><span data-line className="block">{contact.heading[0]}</span></span>
-          <span className="block overflow-hidden"><span data-line className="block text-mist">{contact.heading[1]}</span></span>
+          <span className="block overflow-hidden"><span data-line data-ink className="block">{contact.heading[0]}</span></span>
+          <span className="block overflow-hidden"><span data-line data-ink className="block text-mist">{contact.heading[1]}</span></span>
         </h1>
         <p data-fade className="mt-10 max-w-[460px] text-[18px] leading-[1.6] text-mist">{contact.sub}</p>
       </Reveal>

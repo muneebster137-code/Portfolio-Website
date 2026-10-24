@@ -9,6 +9,7 @@ import { CaseGallery } from "@/components/case/CaseGallery";
 import { caseCovers, caseGalleries } from "@/lib/media-manifest";
 import { resolveAll, resolveSlot } from "@/lib/media.server";
 import { OpeningVisual } from "@/components/case/OpeningVisual";
+import { DreamLevels } from "@/components/fx/DreamLevels";
 import { CtaBand } from "@/components/page/CtaBand";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -46,6 +47,7 @@ export default async function CaseStudy({ params }: Params) {
 
   return (
     <article style={{ ["--case" as string]: c.accent }}>
+      <DreamLevels />
       <Reveal as="header" immediate className="mx-auto max-w-[1600px] px-5 md:px-10 pt-32">
         <div className="flex flex-wrap justify-between gap-3 label text-fog" data-fade>
           <span>
@@ -54,9 +56,9 @@ export default async function CaseStudy({ params }: Params) {
           <span>{[c.major && "Major case study", c.via && "via Watch How Malaysia", c.year].filter(Boolean).join(" · ")}</span>
         </div>
         <h1 className="leading-[0.82] mt-12">
-          <span className="block overflow-hidden"><span data-line className="block type-x" style={{ fontSize: `${titleVw}vw` }}>{first}</span></span>
+          <span className="block overflow-hidden"><span data-line data-ink className="block type-x" style={{ fontSize: `${titleVw}vw` }}>{first}</span></span>
           <span className="flex flex-wrap items-end gap-x-[3vw] gap-y-4">
-            {rest && <span className="block overflow-hidden"><span data-line className="block type-c font-light text-mist text-[15vw] md:text-[10vw]">{rest}</span></span>}
+            {rest && <span className="block overflow-hidden"><span data-line data-ink className="block type-c font-light text-mist text-[15vw] md:text-[10vw]">{rest}</span></span>}
             <span data-fade className="max-w-[460px] font-sans normal-case text-[19px] md:text-[22px] leading-[1.4] text-bone/85 font-light pb-[1.6vw]">{c.summary}</span>
           </span>
         </h1>

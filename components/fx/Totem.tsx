@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { time } from "@/components/three/store";
 
 // The spinning top from Inception, in the corner. Scrolling spins it; when you stop it slows and starts
 // to wobble but keeps going (you are still dreaming). Only in the "Wake up" section does it fall over.
@@ -28,7 +29,7 @@ export function Totem() {
     if (wake) io!.observe(wake);
 
     const frame = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
+      const dt = Math.min(0.05, (now - last) / 1000) * time.scale;
       last = now;
       const dy = Math.abs(window.scrollY - lastY);
       lastY = window.scrollY;

@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, RoundedBox, useTexture } from "@react-three/drei";
 import * as THREE from "three";
-import { pointer, showcaseState, smooth } from "./store";
+import { pointer, showcaseState, smooth, time } from "./store";
 
 // What an object shows before its picture is supplied: a quiet graphite card.
 let placeholderUrl = "";
@@ -95,7 +95,8 @@ function Disc({ src }: { src?: string }) {
   const tex = useTexture(src ?? placeholder());
   const top = useMemo(() => discTexture(tex.image as HTMLImageElement, "REELS"), [tex]);
   const disc = useRef<THREE.Mesh>(null);
-  useFrame((_, dt) => {
+  useFrame((_, rawDt) => {
+    const dt = rawDt * time.scale;
     if (disc.current) disc.current.rotation.y += dt * 0.5;
   });
   return (
@@ -229,8 +230,8 @@ const BD = 0.34;
 function StoryBook({ src }: { src?: string }) {
   const map = useCoverTexture(src, (BW - 0.02) / (BH - 0.02));
   const board = useRef<THREE.Group>(null);
-  useFrame((state) => {
-    if (board.current) board.current.rotation.y = -(0.1 + 0.32 * (0.5 - 0.5 * Math.cos(state.clock.elapsedTime * 0.7)));
+  useFrame(() => {
+    if (board.current) board.current.rotation.y = -(0.1 + 0.32 * (0.5 - 0.5 * Math.cos(time.t * 0.7)));
   });
   const cloth = "#0E8A63";
   const edges = pageEdges();
@@ -356,9 +357,10 @@ function Arc({ textures }: { textures: ShelfTextures }) {
   const target = useMemo(() => new THREE.Vector3(), []);
   const { viewport } = useThree();
 
-  useFrame((state, dt) => {
+  useFrame((_, rawDt) => {
+    const dt = rawDt * time.scale;
     const head = showcaseState.head;
-    const t = state.clock.elapsedTime;
+    const t = time.t;
     const k = 1 - Math.pow(0.00002, dt);
     groups.current.forEach((g, i) => {
       if (!g) return;

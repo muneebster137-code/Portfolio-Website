@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
-import { dreamState, pointer, smooth } from "./store";
+import { SKETCHED, dreamState, pointer, smooth, time } from "./store";
 import { FIRST, FIRST_LINE, SketchSheet, TOTAL, makeWorkSide, toSheet } from "./paperTextures";
 import { pencil as pencilSound } from "@/components/fx/sound";
 
@@ -87,6 +87,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
   const hover = useRef<{ x: number; y: number } | null>(null);
   const hoverW = useRef(0);
   const lastDrawn = useRef(0);
+  const sketched = useRef(false);
 
   const sketch = useMemo(() => new SketchSheet(), []);
   const geo = useMemo(() => new THREE.PlaneGeometry(W, H, SEG, 1), []);
@@ -103,6 +104,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     t.repeat.x = -1;
     setWorkTex(t);
     return () => {
+      dreamState.sketch = null;
       t.dispose();
       sketch.texture.dispose();
       sketch.mask.dispose();
@@ -117,11 +119,12 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     []
   );
 
-  useFrame((state, dt) => {
+  useFrame((_, rawDt) => {
+    const dt = rawDt * time.scale;
     const g = group.current;
     if (!g) return;
     const p = dreamState.progress;
-    const t = state.clock.elapsedTime;
+    const t = time.t;
     // Below roughly 5:4 there is no room beside the headline, so the sheet waits underneath it.
     const narrow = viewport.aspect < 1.25;
     // Progress is already smoothed by the scroll timeline; only a light damping on top, and none
@@ -256,6 +259,11 @@ function Sheet({ backSrc }: { backSrc?: string }) {
     const fresh = !hover.current;
     hover.current = { x: (e.uv.x - 0.5) * W, y: (e.uv.y - 0.5) * H };
     sketch.scribble(e.uv.x, e.uv.y, fresh);
+    if (!sketched.current && sketch.inkTotal > 500) {
+      sketched.current = true;
+      dreamState.sketch = () => sketch.exportDoodle();
+      window.dispatchEvent(new Event(SKETCHED));
+    }
   };
   const onLeave = () => {
     hover.current = null;

@@ -17,8 +17,8 @@ export default function ServicesPage() {
       <Reveal as="header" immediate className="mx-auto max-w-[1600px] px-5 md:px-10 pt-36 pb-20">
         <p className="label text-fog" data-fade>Services</p>
         <h1 className="type-x mt-8 text-[13vw] md:text-[clamp(56px,7vw,124px)] leading-[0.92]">
-          <span className="block overflow-hidden"><span data-line className="block">Seven services.</span></span>
-          <span className="block overflow-hidden"><span data-line className="block text-mist">One creative engine.</span></span>
+          <span className="block overflow-hidden"><span data-line data-ink className="block">Seven services.</span></span>
+          <span className="block overflow-hidden"><span data-line data-ink className="block text-mist">One creative engine.</span></span>
         </h1>
         <p data-fade className="mt-10 max-w-[520px] text-[18px] leading-[1.6] text-mist">
           Whatever the format, the process is the same: I understand the need, build on your vision, and deliver creative designed around how people actually pay attention.

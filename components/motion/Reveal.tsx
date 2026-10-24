@@ -4,6 +4,7 @@ import { useEffect, useRef, type ElementType, type ReactNode } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { pencil } from "@/components/fx/sound";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -12,6 +13,7 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 //   [data-fade]  fades and rises
 //   [data-words] reads word by word as it scrolls through (scrubbed)
 //   [data-rise]  lifts into place, staggered
+//   [data-ink]   is drawn in pencil outline first, left to right, then inked in
 export function Reveal({ as: Tag = "div", className, children, immediate = false, ...rest }: { as?: ElementType; className?: string; children: ReactNode; immediate?: boolean } & Record<string, unknown>) {
   const ref = useRef<HTMLElement>(null);
 
@@ -25,6 +27,25 @@ export function Reveal({ as: Tag = "div", className, children, immediate = false
       const lines = el.querySelectorAll("[data-line]");
       if (lines.length) gsap.from(lines, { yPercent: 112, duration: 1.2, stagger: 0.08, ease: "expo.out", delay: immediate ? 0.15 : 0, scrollTrigger: trigger(el, "top 88%") });
       el.querySelectorAll("[data-fade]").forEach((f) => gsap.from(f, { autoAlpha: 0, y: 24, duration: 1, ease: "power3.out", delay: immediate ? 0.4 : 0, scrollTrigger: trigger(f, "top 90%") }));
+      el.querySelectorAll<HTMLElement>("[data-ink]").forEach((t, i) => {
+        t.classList.add("inking");
+        gsap.fromTo(
+          t,
+          { clipPath: "inset(-25% 100% -25% 0)" },
+          {
+            clipPath: "inset(-25% 0% -25% 0)",
+            duration: 1.1,
+            ease: "power1.inOut",
+            delay: (immediate ? 0.15 : 0) + i * 0.25,
+            scrollTrigger: trigger(t, "top 90%"),
+            onUpdate: () => pencil(1100),
+            onComplete: () => {
+              gsap.delayedCall(0.15, () => t.classList.remove("inking"));
+              gsap.set(t, { clearProps: "clipPath" });
+            },
+          }
+        );
+      });
       const rises = el.querySelectorAll("[data-rise]");
       if (rises.length) gsap.from(rises, { y: 90, autoAlpha: 0, duration: 1.1, stagger: 0.09, ease: "expo.out", scrollTrigger: trigger(el, "top 85%") });
       el.querySelectorAll<HTMLElement>("[data-words]").forEach((p) => {

@@ -88,6 +88,8 @@ export class SketchSheet {
   private lastDoodle: Pt | null = null;
   // Pixels of line the visitor has drawn since the last frame read it (for the pencil sound).
   doodleInk = 0;
+  // All the line the visitor has drawn on this sheet, in pixels.
+  inkTotal = 0;
   private last = "";
 
   constructor() {
@@ -128,9 +130,24 @@ export class SketchSheet {
       d.lineTo(p[0], p[1]);
       d.stroke();
       this.doodleRev++;
-      this.doodleInk += Math.hypot(p[0] - this.lastDoodle[0], p[1] - this.lastDoodle[1]);
+      const len = Math.hypot(p[0] - this.lastDoodle[0], p[1] - this.lastDoodle[1]);
+      this.doodleInk += len;
+      this.inkTotal += len;
     }
     this.lastDoodle = p;
+  }
+
+  // The visitor's own drawing on a clean sheet, as a PNG data URL (to send with their brief).
+  exportDoodle() {
+    const w = 640;
+    const h = Math.round((w * PH) / PW);
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const x = c.getContext("2d")!;
+    x.drawImage(this.base, 0, 0, w, h);
+    x.drawImage(this.doodle, 0, 0, w, h);
+    return c.toDataURL("image/png");
   }
 
   // Where the pencil point is when `drawn` of the sketch is done, in sheet pixels.

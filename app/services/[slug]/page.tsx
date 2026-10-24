@@ -78,7 +78,7 @@ export default async function ServiceDetail({ params }: Params) {
               <span className="size-2.5 rounded-[3px]" style={{ background: s.color }} />
               {s.code} · {String(i + 1).padStart(2, "0")} of 07
             </p>
-            <h1 className="overflow-hidden mt-8"><span data-line className="block type-x text-[13vw] md:text-[7.2vw] leading-[0.86]">{s.name}</span></h1>
+            <h1 className="overflow-hidden mt-8"><span data-line data-ink className="block type-x text-[13vw] md:text-[7.2vw] leading-[0.86]">{s.name}</span></h1>
             <p className="overflow-hidden mt-8"><span data-line className="block type-c font-light text-mist text-[9vw] md:text-[4.4vw] leading-[0.95]">{s.hook}</span></p>
             <div className="mt-12 flex flex-wrap items-end gap-x-10 gap-y-6" data-fade>
               <p className="type-x text-[18vw] md:text-[9vw] leading-[0.8]">{s.number}</p>

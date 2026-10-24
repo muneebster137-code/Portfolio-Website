@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { identity, navLinks } from "@/lib/site";
 import { getLenis } from "./SmoothScroll";
+import { DreamMap } from "@/components/fx/DreamMap";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -45,6 +46,7 @@ export function SiteFooter() {
           <a href={identity.linkedin} className="hover:text-void">LinkedIn</a>
         </div>
       </div>
+      <DreamMap />
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 flex flex-wrap items-center justify-between gap-4 pb-4">
         <p className="label text-void/55">© 2026 {identity.name}. All rights reserved.</p>
         <button type="button" onClick={() => getLenis()?.scrollTo(0, { duration: 2 })} className="label text-void/55 hover:text-void">

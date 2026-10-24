@@ -11,6 +11,7 @@ import { PencilTrail } from "@/components/fx/PencilTrail";
 import { SketchFilter } from "@/components/fx/SketchHover";
 import { Totem } from "@/components/fx/Totem";
 import { Limbo } from "@/components/fx/Limbo";
+import { TimeDilation } from "@/components/fx/TimeDilation";
 import { identity } from "@/lib/site";
 import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <PencilTrail />
         <Totem />
         <Limbo />
+        <TimeDilation />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
         <AccentProvider>
           <SmoothScroll>

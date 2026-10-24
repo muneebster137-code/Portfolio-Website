@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { gsap } from "gsap";
 import { identity, services, serviceSlug } from "@/lib/site";
 import { contact } from "@/lib/profile";
+import { SKETCH_KEY } from "@/components/three/store";
 
 type Status = "idle" | "sending" | "flying" | "sent" | "error";
 
@@ -22,14 +23,49 @@ const SHAPES = {
   plane: "polygon(0% 12%, 55% 34%, 100% 50%, 55% 66%, 0% 88%, 18% 50%)",
 };
 
+const SIGNATURE_FONT = `italic 600 40px "Segoe Script", "Brush Script MT", "Snell Roundhand", cursive`;
+
+// Signs the sketch with the visitor's name in the bottom corner and returns it as a PNG file.
+async function signedSketch(src: string, name: string) {
+  const img = new Image();
+  img.src = src;
+  await img.decode();
+  const c = document.createElement("canvas");
+  c.width = img.width;
+  c.height = img.height;
+  const x = c.getContext("2d")!;
+  x.drawImage(img, 0, 0);
+  x.font = SIGNATURE_FONT;
+  x.fillStyle = "#26282E";
+  x.textAlign = "right";
+  x.fillText(`— ${name}`, c.width - 36, c.height - 40);
+  const blob = await new Promise<Blob | null>((r) => c.toBlob(r, "image/png"));
+  return blob ? new File([blob], "sketch.png", { type: "image/png" }) : null;
+}
+
 // The brief is written on a sheet of A4. Sent, the sheet folds into a paper plane and flies off.
-// Name, email, brand, service (pre-selected from the page you came from), brief and an optional timeline.
+// Name, email, brand, service (pre-selected from the page you came from), brief and an optional timeline,
+// plus the visitor's own sketch from the home page, signed, if they made one.
 export function ContactForm() {
   const params = useSearchParams();
   const preset = params.get("service") ?? "";
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
+  const [sketch, setSketch] = useState<string | null>(null);
+  const [signer, setSigner] = useState("");
   const sheet = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      setSketch(sessionStorage.getItem(SKETCH_KEY));
+    } catch {}
+  }, []);
+  const dropSketch = () => {
+    setSketch(null);
+    try {
+      sessionStorage.removeItem(SKETCH_KEY);
+    } catch {}
+  };
 
   const flyAway = () => {
     const el = sheet.current;
@@ -56,24 +92,32 @@ export function ContactForm() {
     const service = services.find((s) => serviceSlug(s) === form.service)?.name ?? "Not chosen";
     setStatus("sending");
     setError("");
+    const fields: Record<string, string> = {
+      _subject: `New project brief from ${form.name}${form.brand ? ` (${form.brand})` : ""}`,
+      _template: "table",
+      _replyto: form.email,
+      Name: form.name,
+      email: form.email,
+      "Brand or company": form.brand || "Not given",
+      Service: service,
+      Brief: form.brief,
+      Timeline: form.timeline || "Not given",
+    };
+    const ok = async (res: Response) => res.ok && String((await res.json().catch(() => ({}))).success) === "true";
+    const asJson = () => fetch(FORMSUBMIT, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(fields) });
     try {
-      const res = await fetch(FORMSUBMIT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          _subject: `New project brief from ${form.name}${form.brand ? ` (${form.brand})` : ""}`,
-          _template: "table",
-          _replyto: form.email,
-          Name: form.name,
-          email: form.email,
-          "Brand or company": form.brand || "Not given",
-          Service: service,
-          Brief: form.brief,
-          Timeline: form.timeline || "Not given",
-        }),
-      });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok || String(body.success) !== "true") throw new Error();
+      let sent = false;
+      // With a sketch, send it as an attachment; if that is refused, the brief still goes without it.
+      const file = sketch ? await signedSketch(sketch, form.name).catch(() => null) : null;
+      if (file) {
+        const data = new FormData();
+        Object.entries({ ...fields, Sketch: "Attached, signed by the sender" }).forEach(([k, v]) => data.append(k, v));
+        data.append("attachment", file);
+        sent = await fetch(FORMSUBMIT, { method: "POST", headers: { Accept: "application/json" }, body: data }).then(ok, () => false);
+      }
+      if (!sent) sent = await asJson().then(ok);
+      if (!sent) throw new Error();
+      if (sketch) dropSketch();
       flyAway();
     } catch {
       setError(`Couldn't send that. Email ${identity.email} instead.`);
@@ -103,7 +147,7 @@ export function ContactForm() {
           <div className="grid md:grid-cols-2 gap-10">
             <label className="block">
               <span className={label}>Name</span>
-              <input name="name" required autoComplete="name" className={field} placeholder="Your name" />
+              <input name="name" required autoComplete="name" className={field} placeholder="Your name" onChange={(e) => setSigner(e.target.value)} />
             </label>
             <label className="block">
               <span className={label}>Email</span>
@@ -133,6 +177,22 @@ export function ContactForm() {
             <span className={label}>Timeline (optional)</span>
             <input name="timeline" className={field} placeholder="When do you need it?" />
           </label>
+          {sketch && (
+            <div className="flex flex-wrap items-end gap-6">
+              <figure className="relative w-36 aspect-[1/1.414] bg-[#F7F4EC] -rotate-2 shadow-[0_14px_30px_-14px_rgba(0,0,0,0.5)] overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element -- a data URL from this visit, not a site asset */}
+                <img src={sketch} alt="Your sketch from the home page" className="absolute inset-0 size-full object-cover" />
+                <figcaption className="absolute right-2 bottom-1.5 text-[13px] text-void/80" style={{ font: `italic 600 13px "Segoe Script", "Brush Script MT", "Snell Roundhand", cursive` }}>
+                  — {signer || "your name"}
+                </figcaption>
+              </figure>
+              <div>
+                <p className={label}>Your sketch, signed</p>
+                <p className="mt-2 text-[15px] text-void/70 max-w-[300px]">It goes with your brief, signed with your name.</p>
+                <button type="button" onClick={dropSketch} className="mt-2 text-[14px] underline underline-offset-4 text-void/60 hover:text-void">Leave it out</button>
+              </div>
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-6">
             <button type="submit" disabled={status === "sending" || status === "flying"} className="inline-flex h-16 items-center gap-3 rounded-full bg-signal px-9 text-lg font-medium text-void hover:bg-void hover:text-bone transition-colors disabled:opacity-60">
               {status === "sending" ? "Sending" : "Start a project"}

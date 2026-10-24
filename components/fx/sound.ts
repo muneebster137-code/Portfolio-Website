@@ -111,3 +111,73 @@ export function pencil(speed: number) {
   g.gain.setTargetAtTime(level, t, 0.025);
   g.gain.setTargetAtTime(0, t + 0.12, 0.05);
 }
+
+// The horn: two low, detuned saws through a closing filter. Played once, on the kick that wakes you up.
+export function braam() {
+  if (!enabled || !ctx) return;
+  const t = ctx.currentTime;
+  const out = ctx.createGain();
+  out.gain.setValueAtTime(0, t);
+  out.gain.linearRampToValueAtTime(0.14, t + 0.06);
+  out.gain.setTargetAtTime(0, t + 0.7, 0.35);
+  const low = ctx.createBiquadFilter();
+  low.type = "lowpass";
+  low.frequency.setValueAtTime(900, t);
+  low.frequency.exponentialRampToValueAtTime(180, t + 1.8);
+  low.connect(out).connect(ctx.destination);
+  [43.65, 44.2, 87.3].forEach((f) => {
+    const o = ctx!.createOscillator();
+    o.type = "sawtooth";
+    o.frequency.value = f;
+    o.connect(low);
+    o.start(t);
+    o.stop(t + 2.6);
+  });
+}
+
+// Going a level deeper: a soft note that slides down.
+export function deeper(level: number) {
+  if (!enabled || !ctx) return;
+  const t = ctx.currentTime;
+  const o = ctx.createOscillator();
+  o.type = "sine";
+  o.frequency.setValueAtTime(330 / level, t);
+  o.frequency.exponentialRampToValueAtTime(165 / level, t + 1.2);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.08, t + 0.05);
+  g.gain.exponentialRampToValueAtTime(0.0008, t + 1.6);
+  o.connect(g).connect(ctx.destination);
+  o.start(t);
+  o.stop(t + 1.7);
+}
+
+// While time is slowed: a low, slowly pulsing drone that fades in and out with the hold.
+let droneGain: GainNode | null = null;
+export function drone(on: boolean) {
+  if (!ctx) return;
+  if (!droneGain) {
+    droneGain = ctx.createGain();
+    droneGain.gain.value = 0;
+    const low = ctx.createBiquadFilter();
+    low.type = "lowpass";
+    low.frequency.value = 260;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.35;
+    const depth = ctx.createGain();
+    depth.gain.value = 120;
+    lfo.connect(depth).connect(low.frequency);
+    [55, 55.6, 82.4].forEach((f) => {
+      const o = ctx!.createOscillator();
+      o.type = "triangle";
+      o.frequency.value = f;
+      o.connect(low);
+      o.start();
+    });
+    lfo.start();
+    low.connect(droneGain).connect(ctx.destination);
+  }
+  const t = ctx.currentTime;
+  droneGain.gain.cancelScheduledValues(t);
+  droneGain.gain.setTargetAtTime(on && enabled ? 0.12 : 0, t, on ? 0.4 : 0.25);
+}

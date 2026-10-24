@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { keyNumbers, story } from "@/lib/site";
-import { dreamState } from "@/components/three/store";
+import { SKETCHED, SKETCH_KEY, dreamState } from "@/components/three/store";
 import { useInViewport } from "@/components/three/useInViewport";
 import { PRELOADER_DONE } from "@/components/shell/Preloader";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
@@ -30,6 +30,19 @@ export function DreamSequence({ sheetBack }: { sheetBack?: string }) {
 function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
   const wrap = useRef<HTMLElement>(null);
   const active = useInViewport(wrap, "0px");
+  // Once the visitor has drawn on the sheet, they can sign it and send it with their brief.
+  const [sketched, setSketched] = useState(false);
+  useEffect(() => {
+    const on = () => setSketched(true);
+    window.addEventListener(SKETCHED, on);
+    return () => window.removeEventListener(SKETCHED, on);
+  }, []);
+  const keepSketch = () => {
+    const png = dreamState.sketch?.();
+    try {
+      if (png) sessionStorage.setItem(SKETCH_KEY, png);
+    } catch {}
+  };
 
   useEffect(() => {
     const q = gsap.utils.selector(wrap);
@@ -116,7 +129,14 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
               <Link href="/contact" className="inline-flex h-12 items-center rounded-full px-6 text-[15px] ring-1 ring-bone/25 hover:ring-bone transition">Start a project</Link>
             </div>
           </div>
-          <p className="ds-fade label text-fog">Scroll<span className="hidden [@media(hover:hover)]:inline"> · or draw on the page</span></p>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <p className="ds-fade label text-fog">Scroll<span className="hidden [@media(hover:hover)]:inline"> · or draw on the page</span></p>
+            {sketched && (
+              <Link href="/contact" onPointerDown={keepSketch} onKeyDown={(e) => e.key === "Enter" && keepSketch()} className="pointer-events-auto label text-bone underline decoration-bone/40 underline-offset-4 hover:decoration-bone animate-[fade-in_0.6s_ease-out]">
+                Sign your sketch and send it with your brief
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* 02 · The sketch */}

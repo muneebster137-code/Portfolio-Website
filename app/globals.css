@@ -192,3 +192,9 @@ html.limbo { filter: invert(1) hue-rotate(180deg); }
 
 /* Press feedback: pills and buttons give a little under the finger, straight away. */
 a.rounded-full:active, button.rounded-full:active { scale: 0.96; }
+
+/* Page titles: a pencil outline first, then the ink fills in. */
+[data-ink], [data-ink] * { -webkit-text-stroke: 1px transparent; transition: color 0.8s ease, -webkit-text-stroke-color 0.8s ease; }
+.inking, .inking * { color: transparent !important; -webkit-text-stroke-color: rgba(238, 234, 225, 0.75); }
+@keyframes fade-in { from { opacity: 0; transform: translateY(6px); } }
+html.dilated { user-select: none; }

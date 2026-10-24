@@ -23,7 +23,7 @@ export default function ResumePage() {
         <div>
           <p className="label text-fog" data-fade>Resume</p>
           <h1 className="type-x mt-8 text-[12vw] md:text-[clamp(52px,6.4vw,112px)] leading-[0.92]">
-            <span className="block overflow-hidden"><span data-line className="block">{identity.name}</span></span>
+            <span className="block overflow-hidden"><span data-line data-ink className="block">{identity.name}</span></span>
           </h1>
           <p data-fade className="mt-6 text-[18px] text-mist">{identity.role}</p>
           <p data-fade className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[15px] text-bone/80">

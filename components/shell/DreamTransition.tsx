@@ -3,16 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { gsap } from "gsap";
-import { serviceBySlug } from "@/lib/site";
-import { getCase } from "@/lib/cases";
-
-function nameFor(path: string, fallback: string) {
-  const [a, b] = path.split("/").filter(Boolean);
-  if (!a) return "Home";
-  if (a === "services") return b ? serviceBySlug(b)?.name ?? fallback : "Services";
-  if (a === "case-studies") return b ? getCase(b)?.title ?? fallback : "Case studies";
-  return a.charAt(0).toUpperCase() + a.slice(1);
-}
+import { nameFor } from "@/lib/page-name";
 
 // Between pages the dark closes in from where you clicked, like an iris, names where you are going,
 // and opens again on the next page. Opening a case from its picture is different: the picture itself

@@ -14,6 +14,8 @@ ScrollTrigger.config({ ignoreMobileResize: true });
 let lenis: Lenis | null = null;
 
 export const getLenis = () => lenis;
+// How closely scrolling follows the wheel; dream levels lower it to make deep pages feel slower.
+export const BASE_LERP = 0.16;
 
 // Lenis drives the scroll; GSAP's ticker drives Lenis so ScrollTrigger and Lenis share one clock.
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
@@ -23,7 +25,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // A light lerp keeps the glide but answers the wheel straight away; scenes follow it directly.
     lenis = new Lenis({
-      lerp: reduced ? 1 : 0.16,
+      lerp: reduced ? 1 : BASE_LERP,
       smoothWheel: !reduced,
       touchMultiplier: 1.4,
     });
