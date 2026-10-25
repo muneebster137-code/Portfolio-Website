@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo, Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { AccentProvider } from "@/components/AccentProvider";
 import { SmoothScroll } from "@/components/shell/SmoothScroll";
 import { Preloader } from "@/components/shell/Preloader";
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <DreamTransition />
           </SmoothScroll>
         </AccentProvider>
+        <Analytics />
       </body>
     </html>
   );
