@@ -54,7 +54,7 @@ const person = {
   "@type": "Person",
   name: identity.name,
   jobTitle: identity.role,
-  description: "I bring visions to life.",
+  description: "Dreamt in pencil. Delivered in colour.",
   url: siteUrl,
   email: `mailto:${identity.email}`,
   telephone: identity.phone,

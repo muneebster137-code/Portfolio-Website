@@ -141,6 +141,9 @@ export const websiteShowcase: Record<string, Slot> = Object.fromEntries(
 const H = "media/home";
 
 export const homeMedia = {
+  // The hero's floating portrait. A cut-out PNG (transparent background) floats free; any other image
+  // shows as a floating card. Until one is added, the About portrait is used.
+  portrait: one(`${H}/hero/portrait`, "3/4", "Hero portrait (cut-out PNG with a transparent background floats best)"),
   sheetBack: one(`${H}/sheet/back`, "a4", "Back of the A4 sheet (the work it turns into)"),
   insideTheDream: Object.fromEntries(
     ["anebos-studios", "aba-group", "trenddeck", "treatsforlife"].map((s) => [s, one(`${H}/inside-the-dream/${s}`, "16/10", "Case image")])

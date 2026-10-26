@@ -7,22 +7,13 @@ import { featuredWork, keyNumbers, services, story } from "@/lib/site";
 
 export function StillIntro({ sheetBack }: { sheetBack?: string }) {
   return (
-    <section id="intro" data-chapter="Reality" aria-label="Introduction" className="mx-auto max-w-[1600px] px-5 md:px-10 pt-36 pb-24">
-      <p className="label text-fog">Founder and Creative Specialist</p>
+    <section id="intro" data-chapter="Reality" aria-label="My story" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24">
+      <p className="label text-fog">01 · Reality</p>
       <div className="mt-8 grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-14 items-end">
-        <div>
-          <h1 className="type-x text-[15vw] md:text-[clamp(56px,8.4vw,150px)] leading-[0.9]">
-            I bring visions to life<span className="text-signal">.</span>
-          </h1>
-          <p className="mt-8 max-w-[440px] text-[17px] leading-[1.6] text-mist">
-            Social media, video, print, branding, websites, packaging and pitch decks from one creative engine. I start by understanding what you want people to feel, then I build everything around that vision.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/case-studies" className="inline-flex h-12 items-center rounded-full bg-bone px-6 text-[15px] font-medium text-void hover:bg-signal transition-colors">View case studies</Link>
-            <Link href="/contact" className="inline-flex h-12 items-center rounded-full px-6 text-[15px] ring-1 ring-bone/25 hover:ring-bone transition">Start a project</Link>
-          </div>
-        </div>
-        <div className="relative aspect-[1/1.414] w-full max-w-[380px] lg:justify-self-end bg-paper rotate-[2deg] overflow-hidden shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]" aria-hidden="true">
+        <h2 className="type-x text-[11vw] md:text-[clamp(44px,5.6vw,100px)] leading-[0.92]">
+          It all starts on a blank page<span className="text-signal">.</span>
+        </h2>
+        <div className="relative aspect-[1/1.414] w-full max-w-[380px] lg:justify-self-end bg-[#F2EFE7] rotate-[2deg] overflow-hidden shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]" aria-hidden="true">
           {sheetBack ? (
             <Image src={sheetBack} alt="" fill sizes="380px" className="object-cover" />
           ) : (

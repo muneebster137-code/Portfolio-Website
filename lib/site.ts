@@ -3,7 +3,7 @@
 export const identity = {
   name: "Muhammad Muneeb Bilal",
   role: "Founder and Creative Specialist",
-  tagline: "I bring visions to life.",
+  tagline: "Dreamt in pencil. Delivered in colour.",
   email: "muneebster137@gmail.com",
   phone: "+92-328-5726711",
   phoneHref: "tel:+923285726711",

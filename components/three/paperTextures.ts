@@ -38,8 +38,7 @@ const STROKES: { pts: Pt[]; light?: boolean }[] = [
 const lengthOf = (pts: Pt[]) => pts.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]), 0);
 export const TOTAL = STROKES.reduce((s, st) => s + lengthOf(st.pts), 0);
 
-// The first construction line: where the preloader's pencil line lands, and how much of the sketch it is.
-export const FIRST_LINE = STROKES[0].pts as [Pt, Pt];
+// How much of the sketch the first construction line is (drawn as the sheet comes into view).
 export const FIRST = lengthOf(STROKES[0].pts) / TOTAL;
 
 // Sheet pixels to the sheet's own units (centre origin, y up).

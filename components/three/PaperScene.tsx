@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { SKETCHED, dreamState, pointer, smooth, time } from "./store";
-import { FIRST, FIRST_LINE, SketchSheet, TOTAL, makeWorkSide, toSheet } from "./paperTextures";
+import { FIRST, SketchSheet, TOTAL, makeWorkSide, toSheet } from "./paperTextures";
 import { pencil as pencilSound } from "@/components/fx/sound";
 
 const W = 2.1;
@@ -78,7 +78,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
   const group = useRef<THREE.Group>(null);
   const pencil = useRef<THREE.Group>(null);
   const extras = useRef<THREE.Group>(null);
-  const { camera, viewport, size, gl } = useThree();
+  const { camera, viewport } = useThree();
   const [workTex, setWorkTex] = useState<THREE.Texture | null>(null);
   const lastCurl = useRef(-1);
   const started = useRef(false);
@@ -115,7 +115,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
   }, [sketch, geo, backSrc, glow, shadow]);
 
   const tmp = useMemo(
-    () => ({ p: new THREE.Vector3(), q: new THREE.Quaternion(), e: new THREE.Euler(), pc: new THREE.Vector3(), qc: new THREE.Quaternion(), tip: new THREE.Vector3(), aim: new THREE.Vector3(), dir: new THREE.Vector3(), a: new THREE.Vector3(), b: new THREE.Vector3() }),
+    () => ({ p: new THREE.Vector3(), q: new THREE.Quaternion(), e: new THREE.Euler(), pc: new THREE.Vector3(), qc: new THREE.Quaternion(), tip: new THREE.Vector3(), aim: new THREE.Vector3(), dir: new THREE.Vector3(), a: new THREE.Vector3() }),
     []
   );
 
@@ -195,20 +195,6 @@ function Sheet({ backSrc }: { backSrc?: string }) {
       pen.quaternion.setFromUnitVectors(UP, tmp.dir);
       pen.scale.setScalar(Math.max(0.0001, 1 - leave));
       pen.visible = leave < 0.999;
-    }
-
-    // Where the opening line sits on screen, for the preloader to land its own line on it.
-    if (dreamState.first < 1 && p < 0.02) {
-      const rect = gl.domElement.getBoundingClientRect();
-      const [ax, ay] = toSheet(FIRST_LINE[0], W, H);
-      const [bx, by] = toSheet(FIRST_LINE[1], W, H);
-      const project = (v: THREE.Vector3) => {
-        g.localToWorld(v).project(camera);
-        return [rect.left + ((v.x + 1) / 2) * size.width, rect.top + ((1 - v.y) / 2) * size.height];
-      };
-      const [sax, say] = project(tmp.a.set(ax, ay, bowAt(ax)));
-      const [sbx, sby] = project(tmp.b.set(bx, by, bowAt(bx)));
-      dreamState.line = { ax: sax, ay: say, bx: sbx, by: sby };
     }
 
     // Dive: the camera falls into the work on the back of the page.

@@ -351,6 +351,12 @@ refresh. Until a file exists, the site shows a placeholder in the right shape.
 |   | `media/services/website-design/casa-de-rococco/showcase` | Full-page screenshot | full-page website screenshot, 1440 × 3115 | .webp .jpg .jpeg .png .avif |
 |   | `media/services/website-design/yumi-furnitures/showcase` | Full-page screenshot | full-page website screenshot, 1440 × 3115 | .webp .jpg .jpeg .png .avif |
 
+## home / hero
+
+| | Path (no extension) | What | Format and size | Extensions |
+|---|---|---|---|---|
+|   | `media/home/hero/portrait` | Hero portrait (cut-out PNG with a transparent background floats best) | 3:4, 1080 × 1440 | .webp .jpg .jpeg .png .avif |
+
 ## home / sheet
 
 | | Path (no extension) | What | Format and size | Extensions |

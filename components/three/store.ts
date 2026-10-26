@@ -1,12 +1,10 @@
 // Mutable scroll and pointer state shared between GSAP (DOM) and react-three-fiber (render loop).
 // Plain objects on purpose: they change every frame and must not trigger React renders.
 
-// first: 0..1 of the opening pencil line drawn on the sheet. line: where that line sits on screen,
-// so the preloader's line can land exactly on it.
+// first: 0..1 of the opening pencil line drawn on the sheet.
 export const dreamState = {
   progress: 0,
   first: 0,
-  line: null as null | { ax: number; ay: number; bx: number; by: number },
   // Once the visitor has drawn enough on the sheet: returns their drawing as an image.
   sketch: null as null | (() => string),
 };

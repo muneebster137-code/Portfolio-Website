@@ -3,12 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { getLenis } from "./SmoothScroll";
-import { dreamState } from "@/components/three/store";
 
 export const PRELOADER_DONE = "mmb:preloader-done";
 
 // A single pencil line crosses the dark while the counter runs. Then the dark lifts and, on the home page,
-// the line flies onto the sheet and becomes its first pencil stroke.
+// the line flies down and becomes the pencil underline beneath the tagline.
 export function Preloader() {
   const root = useRef<HTMLDivElement>(null);
   const [count, setCount] = useState(0);
@@ -34,7 +33,8 @@ export function Preloader() {
 
     // The ending depends on whether the sheet is on screen to land on.
     const end = () => {
-      const l = dreamState.line;
+      const target = document.querySelector("[data-landing]")?.getBoundingClientRect();
+      const l = target && target.width > 0 ? { ax: target.left, ay: target.top + target.height / 2, bx: target.right, by: target.top + target.height / 2 } : null;
       const tl = gsap.timeline({ onComplete: remove });
       if (l && window.scrollY < 10) {
         const len = Math.hypot(l.bx - l.ax, l.by - l.ay);

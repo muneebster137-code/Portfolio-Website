@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Muhammad Muneeb Bilal, Founder and Creative Specialist. I bring visions to life.";
+export const alt = "Muhammad Muneeb Bilal, Founder and Creative Specialist. Dreamt in pencil. Delivered in colour.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -11,10 +11,10 @@ export default function OpenGraphImage() {
       <div style={{ width: "100%", height: "100%", display: "flex", background: "#060708", color: "#EEEAE1", padding: "72px 80px", fontFamily: "sans-serif" }}>
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", flex: 1 }}>
           <div style={{ display: "flex", fontSize: 24, letterSpacing: 3, color: "#8E929B", textTransform: "uppercase" }}>Muhammad Muneeb Bilal</div>
-          <div style={{ display: "flex", flexDirection: "column", fontSize: 104, fontWeight: 700, lineHeight: 0.95, letterSpacing: -4 }}>
-            <span>I bring visions</span>
+          <div style={{ display: "flex", flexDirection: "column", fontSize: 92, fontWeight: 700, lineHeight: 0.98, letterSpacing: -4 }}>
+            <span>Dreamt in pencil.</span>
             <span style={{ display: "flex" }}>
-              to life<span style={{ color: "#FF4A1C" }}>.</span>
+              Delivered in&nbsp;<span style={{ color: "#FF4A1C" }}>colour</span>.
             </span>
           </div>
           <div style={{ display: "flex", fontSize: 28, color: "#A9ADB5" }}>Founder and Creative Specialist · Islamabad, Pakistan</div>

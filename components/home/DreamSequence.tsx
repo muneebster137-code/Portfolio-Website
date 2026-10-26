@@ -8,7 +8,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { keyNumbers, story } from "@/lib/site";
 import { SKETCHED, SKETCH_KEY, dreamState } from "@/components/three/store";
 import { useInViewport } from "@/components/three/useInViewport";
-import { PRELOADER_DONE } from "@/components/shell/Preloader";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
 import { rustle } from "@/components/fx/sound";
 import { StillIntro } from "./StillScenes";
@@ -17,8 +16,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 const PaperScene = dynamic(() => import("@/components/three/PaperScene"), { ssr: false });
 
-// Shots 01 to 03 in one pinned scene: a blank sheet (reality), the sketch (my story),
-// and the fold that turns the page into the work. Captions are timed to the same scroll.
+// The story after the hero and the marquee, shots 01 to 03 in one pinned scene: a blank sheet
+// (reality), the sketch (my story), and the fold that turns the page into the work. Captions are timed
+// to the same scroll.
 const SUB_START = 0.24;
 const SUB_LEN = 0.065;
 
@@ -45,22 +45,22 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
   };
 
   useEffect(() => {
-    const q = gsap.utils.selector(wrap);
-    let intro: gsap.core.Timeline | undefined;
-    const play = () => {
-      intro = gsap
-        .timeline()
-        .from(q(".ds-line"), { yPercent: 110, duration: 1.4, stagger: 0.1, ease: "expo.out" })
-        .from(q(".ds-fade"), { autoAlpha: 0, y: 14, duration: 1, stagger: 0.08, ease: "power3.out" }, "-=1");
-      // The first pencil stroke on the sheet (where the preloader's line just landed).
-      if (dreamState.first < 1) gsap.to(dreamState, { first: 1, duration: 0.9, ease: "power2.inOut" });
-    };
-    if ((window as unknown as { __mmbReady?: boolean }).__mmbReady) play();
-    else window.addEventListener(PRELOADER_DONE, play, { once: true });
 
     // Which side of the page turn the reader is on, so the rustle plays once per turn, either way.
     let turned = false;
     const ctx = gsap.context(() => {
+      // As the sheet comes into view: its first pencil stroke, then the words arrive.
+      ScrollTrigger.create({
+        trigger: wrap.current,
+        start: "top 65%",
+        once: true,
+        onEnter: () => {
+          if (dreamState.first < 1) gsap.to(dreamState, { first: 1, duration: 0.9, ease: "power2.inOut" });
+        },
+      });
+      gsap.from(".ds-line", { yPercent: 110, duration: 1.2, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: wrap.current, start: "top 60%" } });
+      gsap.from(".ds-fade", { autoAlpha: 0, y: 14, duration: 0.9, stagger: 0.07, ease: "power3.out", scrollTrigger: { trigger: wrap.current, start: "top 55%" } });
+
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
@@ -99,15 +99,11 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
         .fromTo(".ds-black", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.05 }, 0.95);
     }, wrap);
 
-    return () => {
-      window.removeEventListener(PRELOADER_DONE, play);
-      intro?.kill();
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={wrap} id="intro" data-chapter="Reality" className="relative h-[780svh]" aria-label="Introduction">
+    <section ref={wrap} id="intro" data-chapter="Reality" className="relative h-[780svh]" aria-label="My story">
       <div className="sticky top-0 h-svh overflow-hidden bg-void">
         <div className="absolute inset-0">
           <PaperScene active={active} backSrc={sheetBack} />
@@ -115,19 +111,12 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
 
         {/* 01 · Reality */}
         <div className="ds-s1 absolute inset-0 px-5 md:px-10 pt-28 pb-10 flex flex-col justify-between pointer-events-none">
-          <p className="ds-fade label text-fog">Founder and Creative Specialist</p>
-          <div className="max-w-[760px]">
-            <h1 className="type-x text-[15vw] md:text-[clamp(56px,8.4vw,150px)] leading-[0.9]">
-              <span className="block overflow-hidden"><span className="ds-line block">I bring visions</span></span>
-              <span className="block overflow-hidden"><span className="ds-line block">to life<span className="text-signal">.</span></span></span>
-            </h1>
-            <p className="ds-fade mt-8 max-w-[440px] text-[17px] leading-[1.6] text-mist">
-              Social media, video, print, branding, websites, packaging and pitch decks from one creative engine. I start by understanding what you want people to feel, then I build everything around that vision.
-            </p>
-            <div className="ds-fade mt-8 flex flex-wrap gap-3 pointer-events-auto">
-              <Link href="/case-studies" className="inline-flex h-12 items-center rounded-full bg-bone px-6 text-[15px] font-medium text-void hover:bg-signal transition-colors">View case studies</Link>
-              <Link href="/contact" className="inline-flex h-12 items-center rounded-full px-6 text-[15px] ring-1 ring-bone/25 hover:ring-bone transition">Start a project</Link>
-            </div>
+          <p className="ds-fade label text-fog">01 · Reality</p>
+          <div className="max-w-[640px]">
+            <h2 className="type-x text-[11vw] md:text-[clamp(44px,5.6vw,100px)] leading-[0.92]">
+              <span className="block overflow-hidden"><span className="ds-line block">It all starts</span></span>
+              <span className="block overflow-hidden"><span className="ds-line block">on a blank page<span className="text-signal">.</span></span></span>
+            </h2>
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <p className="ds-fade label text-fog">Scroll<span className="hidden [@media(hover:hover)]:inline"> · or draw on the page</span></p>
