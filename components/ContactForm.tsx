@@ -6,6 +6,8 @@ import { gsap } from "gsap";
 import { identity, services, serviceSlug } from "@/lib/site";
 import { contact } from "@/lib/profile";
 import { SKETCH_KEY } from "@/components/three/store";
+import { BriefBuilder, type Brief } from "@/components/BriefBuilder";
+import { track } from "@vercel/analytics";
 
 type Status = "idle" | "sending" | "flying" | "sent" | "error";
 
@@ -54,12 +56,24 @@ export function ContactForm() {
   const [sketch, setSketch] = useState<string | null>(null);
   const [signer, setSigner] = useState("");
   const sheet = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const built = useRef(false);
 
   useEffect(() => {
     try {
       setSketch(sessionStorage.getItem(SKETCH_KEY));
     } catch {}
   }, []);
+  // The brief builder's result goes into the form's own fields, where it can still be edited.
+  const applyBrief = (b: Brief) => {
+    const f = formRef.current;
+    if (!f) return;
+    built.current = true;
+    (f.elements.namedItem("brief") as HTMLTextAreaElement).value = b.text;
+    if (b.service) (f.elements.namedItem("service") as HTMLSelectElement).value = b.service;
+    if (b.timeline) (f.elements.namedItem("timeline") as HTMLInputElement).value = b.timeline;
+    (f.elements.namedItem("brief") as HTMLTextAreaElement).focus();
+  };
   const dropSketch = () => {
     setSketch(null);
     try {
@@ -118,6 +132,7 @@ export function ContactForm() {
       if (!sent) sent = await asJson().then(ok);
       if (!sent) throw new Error();
       if (sketch) dropSketch();
+      track("brief_sent", { service, sketch: !!sketch, builder: built.current });
       flyAway();
     } catch {
       setError(`Couldn't send that. Email ${identity.email} instead.`);
@@ -138,12 +153,13 @@ export function ContactForm() {
     // The shadow sits on a wrapper: the sheet's own outline is clipped, and a drop shadow follows it.
     <div className="[filter:drop-shadow(0_28px_36px_rgba(0,0,0,0.55))]">
       <div ref={sheet} className="relative bg-[#F2EFE7] text-void p-6 md:p-12 origin-center will-change-transform" style={{ clipPath: SHAPES.page }}>
-        <form onSubmit={onSubmit} className="grid gap-10">
+        <form ref={formRef} onSubmit={onSubmit} className="grid gap-10">
           <div className="flex justify-between label text-void/45" aria-hidden="true">
             <span>A sheet of A4</span>
             <span>Your brief</span>
           </div>
           <input type="text" name="_honey" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+          <BriefBuilder onUse={applyBrief} />
           <div className="grid md:grid-cols-2 gap-10">
             <label className="block">
               <span className={label}>Name</span>

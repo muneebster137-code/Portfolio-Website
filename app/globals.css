@@ -202,3 +202,8 @@ html.dilated { user-select: none; }
 /* Weaker devices (see components/fx/perf.ts): solid glass instead of blurred, no outline name ring. */
 html[data-tier="low"] .backdrop-blur-xl, html[data-tier="low"] .backdrop-blur { backdrop-filter: none !important; background-color: rgb(6 7 8 / 0.9); }
 html[data-tier="low"] .orbit-names { display: none; }
+
+/* Case studies wear the client's colour in the details. */
+.case-tinted ::selection { background: var(--case); color: var(--case-ink); }
+.case-tinted .kick-btn { background: var(--case); color: var(--case-ink); }
+.case-tinted .kick-btn:hover { background: #060708; color: #EEEAE1; }

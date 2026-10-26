@@ -13,6 +13,7 @@ import { SketchFilter } from "@/components/fx/SketchHover";
 import { Totem } from "@/components/fx/Totem";
 import { Limbo } from "@/components/fx/Limbo";
 import { TimeDilation } from "@/components/fx/TimeDilation";
+import { TrackClicks } from "@/components/fx/TrackClicks";
 import { identity } from "@/lib/site";
 import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
@@ -79,6 +80,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Totem />
         <Limbo />
         <TimeDilation />
+        <TrackClicks />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
         <AccentProvider>
           <SmoothScroll>

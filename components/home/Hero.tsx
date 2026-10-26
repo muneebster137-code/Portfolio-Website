@@ -33,7 +33,7 @@ function WorkButton() {
     return () => window.removeEventListener("pointermove", move);
   }, []);
   return (
-    <Link ref={ref} href="/case-studies" aria-label="View case studies" className="hero-cta group pointer-events-auto relative grid size-28 md:size-44 place-items-center rounded-full bg-signal text-void shadow-[0_30px_60px_-20px_rgba(255,74,28,0.45)]">
+    <Link ref={ref} href="/case-studies" aria-label="View case studies" data-track="cta_view_work" data-track-from="hero" className="hero-cta group pointer-events-auto relative grid size-28 md:size-44 place-items-center rounded-full bg-signal text-void shadow-[0_30px_60px_-20px_rgba(255,74,28,0.45)]">
       <svg viewBox="0 0 200 200" className="absolute inset-0 size-full animate-[spin_16s_linear_infinite] group-hover:animate-[spin_5s_linear_infinite]" aria-hidden="true">
         <defs>
           <path id="cta-rim" d="M100 100 m-74 0 a74 74 0 1 1 148 0 a74 74 0 1 1 -148 0" />
@@ -119,7 +119,7 @@ export function Hero({ portrait, cutout, tiles }: { portrait?: string; cutout: b
             Social media, video, print, branding, websites, packaging and pitch decks from one creative engine. I start by understanding what you want people to feel, then I build everything around that vision.
           </p>
           <div className="hero-fade mt-8 flex flex-wrap gap-3 pointer-events-auto">
-            <Link href="/contact" className="inline-flex h-12 items-center rounded-full bg-bone px-6 text-[15px] font-medium text-void hover:bg-signal transition-colors">Start a project</Link>
+            <Link href="/contact" data-track="cta_start_project" data-track-from="hero" className="inline-flex h-12 items-center rounded-full bg-bone px-6 text-[15px] font-medium text-void hover:bg-signal transition-colors">Start a project</Link>
             <Link href="/resume" className="inline-flex h-12 items-center rounded-full px-6 text-[15px] ring-1 ring-bone/25 hover:ring-bone transition">Resume</Link>
           </div>
         </div>

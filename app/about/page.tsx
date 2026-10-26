@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { about, allTestimonials, education } from "@/lib/profile";
+import { about, education } from "@/lib/profile";
 import { processSteps } from "@/lib/site";
 import { Reveal } from "@/components/motion/Reveal";
 import { FoldCity } from "@/components/fx/FoldCity";
+import { ProofWall } from "@/components/page/ProofWall";
+import { proofLogos, proofNotes } from "@/lib/proof.server";
 import { SectionHead } from "@/components/page/SectionHead";
 import { CtaBand } from "@/components/page/CtaBand";
 import { Placeholder } from "@/components/ui/Slot";
@@ -106,18 +108,7 @@ export default function AboutPage() {
         <Reveal>
           <SectionHead id="quotes-h" label="04" title="What clients say" />
         </Reveal>
-        <Reveal as="ul" className="mt-10 border-t border-hair">
-          {allTestimonials.map((t) => (
-            <li key={t.name} data-fade className="grid md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-4 md:gap-16 py-10 border-b border-hair">
-              <blockquote className="text-[19px] md:text-[22px] leading-[1.5] text-bone/90">&ldquo;{t.quote}&rdquo;</blockquote>
-              <p className="text-[15px] leading-[1.6]">
-                <span className="block">{t.name}</span>
-                <span className="block text-mist">{t.title}</span>
-                <span className="label text-fog block mt-3">{t.source}</span>
-              </p>
-            </li>
-          ))}
-        </Reveal>
+        <ProofWall notes={proofNotes()} logos={proofLogos()} />
       </section>
 
       <section aria-labelledby="edu-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24 md:py-32">

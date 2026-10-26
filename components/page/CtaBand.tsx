@@ -60,7 +60,7 @@ export function CtaBand({ line, sub = "Let's bring it to life.", service }: { li
           <span className="block overflow-hidden"><span className="kick-line block">{line}</span></span>
           <span className="block overflow-hidden"><span className="kick-line block text-void/40">{sub}</span></span>
         </h2>
-        <Link href={href} className="kick-fade mt-14 inline-flex h-16 items-center gap-3 rounded-full bg-signal px-9 text-lg font-medium text-void hover:bg-void hover:text-bone transition-colors">
+        <Link href={href} data-track="cta_start_project" data-track-from="wake_up" className="kick-fade kick-btn mt-14 inline-flex h-16 items-center gap-3 rounded-full bg-signal px-9 text-lg font-medium text-void hover:bg-void hover:text-bone transition-colors">
           Start a project
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9" /></svg>
         </Link>

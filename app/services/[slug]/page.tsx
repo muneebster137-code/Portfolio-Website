@@ -8,6 +8,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { ServiceObject, PackagingModel } from "@/components/three/LazyScenes";
 import { MediaSlot } from "@/components/ui/Slot";
 import { VideoSlot } from "@/components/ui/VideoSlot";
+import { ScrollFilm } from "@/components/ui/ScrollFilm";
 import { brandMedia, homeMedia, packagingModel, serviceMedia, videographyHook, websiteShowcase, type Slot } from "@/lib/media-manifest";
 import { resolveAll, resolveSlot, type Resolved } from "@/lib/media.server";
 import { CaseCard } from "@/components/page/CaseCard";
@@ -122,7 +123,10 @@ export default async function ServiceDetail({ params }: Params) {
           <SegmentRail names={page.segments.map((g) => g.name)} color={s.color} />
           <div className="space-y-32">
             {page.segments.map((g, gi) => {
-              const slots = (media[g.id] ?? []) as Resolved[];
+              const all = (media[g.id] ?? []) as Resolved[];
+              // Films with a scroll copy play as you scroll; everything else sits in the grid.
+              const films = all.filter((m) => m.scrub);
+              const slots = all.filter((m) => !m.scrub);
               return (
                 <Reveal key={g.name} as="article" id={`seg-${gi}`} aria-labelledby={`seg-h-${gi}`}>
                   <div className="flex flex-wrap items-end justify-between gap-6 border-t border-hair pt-8">
@@ -138,6 +142,11 @@ export default async function ServiceDetail({ params }: Params) {
                       <Link data-fade href={`/case-studies/${g.caseSlug}`} className="text-[15px] underline decoration-bone/25 underline-offset-4 hover:decoration-bone">View case study</Link>
                     )}
                   </div>
+                  {films.map((f) => (
+                    <div key={f.path} className="mt-10">
+                      <ScrollFilm slot={f} />
+                    </div>
+                  ))}
                   {slots.length > 0 && <SlotGrid slots={slots} />}
                 </Reveal>
               );

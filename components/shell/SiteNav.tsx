@@ -55,7 +55,7 @@ export function SiteNav() {
           <Link href="/resume" className="hidden md:inline-flex h-11 items-center rounded-full bg-void/55 px-5 text-sm text-bone ring-1 ring-bone/10 backdrop-blur-xl backdrop-saturate-150 hover:ring-bone/40 transition">
             Resume
           </Link>
-          <Link href="/contact" className="hidden sm:inline-flex h-11 items-center rounded-full bg-signal px-5 text-sm font-medium text-void hover:bg-bone transition-colors">
+          <Link href="/contact" data-track="cta_start_project" data-track-from="nav" className="hidden sm:inline-flex h-11 items-center rounded-full bg-signal px-5 text-sm font-medium text-void hover:bg-bone transition-colors">
             Start a project
           </Link>
           <button

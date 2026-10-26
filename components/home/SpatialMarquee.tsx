@@ -127,6 +127,8 @@ export function SpatialMarquee({ items }: { items: MarqueeItem[] }) {
                 <Link
                   href={`/case-studies/${it.slug}`}
                   aria-label={`${it.title} case study`}
+                  data-track="case_open"
+                  data-track-from="marquee"
                   onPointerEnter={() => (hold.current = true)}
                   onPointerLeave={() => (hold.current = false)}
                   onFocus={() => (focusAt.current = i)}

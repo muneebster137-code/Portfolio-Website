@@ -10,6 +10,7 @@ import { caseCovers, caseGalleries } from "@/lib/media-manifest";
 import { resolveAll, resolveSlot } from "@/lib/media.server";
 import { OpeningVisual } from "@/components/case/OpeningVisual";
 import { DreamLevels } from "@/components/fx/DreamLevels";
+import { CaseTint } from "@/components/fx/CaseTint";
 import { CtaBand } from "@/components/page/CtaBand";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -46,7 +47,9 @@ export default async function CaseStudy({ params }: Params) {
   const titleVw = Math.min(13.5, 92 / first.length);
 
   return (
-    <article style={{ ["--case" as string]: c.accent }}>
+    // --case and --case-ink carry the client's colour into the details (see .case-tinted in globals.css).
+    <article className="case-tinted" style={{ ["--case" as string]: c.accent, ["--case-ink" as string]: onColor(c.accent) }}>
+      <CaseTint accent={c.accent} />
       <DreamLevels />
       <Reveal as="header" immediate className="mx-auto max-w-[1600px] px-5 md:px-10 pt-32">
         <div className="flex flex-wrap justify-between gap-3 label text-fog" data-fade>

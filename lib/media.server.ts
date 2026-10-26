@@ -2,14 +2,23 @@ import fs from "node:fs";
 import path from "node:path";
 import { EXTENSIONS, homeMedia, type Slot } from "./media-manifest";
 
-export type Resolved = Slot & { src?: string };
+// poster: a still shown until a video plays; scrub: a video's light copy for playing it by scrolling.
+export type Resolved = Slot & { src?: string; poster?: string; scrub?: string };
 
 const PUBLIC = path.join(process.cwd(), "public");
 
 // Finds the file for a slot, whatever extension it was saved with. No file: no src, so a placeholder shows.
 export function resolveSlot(slot: Slot): Resolved {
+  const has = (suffix: string) => fs.existsSync(path.join(PUBLIC, slot.path + suffix));
   for (const ext of EXTENSIONS[slot.kind]) {
-    if (fs.existsSync(path.join(PUBLIC, slot.path + ext))) return { ...slot, src: `/${slot.path}${ext}` };
+    if (!has(ext)) continue;
+    if (slot.kind !== "video") return { ...slot, src: `/${slot.path}${ext}` };
+    return {
+      ...slot,
+      src: `/${slot.path}${ext}`,
+      ...(has(".poster.webp") && { poster: `/${slot.path}.poster.webp` }),
+      ...(has(".scrub.mp4") && { scrub: `/${slot.path}.scrub.mp4` }),
+    };
   }
   return { ...slot };
 }

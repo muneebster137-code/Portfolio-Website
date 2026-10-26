@@ -2,10 +2,12 @@ import { testimonials } from "@/lib/site";
 import { featuredCerts } from "@/lib/profile";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHead } from "@/components/page/SectionHead";
+import { ProofWall } from "@/components/page/ProofWall";
+import { proofLogos, proofNotes } from "@/lib/proof.server";
 
-// What clients say, read slowly; the credentials sit underneath as a single line.
+// What clients say: one quote read slowly, then the rest pinned to a wall; the credentials sit underneath.
 export function Proof() {
-  const [lead, ...rest] = testimonials;
+  const [lead] = testimonials;
   return (
     <section id="proof" data-chapter="Proof" className="relative bg-void border-t border-hair" aria-labelledby="proof-h">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 py-36 md:py-44">
@@ -19,14 +21,10 @@ export function Proof() {
           </figure>
         </Reveal>
 
-        <Reveal className="mt-28 grid md:grid-cols-2 gap-14 md:gap-24">
-          {rest.map((t) => (
-            <figure key={t.name} data-fade>
-              <blockquote className="text-[18px] md:text-[20px] leading-[1.6] text-bone/85">&ldquo;{t.quote}&rdquo;</blockquote>
-              <figcaption className="label text-fog mt-6">{t.name} · {t.title}</figcaption>
-            </figure>
-          ))}
-        </Reveal>
+        <div className="mt-28">
+          <p className="label text-fog">Pinned to the wall · pick one up to read it</p>
+          <ProofWall notes={proofNotes(lead.name)} logos={proofLogos()} />
+        </div>
 
         <Reveal className="mt-32 pt-10 border-t border-hair grid md:grid-cols-[auto_1fr] gap-6 md:gap-16 items-baseline">
           <p className="type-x text-[64px] md:text-[88px] leading-none" data-fade>30+</p>

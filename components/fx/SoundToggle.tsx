@@ -14,6 +14,7 @@ export function SoundToggle() {
     <button
       type="button"
       onClick={() => setSound(!on)}
+      data-track={on ? undefined : "sound_on"}
       aria-pressed={on}
       aria-label={on ? "Turn sound off" : "Turn sound on"}
       className="hidden md:grid h-11 w-11 place-items-center rounded-full bg-void/55 text-bone ring-1 ring-bone/10 backdrop-blur-xl backdrop-saturate-150 hover:ring-bone/40 transition"

@@ -79,10 +79,11 @@ export function VideoSlot({ slot, className = "", autoplay = true }: { slot: Res
           <video
             ref={video}
             src={slot.src}
+            poster={slot.poster}
             muted={muted}
             loop
             playsInline
-            preload="metadata"
+            preload={slot.poster ? "none" : "metadata"}
             aria-label={slot.label}
             onClick={toggle}
             onPlay={() => setPlaying(true)}

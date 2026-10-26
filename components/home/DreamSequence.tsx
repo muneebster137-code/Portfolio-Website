@@ -121,7 +121,7 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <p className="ds-fade label text-fog">Scroll<span className="hidden [@media(hover:hover)]:inline"> · or draw on the page</span></p>
             {sketched && (
-              <Link href="/contact" onPointerDown={keepSketch} onKeyDown={(e) => e.key === "Enter" && keepSketch()} className="pointer-events-auto label text-bone underline decoration-bone/40 underline-offset-4 hover:decoration-bone animate-[fade-in_0.6s_ease-out]">
+              <Link href="/contact" data-track="sketch_sent_to_brief" onPointerDown={keepSketch} onKeyDown={(e) => e.key === "Enter" && keepSketch()} className="pointer-events-auto label text-bone underline decoration-bone/40 underline-offset-4 hover:decoration-bone animate-[fade-in_0.6s_ease-out]">
                 Sign your sketch and send it with your brief
               </Link>
             )}

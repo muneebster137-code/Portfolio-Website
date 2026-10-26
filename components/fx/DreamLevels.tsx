@@ -43,11 +43,11 @@ export function DreamLevels() {
         className="pointer-events-none fixed inset-0 z-[20] transition-opacity duration-[1.2s] print:hidden"
         style={{ opacity: LEVELS[level].shade, background: "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.75) 100%)" }}
       />
-      <div aria-hidden="true" className="pointer-events-none fixed right-5 md:right-8 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col items-end gap-3 text-bone mix-blend-difference print:hidden">
+      <div aria-hidden="true" className="pointer-events-none fixed right-5 md:right-8 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col items-end gap-3 text-bone print:hidden">
         <span className="label tabular-nums">Level {level + 1}</span>
         <span className="flex flex-col gap-1.5">
           {LEVELS.map((_, i) => (
-            <span key={i} className={`h-px w-6 transition-colors duration-700 ${i <= level ? "bg-bone" : "bg-bone/25"}`} />
+            <span key={i} className={`h-px w-6 transition-colors duration-700 ${i <= level ? "bg-[var(--case,#EEEAE1)]" : "bg-bone/25"}`} />
           ))}
         </span>
       </div>
