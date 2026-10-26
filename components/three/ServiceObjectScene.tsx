@@ -6,6 +6,7 @@ import { ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
 import { ShelfObject } from "./ServiceObjects";
 import { pointer, time } from "./store";
+import { canvasQuality, useTier } from "@/components/fx/perf";
 
 // A service page's own object from the shelf, lit alone and turning slowly toward the pointer.
 function Turntable({ children }: { children: React.ReactNode }) {
@@ -23,8 +24,9 @@ function Turntable({ children }: { children: React.ReactNode }) {
 }
 
 export default function ServiceObjectScene({ index, active, textures }: { index: number; active: boolean; textures?: (string | undefined)[] }) {
+  const q = canvasQuality(useTier());
   return (
-    <Canvas flat dpr={[1, 1.75]} frameloop={active ? "always" : "never"} camera={{ position: [0, 0.3, 6.6], fov: 32 }} gl={{ antialias: true, alpha: true }} aria-hidden="true">
+    <Canvas flat dpr={q.dpr} frameloop={active ? "always" : "never"} camera={{ position: [0, 0.3, 6.6], fov: 32 }} gl={{ antialias: q.antialias, alpha: true }} aria-hidden="true">
       <ambientLight intensity={0.95} />
       <spotLight position={[0, 6, 6]} angle={0.5} penumbra={0.9} intensity={60} distance={20} />
       <directionalLight position={[-5, 2, 3]} intensity={0.35} color="#EEEAE1" />
@@ -33,7 +35,7 @@ export default function ServiceObjectScene({ index, active, textures }: { index:
           <ShelfObject index={index} textures={textures} />
         </Suspense>
       </Turntable>
-      <ContactShadows position={[0, -1.85, 0]} opacity={0.7} scale={12} blur={2.4} far={4} color="#000000" />
+      {q.shadows > 0 && <ContactShadows position={[0, -1.85, 0]} opacity={0.7} scale={12} blur={2.4} far={4} resolution={q.shadows} color="#000000" />}
     </Canvas>
   );
 }

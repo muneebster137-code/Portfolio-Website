@@ -198,3 +198,7 @@ a.rounded-full:active, button.rounded-full:active { scale: 0.96; }
 .inking, .inking * { color: transparent !important; -webkit-text-stroke-color: rgba(238, 234, 225, 0.75); }
 @keyframes fade-in { from { opacity: 0; transform: translateY(6px); } }
 html.dilated { user-select: none; }
+
+/* Weaker devices (see components/fx/perf.ts): solid glass instead of blurred, no outline name ring. */
+html[data-tier="low"] .backdrop-blur-xl, html[data-tier="low"] .backdrop-blur { backdrop-filter: none !important; background-color: rgb(6 7 8 / 0.9); }
+html[data-tier="low"] .orbit-names { display: none; }

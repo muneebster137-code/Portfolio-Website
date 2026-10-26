@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, RoundedBox, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { pointer, showcaseState, smooth, time } from "./store";
+import { canvasQuality, sized, useTier } from "@/components/fx/perf";
 
 // What an object shows before its picture is supplied: a quiet graphite card.
 let placeholderUrl = "";
@@ -76,7 +77,7 @@ function discTexture(img: HTMLImageElement, label: string) {
 }
 
 function Phone({ src }: { src?: string }) {
-  const tex = useTexture(src ?? placeholder());
+  const tex = useTexture(sized(src, 1080) ?? placeholder());
   const map = useMemo(() => cover(tex.clone(), 1.12 / 2.36), [tex]);
   return (
     <group>
@@ -92,7 +93,7 @@ function Phone({ src }: { src?: string }) {
 }
 
 function Disc({ src }: { src?: string }) {
-  const tex = useTexture(src ?? placeholder());
+  const tex = useTexture(sized(src, 1080) ?? placeholder());
   const top = useMemo(() => discTexture(tex.image as HTMLImageElement, "REELS"), [tex]);
   const disc = useRef<THREE.Mesh>(null);
   useFrame((_, rawDt) => {
@@ -112,7 +113,7 @@ function Disc({ src }: { src?: string }) {
 }
 
 function Magazine({ src }: { src?: string }) {
-  const tex = useTexture(src ?? placeholder());
+  const tex = useTexture(sized(src, 1080) ?? placeholder());
   const map = useMemo(() => cover(tex.clone(), 1.7 / 2.3), [tex]);
   return (
     <group>
@@ -280,7 +281,7 @@ function StoryBook({ src }: { src?: string }) {
 }
 
 function Browser({ src }: { src?: string }) {
-  const tex = useTexture(src ?? placeholder());
+  const tex = useTexture(sized(src, 1080) ?? placeholder());
   const map = useMemo(() => cover(tex.clone(), 2.7 / 1.5), [tex]);
   return (
     <group>
@@ -302,7 +303,7 @@ function Browser({ src }: { src?: string }) {
 }
 
 function PackBox({ src }: { src?: string }) {
-  const tex = useTexture(src ?? placeholder());
+  const tex = useTexture(sized(src, 1080) ?? placeholder());
   const front = useMemo(() => cover(tex.clone(), 1.5 / 2), [tex]);
   return (
     <mesh rotation={[0, 0.5, 0]}>
@@ -318,7 +319,7 @@ function PackBox({ src }: { src?: string }) {
 }
 
 function Slides({ srcs = [] }: { srcs?: (string | undefined)[] }) {
-  const [a, b, c] = useTexture([0, 1, 2].map((k) => srcs[k] ?? placeholder()));
+  const [a, b, c] = useTexture([0, 1, 2].map((k) => sized(srcs[k], 828) ?? placeholder()));
   const maps = useMemo(() => [c, b, a].map((t) => cover(t.clone(), 16 / 9)), [a, b, c]);
   return (
     <group>
@@ -352,7 +353,7 @@ export function ShelfObject({ index, textures = [] }: { index: number; textures?
 }
 
 // Seven objects on an arc, like a shelf of records; the one in front turns slowly to show itself.
-function Arc({ textures }: { textures: ShelfTextures }) {
+function Arc({ textures, shadows }: { textures: ShelfTextures; shadows: number }) {
   const groups = useRef<(THREE.Group | null)[]>([]);
   const target = useMemo(() => new THREE.Vector3(), []);
   const { viewport } = useThree();
@@ -403,18 +404,19 @@ function Arc({ textures }: { textures: ShelfTextures }) {
           </Suspense>
         </group>
       ))}
-      <ContactShadows position={[0, -1.85, 0]} opacity={0.7} scale={22} blur={2.4} far={4} color="#000000" />
+      {shadows > 0 && <ContactShadows position={[0, -1.85, 0]} opacity={0.7} scale={22} blur={2.4} far={4} resolution={shadows} color="#000000" />}
     </>
   );
 }
 
 export default function ServiceObjects({ active, textures }: { active: boolean; textures: ShelfTextures }) {
+  const q = canvasQuality(useTier());
   return (
-    <Canvas flat dpr={[1, 1.75]} frameloop={active ? "always" : "never"} camera={{ position: [0, 0.35, 7.6], fov: 32 }} gl={{ antialias: true, alpha: true }} aria-hidden="true">
+    <Canvas flat dpr={q.dpr} frameloop={active ? "always" : "never"} camera={{ position: [0, 0.35, 7.6], fov: 32 }} gl={{ antialias: q.antialias, alpha: true }} aria-hidden="true">
       <ambientLight intensity={0.9} />
       <spotLight position={[0, 6, 6]} angle={0.45} penumbra={0.9} intensity={60} distance={20} />
       <directionalLight position={[-5, 2, 3]} intensity={0.35} color="#EEEAE1" />
-      <Arc textures={textures} />
+      <Arc textures={textures} shadows={q.shadows} />
     </Canvas>
   );
 }

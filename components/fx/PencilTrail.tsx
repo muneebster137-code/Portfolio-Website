@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { getTier } from "./perf";
 
 const LIFE = 650; // ms a mark stays before it fades out
 
@@ -13,7 +14,7 @@ export function PencilTrail() {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const c = canvas.current;
-    if (!c || !fine.matches || reduced.matches) return;
+    if (!c || !fine.matches || reduced.matches || getTier() === "low") return;
     const ctx = c.getContext("2d")!;
     const pts: { x: number; y: number; t: number }[] = [];
     let raf = 0;
@@ -49,13 +50,17 @@ export function PencilTrail() {
         ctx.stroke();
       }
       raf = pts.length ? requestAnimationFrame(frame) : 0;
+      if (!raf) c.style.visibility = "hidden";
     };
 
     const move = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       pts.push({ x: e.clientX, y: e.clientY, t: performance.now() });
       if (pts.length > 80) pts.shift();
-      if (!raf) raf = requestAnimationFrame(frame);
+      if (!raf) {
+        c.style.visibility = "visible";
+        raf = requestAnimationFrame(frame);
+      }
     };
 
     window.addEventListener("pointermove", move, { passive: true });
@@ -67,5 +72,5 @@ export function PencilTrail() {
     };
   }, []);
 
-  return <canvas ref={canvas} aria-hidden="true" className="pointer-events-none fixed inset-0 z-[90] size-full mix-blend-difference print:hidden" />;
+  return <canvas ref={canvas} aria-hidden="true" className="pointer-events-none fixed inset-0 z-[90] size-full mix-blend-difference invisible print:hidden" />;
 }

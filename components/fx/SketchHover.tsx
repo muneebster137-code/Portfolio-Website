@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { getTier } from "./perf";
 
 // The SVG filter that turns any picture into a pencil drawing of itself: edges become graphite lines,
 // tones become light shading on paper. Rendered once in the layout.
@@ -37,7 +38,7 @@ export function SketchHover({ src, className = "" }: { src?: string; className?:
   useEffect(() => {
     const el = ref.current;
     const host = el?.parentElement;
-    if (!el || !host || !src || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (!el || !host || !src || getTier() === "low" || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const place = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       const r = host.getBoundingClientRect();

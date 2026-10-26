@@ -109,7 +109,7 @@ export function SpatialMarquee({ items }: { items: MarqueeItem[] }) {
       <div className="absolute inset-0 grid place-items-center [perspective:1700px] [perspective-origin:50%_40%]">
         <div className="relative [transform-style:preserve-3d] scale-[0.52] sm:scale-[0.7] lg:scale-100 [transform:rotateX(-11deg)_rotateZ(-4deg)]">
           {/* The names, in outline, turning the other way on a wider ring below the covers. */}
-          <div ref={words} className="absolute left-1/2 top-1/2 [transform-style:preserve-3d]" aria-hidden="true">
+          <div ref={words} className="orbit-names absolute left-1/2 top-1/2 [transform-style:preserve-3d]" aria-hidden="true">
             {names.map((w, i) => (
               <span
                 key={i}

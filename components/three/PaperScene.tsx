@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { SKETCHED, dreamState, pointer, smooth, time } from "./store";
 import { FIRST, SketchSheet, TOTAL, makeWorkSide, toSheet } from "./paperTextures";
 import { pencil as pencilSound } from "@/components/fx/sound";
+import { canvasQuality, getTier, sized, useTier } from "@/components/fx/perf";
 
 const W = 2.1;
 const H = 2.97;
@@ -89,7 +90,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
   const lastDrawn = useRef(0);
   const sketched = useRef(false);
 
-  const sketch = useMemo(() => new SketchSheet(), []);
+  const sketch = useMemo(() => new SketchSheet({ high: 1, mid: 0.75, low: 0.5 }[getTier()]), []);
   const geo = useMemo(() => new THREE.PlaneGeometry(W, H, SEG, 1), []);
   const base = useMemo(() => Float32Array.from(geo.attributes.position.array), [geo]);
   const glow = useMemo(() => glowTexture("rgba(255,236,206,0.17)", "rgba(255,236,206,0)", true), []);
@@ -97,7 +98,7 @@ function Sheet({ backSrc }: { backSrc?: string }) {
 
   useEffect(() => {
     // A supplied back image (media/home/sheet/back) wins; otherwise the sheet shows a contact sheet of the work.
-    const t = backSrc ? new THREE.TextureLoader().load(backSrc) : makeWorkSide(() => {});
+    const t = backSrc ? new THREE.TextureLoader().load(sized(backSrc, 1200)!) : makeWorkSide(() => {});
     t.colorSpace = THREE.SRGBColorSpace;
     // The back is seen mirrored once the page has turned, so flip it to read the right way round.
     t.wrapS = THREE.RepeatWrapping;
@@ -283,13 +284,14 @@ function Sheet({ backSrc }: { backSrc?: string }) {
 }
 
 export default function PaperScene({ active, backSrc }: { active: boolean; backSrc?: string }) {
+  const q = canvasQuality(useTier());
   return (
     <Canvas
       flat
-      dpr={[1, 1.75]}
+      dpr={q.dpr}
       frameloop={active ? "always" : "never"}
       camera={{ position: [0, 0, CAM_Z], fov: 32, near: 0.05, far: 60 }}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      gl={{ antialias: q.antialias, alpha: true, powerPreference: "high-performance" }}
       aria-hidden="true"
     >
       <ambientLight intensity={1.05} />

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { sized } from "@/components/fx/perf";
 
 // The sheet is 1024 × 1448 px: A4 proportions.
 const PW = 1024;
@@ -91,18 +92,21 @@ export class SketchSheet {
   inkTotal = 0;
   private last = "";
 
-  constructor() {
-    this.canvas.width = this.base.width = PW;
-    this.canvas.height = this.base.height = PH;
+  // scale: the canvas size relative to full A4 pixels (smaller on weaker devices).
+  constructor(private scale = 1) {
+    const w = Math.round(PW * this.scale);
+    const h = Math.round(PH * this.scale);
+    this.canvas.width = this.base.width = this.doodle.width = w;
+    this.canvas.height = this.base.height = this.doodle.height = h;
     this.ctx = this.canvas.getContext("2d")!;
-    this.doodle.width = PW;
-    this.doodle.height = PH;
     this.dctx = this.doodle.getContext("2d")!;
+    // Everything is drawn in full-size sheet pixels; the scale shrinks it onto the smaller canvas.
+    this.dctx.setTransform(this.scale, 0, 0, this.scale, 0, 0);
     const b = this.base.getContext("2d")!;
     b.fillStyle = "#F2EFE7";
-    b.fillRect(0, 0, PW, PH);
+    b.fillRect(0, 0, w, h);
     // Paper tooth: faint grain so the sheet reads as paper under light, not a white card.
-    const img = b.getImageData(0, 0, PW, PH);
+    const img = b.getImageData(0, 0, w, h);
     for (let i = 0; i < img.data.length; i += 4) {
       const n = (Math.random() - 0.5) * 10;
       img.data[i] += n;
@@ -112,7 +116,7 @@ export class SketchSheet {
     b.putImageData(img, 0, 0);
     this.texture = new THREE.CanvasTexture(this.canvas);
     this.texture.colorSpace = THREE.SRGBColorSpace;
-    this.texture.anisotropy = 8;
+    this.texture.anisotropy = this.scale < 1 ? 2 : 8;
     this.draw(0, 0);
   }
 
@@ -176,12 +180,14 @@ export class SketchSheet {
     if (key === this.last) return;
     this.last = key;
     const c = this.ctx;
+    c.setTransform(1, 0, 0, 1, 0, 0);
     c.drawImage(this.base, 0, 0);
     if (doodle > 0 && this.doodleRev) {
       c.globalAlpha = doodle;
       c.drawImage(this.doodle, 0, 0);
       c.globalAlpha = 1;
     }
+    c.setTransform(this.scale, 0, 0, this.scale, 0, 0);
 
     if (ink > 0) {
       c.globalAlpha = ink;
@@ -279,7 +285,7 @@ export function makeWorkSide(onReady: () => void) {
       tex.needsUpdate = true;
       if (++loaded === WORK.length) onReady();
     };
-    img.src = src;
+    img.src = sized(src, 640)!;
   });
   return tex;
 }

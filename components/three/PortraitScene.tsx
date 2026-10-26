@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { pointer, time } from "./store";
+import { canvasQuality, sized, useTier } from "@/components/fx/perf";
 
 // A rounded-corner alpha mask, shared by every card in the scene.
 let maskTex: THREE.CanvasTexture | null = null;
@@ -42,7 +43,7 @@ function fit(tex: THREE.Texture, aspect: number) {
 const PH = 3.3; // portrait height in scene units
 
 function Portrait({ src, cutout }: { src: string; cutout: boolean }) {
-  const tex = useTexture(src);
+  const tex = useTexture(sized(src, 1080)!);
   const { width: iw, height: ih } = tex.image as { width: number; height: number };
   const aspect = cutout ? iw / ih : 0.78;
   const map = useMemo(() => {
@@ -77,7 +78,7 @@ const ORBIT: [number, number, number, number][] = [
 ];
 
 function Tiles({ srcs }: { srcs: string[] }) {
-  const texs = useTexture(srcs);
+  const texs = useTexture(srcs.map((s) => sized(s, 640)!));
   const maps = useMemo(() => texs.map((t) => fit(t.clone(), 16 / 10)), [texs]);
   const refs = useRef<(THREE.Mesh | null)[]>([]);
   useFrame(() => {
@@ -157,8 +158,9 @@ function Stage({ src, cutout, tiles, ready }: { src?: string; cutout: boolean; t
 }
 
 export default function PortraitScene({ active, src, cutout, tiles, ready }: { active: boolean; src?: string; cutout: boolean; tiles: string[]; ready: boolean }) {
+  const q = canvasQuality(useTier());
   return (
-    <Canvas flat dpr={[1, 1.75]} frameloop={active ? "always" : "never"} camera={{ position: [0, 0, 7.5], fov: 32 }} gl={{ antialias: true, alpha: true }} aria-hidden="true">
+    <Canvas flat dpr={q.dpr} frameloop={active ? "always" : "never"} camera={{ position: [0, 0, 7.5], fov: 32 }} gl={{ antialias: q.antialias, alpha: true }} aria-hidden="true">
       <fog attach="fog" args={["#060708", 7, 13]} />
       <Stage src={src} cutout={cutout} tiles={tiles} ready={ready} />
     </Canvas>

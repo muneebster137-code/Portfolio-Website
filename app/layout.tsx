@@ -71,7 +71,8 @@ export const viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${archivo.variable} ${geist.variable} ${geistMono.variable}`}>
+    // The device tier (data-tier) is set on <html> in the browser before React takes over.
+    <html lang="en" className={`${archivo.variable} ${geist.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body className="font-sans bg-void text-bone antialiased">
         <SketchFilter />
         <PencilTrail />

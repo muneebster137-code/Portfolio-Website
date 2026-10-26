@@ -20,9 +20,11 @@ export function ServiceObject({ index, textures, className = "" }: { index: numb
 }
 
 export function PackagingModel({ modelSrc, boxTexture, className = "" }: { modelSrc?: string; boxTexture?: string; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const active = useInViewport(ref, "0px");
   return (
-    <div className={className}>
-      <PackagingScene modelSrc={modelSrc} boxTexture={boxTexture} />
+    <div ref={ref} className={className}>
+      <PackagingScene modelSrc={modelSrc} boxTexture={boxTexture} active={active} />
     </div>
   );
 }

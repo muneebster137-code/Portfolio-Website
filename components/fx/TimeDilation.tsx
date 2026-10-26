@@ -75,7 +75,7 @@ export function TimeDilation() {
 
   return (
     <div aria-hidden="true" className={`pointer-events-none fixed inset-0 z-[85] transition-opacity duration-700 print:hidden ${on ? "opacity-100" : "opacity-0"}`}>
-      <div className="absolute inset-0 [backdrop-filter:saturate(0.25)_contrast(1.08)]" style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)" }} />
+      <div className={`absolute inset-0 ${on ? "[backdrop-filter:saturate(0.25)_contrast(1.08)]" : ""}`} style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)" }} />
       <p className="absolute inset-x-0 bottom-20 text-center label text-bone/80">Time slows down here. Let go to wake.</p>
     </div>
   );

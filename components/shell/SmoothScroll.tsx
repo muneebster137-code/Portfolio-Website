@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getTier, onTierChange } from "@/components/fx/perf";
 
 gsap.registerPlugin(ScrollTrigger);
 // On phones the address bar resizes the viewport while scrolling; re-measuring then makes pinned
@@ -26,8 +27,11 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     // A light lerp keeps the glide but answers the wheel straight away; scenes follow it directly.
     lenis = new Lenis({
       lerp: reduced ? 1 : BASE_LERP,
-      smoothWheel: !reduced,
+      smoothWheel: !reduced && getTier() !== "low",
       touchMultiplier: 1.4,
+    });
+    const offTier = onTierChange((t) => {
+      if (lenis && !reduced) lenis.options.smoothWheel = t !== "low";
     });
 
     // The preloader mounts first and releases the scroll when it finishes.
@@ -41,6 +45,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      offTier();
       gsap.ticker.remove(tick);
       window.removeEventListener("orientationchange", onRotate);
       lenis?.destroy();
