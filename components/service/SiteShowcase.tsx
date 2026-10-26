@@ -1,5 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
+import { LocalLink as Link } from "@/components/i18n";
+import type { Lang } from "@/lib/i18n";
+import { ui } from "@/lib/ui";
 import type { Website } from "@/lib/services-content";
 import type { Resolved } from "@/lib/media.server";
 import { Reveal } from "@/components/motion/Reveal";
@@ -12,12 +14,13 @@ const statusColor: Record<Website["status"], string> = {
 };
 
 // The seven selected websites. Each full-page screenshot (1440 × 3115) scrolls inside its browser frame.
-export function SiteShowcase({ sites }: { sites: (Website & { showcase: Resolved })[] }) {
+export function SiteShowcase({ sites, lang }: { sites: (Website & { showcase: Resolved })[]; lang: Lang }) {
+  const t = ui[lang].sites;
   return (
     <section aria-labelledby="sites-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24">
       <Reveal>
-        <p className="label text-fog" data-fade>Selected websites · 7</p>
-        <h2 id="sites-h" className="overflow-hidden mt-4"><span data-line className="block type-x text-[12vw] md:text-[6vw] leading-[0.88]">Selected websites</span></h2>
+        <p className="label text-fog" data-fade>{t.selected} · {sites.length}</p>
+        <h2 id="sites-h" className="overflow-hidden mt-4"><span data-line className="block type-x text-[12vw] md:text-[6vw] leading-[0.88]">{t.selected}</span></h2>
       </Reveal>
       <div className="mt-16 space-y-28">
         {sites.map((s, i) => (
@@ -38,29 +41,29 @@ export function SiteShowcase({ sites }: { sites: (Website & { showcase: Resolved
                   )}
                 </div>
               </div>
-              <p className="label text-fog mt-3">Scroll inside the frame</p>
+              <p className="label text-fog mt-3">{t.scrollInside}</p>
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-3" data-fade>
                 <span className="label text-fog">{String(i + 1).padStart(2, "0")} / 07</span>
                 <span className="label inline-flex items-center gap-2">
                   <span className="size-2 rounded-full" style={{ background: statusColor[s.status] }} />
-                  {s.status}
+                  {t.status[s.status] ?? s.status}
                 </span>
               </div>
               <h3 className="overflow-hidden mt-5"><span data-line className="block type-x text-[9vw] md:text-[3.4vw] leading-[0.95]">{s.name}</span></h3>
               <dl className="mt-8 grid grid-cols-3 border-y border-hair" data-fade>
-                <div className="py-4 pr-3"><dt className="label text-fog">Platform</dt><dd className="mt-2 text-[15px]">{s.platform}</dd></div>
-                <div className="py-4 px-3"><dt className="label text-fog">Build</dt><dd className="mt-2 text-[15px]">{s.build}</dd></div>
-                <div className="py-4 pl-3"><dt className="label text-fog">Year</dt><dd className="mt-2 text-[15px]">{s.year || "—"}</dd></div>
+                <div className="py-4 pr-3"><dt className="label text-fog">{t.platform}</dt><dd className="mt-2 text-[15px]">{s.platform}</dd></div>
+                <div className="py-4 px-3"><dt className="label text-fog">{t.build}</dt><dd className="mt-2 text-[15px]">{s.build}</dd></div>
+                <div className="py-4 pl-3"><dt className="label text-fog">{t.year}</dt><dd className="mt-2 text-[15px]">{s.year || "—"}</dd></div>
               </dl>
               <p className="mt-6 text-mist leading-relaxed text-[17px]" data-fade>{s.text}</p>
               <p className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-[15px]" data-fade>
                 {s.url && (
-                  <a href={s.url} target="_blank" rel="noreferrer" className="underline decoration-bone/30 underline-offset-4 hover:decoration-bone">Visit the live site</a>
+                  <a href={s.url} target="_blank" rel="noreferrer" className="underline decoration-bone/30 underline-offset-4 hover:decoration-bone">{t.visitLive}</a>
                 )}
                 {s.caseSlug && (
-                  <Link href={`/case-studies/${s.caseSlug}`} className="underline decoration-bone/30 underline-offset-4 hover:decoration-bone">View case study</Link>
+                  <Link href={`/case-studies/${s.caseSlug}`} className="underline decoration-bone/30 underline-offset-4 hover:decoration-bone">{ui[lang].common.viewCaseStudy}</Link>
                 )}
               </p>
             </div>

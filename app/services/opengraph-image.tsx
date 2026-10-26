@@ -1,9 +1,9 @@
-import { OG_SIZE, card } from "@/lib/og";
+import { OG, pageAlt, pageCard } from "@/lib/og-pages";
 
-export const alt = "Seven services, one creative engine: Muhammad Muneeb Bilal.";
-export const size = OG_SIZE;
-export const contentType = "image/png";
+export const alt = pageAlt("en", "services");
+export const size = OG.size;
+export const contentType = OG.contentType;
 
-export default async function Image() {
-  return card({ kicker: "Services", title: "Seven services. One creative engine.", sub: "Social media, video, print, branding, websites, packaging and pitch decks.", image: undefined });
+export default function Image() {
+  return pageCard("en", "services");
 }

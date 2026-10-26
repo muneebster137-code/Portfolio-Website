@@ -1,9 +1,9 @@
-import { OG_SIZE, card } from "@/lib/og";
+import { OG, pageAlt, pageCard } from "@/lib/og-pages";
 
-export const alt = "Resume of Muhammad Muneeb Bilal, Founder and Creative Specialist.";
-export const size = OG_SIZE;
-export const contentType = "image/png";
+export const alt = pageAlt("en", "resume");
+export const size = OG.size;
+export const contentType = OG.contentType;
 
-export default async function Image() {
-  return card({ kicker: "Resume", title: "Muhammad Muneeb Bilal", sub: "Founder and Creative Specialist · Islamabad, Pakistan", image: undefined });
+export default function Image() {
+  return pageCard("en", "resume");
 }

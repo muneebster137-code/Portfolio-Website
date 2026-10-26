@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getTier, sized } from "@/components/fx/perf";
+import { useUI } from "@/components/i18n";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -54,6 +55,7 @@ export function OpeningVisual({ src, alt, accent, video, initials }: { src?: str
   const sketchHost = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
   const [wipe, setWipe] = useState(100);
+  const t = useUI().media;
   const wipeable = !!src && !video;
 
   useEffect(() => {
@@ -147,15 +149,15 @@ export function OpeningVisual({ src, alt, accent, video, initials }: { src?: str
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6" /></svg>
                     </span>
                   </div>
-                  <span className="pointer-events-none label absolute left-4 top-4 rounded-full bg-[#F2EFE7] px-3 py-1.5 text-void" aria-hidden="true">Sketch</span>
-                  <span className="pointer-events-none label absolute right-4 top-4 rounded-full bg-void/80 px-3 py-1.5 text-bone" aria-hidden="true">Final</span>
+                  <span className="pointer-events-none label absolute left-4 top-4 rounded-full bg-[#F2EFE7] px-3 py-1.5 text-void" aria-hidden="true">{t.sketch}</span>
+                  <span className="pointer-events-none label absolute right-4 top-4 rounded-full bg-void/80 px-3 py-1.5 text-bone" aria-hidden="true">{t.final}</span>
                   <input
                     type="range"
                     min={0}
                     max={100}
                     value={Math.round(wipe)}
                     onChange={(e) => setWipe(Number(e.target.value))}
-                    aria-label="Compare the pencil sketch with the final work"
+                    aria-label={t.compare}
                     className="sr-only"
                   />
                 </>
@@ -170,7 +172,7 @@ export function OpeningVisual({ src, alt, accent, video, initials }: { src?: str
                   <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                 </span>
               </span>
-              <span className="label absolute left-5 bottom-5 rounded-full bg-void border border-hair px-3 py-2">Opening reel · video to supply</span>
+              <span className="label absolute left-5 bottom-5 rounded-full bg-void border border-hair px-3 py-2">{t.openingReel}</span>
             </>
           )}
         </div>

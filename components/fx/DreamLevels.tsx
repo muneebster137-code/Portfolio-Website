@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { BASE_LERP, getLenis } from "@/components/shell/SmoothScroll";
 import { deeper } from "./sound";
+import { useUI } from "@/components/i18n";
 
 const LEVELS = [
   { lerp: BASE_LERP, shade: 0 },
@@ -14,6 +15,7 @@ const LEVELS = [
 // darker at the edges and a little slower to scroll, and the corner says how deep you are.
 export function DreamLevels() {
   const [level, setLevel] = useState(0);
+  const t = useUI().levels;
 
   useEffect(() => {
     const update = () => {
@@ -44,7 +46,7 @@ export function DreamLevels() {
         style={{ opacity: LEVELS[level].shade, background: "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.75) 100%)" }}
       />
       <div aria-hidden="true" className="pointer-events-none fixed right-5 md:right-8 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col items-end gap-3 text-bone print:hidden">
-        <span className="label tabular-nums">Level {level + 1}</span>
+        <span className="label tabular-nums">{t.level} {level + 1}</span>
         <span className="flex flex-col gap-1.5">
           {LEVELS.map((_, i) => (
             <span key={i} className={`h-px w-6 transition-colors duration-700 ${i <= level ? "bg-[var(--case,#EEEAE1)]" : "bg-bone/25"}`} />

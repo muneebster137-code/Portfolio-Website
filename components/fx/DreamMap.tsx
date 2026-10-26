@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { nameFor } from "@/lib/page-name";
+import { useLang, useUI } from "@/components/i18n";
+import { stripLang } from "@/lib/i18n";
 import { pencil } from "./sound";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -16,6 +18,8 @@ const MAX = 7;
 // room by room, ending where they are now.
 export function DreamMap() {
   const pathname = usePathname();
+  const lang = useLang();
+  const t = useUI().footer;
   const [path, setPath] = useState<string[]>([]);
   const root = useRef<HTMLDivElement>(null);
 
@@ -57,23 +61,23 @@ export function DreamMap() {
 
   return (
     <div ref={root} className="mx-auto max-w-[1600px] px-5 md:px-10 pb-10">
-      <p className="label text-void/55">The path you took through this dream</p>
+      <p className="label text-void/55">{t.pathTitle}</p>
       {n < 2 ? (
-        <p className="mt-3 text-[15px] text-void/60">One room so far. Wander further and your path draws itself here.</p>
+        <p className="mt-3 text-[15px] text-void/60">{t.pathOne}</p>
       ) : (
         <div className="relative mt-4 h-28 md:h-32">
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible" aria-hidden="true">
             <path className="dm-line" d={d} fill="none" stroke="#26282E" strokeOpacity="0.75" strokeWidth="1.3" strokeLinecap="round" vectorEffect="non-scaling-stroke" pathLength={1} strokeDasharray="1" />
             <path className="dm-line" d={d} fill="none" stroke="#26282E" strokeOpacity="0.3" strokeWidth="1" transform="translate(0.15 0.8)" vectorEffect="non-scaling-stroke" pathLength={1} strokeDasharray="1" />
           </svg>
-          <ol className="absolute inset-0" aria-label="Pages you visited, in order">
+          <ol className="absolute inset-0" aria-label={t.pathAria}>
             {path.map((p, i) => {
               const here = i === n - 1;
               return (
                 <li key={`${p}-${i}`} className="dm-stop absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style={{ left: `${pts[i].x}%`, top: `${pts[i].y}%` }}>
                   <span className={`block size-2.5 rounded-full ${here ? "bg-signal" : "bg-void/80"}`} />
                   <span className={`absolute whitespace-nowrap label ${i % 2 ? "bottom-full mb-2" : "top-full mt-2"} ${here ? "text-void" : "text-void/55"}`}>
-                    {here ? `${nameFor(p, "", true)} · you are here` : nameFor(p, "", true)}
+                    {here ? `${nameFor(stripLang(p), "", true, lang)} · ${t.youAreHere}` : nameFor(stripLang(p), "", true, lang)}
                   </span>
                 </li>
               );

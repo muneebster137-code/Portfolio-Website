@@ -72,8 +72,12 @@ export const viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // The device tier (data-tier) is set on <html> in the browser before React takes over.
+    // The device tier (data-tier) and, on /tr pages, lang="tr" are set on <html> in the browser before React takes over.
     <html lang="en" className={`${archivo.variable} ${geist.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Turkish pages live under /tr: mark the document as Turkish before anything renders. */}
+        <script dangerouslySetInnerHTML={{ __html: "var p=location.pathname;if(p==='/tr'||p.indexOf('/tr/')===0)document.documentElement.lang='tr'" }} />
+      </head>
       <body className="font-sans bg-void text-bone antialiased">
         <SketchFilter />
         <PencilTrail />

@@ -5,11 +5,13 @@ import { useRef, useState } from "react";
 import { RATIOS } from "@/lib/media-manifest";
 import type { Resolved } from "@/lib/media.server";
 import { Placeholder } from "./Slot";
+import { useUI } from "@/components/i18n";
 
 // One carousel post, swiped the way it is on Instagram: slides side by side, snapping one at a time.
 export function CarouselSlot({ slides, className = "" }: { slides: Resolved[]; className?: string }) {
   const track = useRef<HTMLDivElement>(null);
   const [at, setAt] = useState(0);
+  const t = useUI().media;
 
   const go = (i: number) => {
     const el = track.current;
@@ -26,7 +28,7 @@ export function CarouselSlot({ slides, className = "" }: { slides: Resolved[]; c
         onScroll={(e) => setAt(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))}
         className="flex overflow-x-auto snap-x snap-mandatory rounded-[10px] ring-1 ring-inset ring-hair bg-carbon [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ aspectRatio: RATIOS[slides[0].ratio].css }}
-        aria-label="Carousel post"
+        aria-label={t.carousel}
         tabIndex={0}
       >
         {slides.map((s) => (
@@ -36,10 +38,10 @@ export function CarouselSlot({ slides, className = "" }: { slides: Resolved[]; c
         ))}
       </div>
       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 pointer-events-none">
-        <button type="button" onClick={() => go(at - 1)} aria-label="Previous slide" className="pointer-events-auto grid place-items-center size-8 rounded-full bg-void/70 text-bone backdrop-blur disabled:opacity-0 transition-opacity" disabled={at === 0}>
+        <button type="button" onClick={() => go(at - 1)} aria-label={t.prevSlide} className="pointer-events-auto grid place-items-center size-8 rounded-full bg-void/70 text-bone backdrop-blur disabled:opacity-0 transition-opacity" disabled={at === 0}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
         </button>
-        <button type="button" onClick={() => go(at + 1)} aria-label="Next slide" className="pointer-events-auto grid place-items-center size-8 rounded-full bg-void/70 text-bone backdrop-blur disabled:opacity-0 transition-opacity" disabled={at === slides.length - 1}>
+        <button type="button" onClick={() => go(at + 1)} aria-label={t.nextSlide} className="pointer-events-auto grid place-items-center size-8 rounded-full bg-void/70 text-bone backdrop-blur disabled:opacity-0 transition-opacity" disabled={at === slides.length - 1}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
         </button>
       </div>

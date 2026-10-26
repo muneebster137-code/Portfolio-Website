@@ -1,14 +1,18 @@
-import { processSteps } from "@/lib/site";
+import type { Lang } from "@/lib/i18n";
+import { content } from "@/lib/content";
+import { ui } from "@/lib/ui";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHead } from "@/components/page/SectionHead";
 
 // A quiet interlude: three lines, one motion each.
-export function Process() {
+export function Process({ lang }: { lang: Lang }) {
+  const { processSteps } = content(lang);
+  const t = ui[lang].process;
   return (
     <section id="process" data-chapter="Process" className="relative bg-void" aria-labelledby="process-h">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 py-36 md:py-48">
         <Reveal>
-          <SectionHead id="process-h" label="Process" title="How I work" />
+          <SectionHead id="process-h" label={t.label} title={t.title} />
         </Reveal>
         <ol className="mt-16 space-y-20 md:space-y-28">
           {processSteps.map((s) => (

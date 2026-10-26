@@ -1,17 +1,18 @@
 import Image from "next/image";
-import Link from "next/link";
-import { featuredWork, keyNumbers, services, story } from "@/lib/site";
+import { LocalLink as Link, useContent, useUI } from "@/components/i18n";
 
 // The home story for visitors whose device asks for less motion: the same words and pictures,
 // laid out still, with no pinned scrolling and no 3D.
 
 export function StillIntro({ sheetBack }: { sheetBack?: string }) {
+  const { keyNumbers, story } = useContent();
+  const t = useUI().dream;
   return (
-    <section id="intro" data-chapter="Reality" aria-label="My story" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24">
-      <p className="label text-fog">01 · Reality</p>
+    <section id="intro" data-chapter="Reality" aria-label={t.myStory.replace(/^\d+ · /, "")} className="mx-auto max-w-[1600px] px-5 md:px-10 py-24">
+      <p className="label text-fog">{t.reality}</p>
       <div className="mt-8 grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-14 items-end">
         <h2 className="type-x text-[11vw] md:text-[clamp(44px,5.6vw,100px)] leading-[0.92]">
-          It all starts on a blank page<span className="text-signal">.</span>
+          {t.start1} {t.start2}<span className="text-signal">.</span>
         </h2>
         <div className="relative aspect-[1/1.414] w-full max-w-[380px] lg:justify-self-end bg-[#F2EFE7] rotate-[2deg] overflow-hidden shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]" aria-hidden="true">
           {sheetBack ? (
@@ -26,7 +27,7 @@ export function StillIntro({ sheetBack }: { sheetBack?: string }) {
       </div>
 
       <div data-chapter="Sketch" className="mt-28 grid md:grid-cols-2 gap-x-16 gap-y-10 max-w-[1200px]">
-        <p className="label text-fog md:col-span-2">02 · My story</p>
+        <p className="label text-fog md:col-span-2">{t.myStory}</p>
         {story.map((line, i) => (
           <p key={i} className="type-c text-[22px] md:text-[30px] leading-[1.25]">{line}</p>
         ))}
@@ -45,33 +46,37 @@ export function StillIntro({ sheetBack }: { sheetBack?: string }) {
 }
 
 export function StillWork({ images }: { images: Record<string, string | undefined> }) {
+  const { featuredWork } = useContent();
+  const t = useUI().dream;
   return (
     <section id="work" data-chapter="Dream" aria-labelledby="still-work-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24">
-      <p className="label text-fog">04 · Inside the dream</p>
-      <h2 id="still-work-h" className="type-x mt-6 text-[11vw] md:text-[clamp(40px,5vw,88px)] leading-[0.95]">Work that started with a blank page</h2>
+      <p className="label text-fog">{t.insideDream}</p>
+      <h2 id="still-work-h" className="type-x mt-6 text-[11vw] md:text-[clamp(40px,5vw,88px)] leading-[0.95]">{t.blankPage}</h2>
       <div className="mt-12 grid md:grid-cols-2 gap-x-8 gap-y-12">
         {featuredWork.map((w) => (
           <Link key={w.slug} href={`/case-studies/${w.slug}`} className="group block">
             <span className="relative block aspect-[16/10] overflow-hidden rounded-[10px] ring-1 ring-inset ring-hair" style={{ background: w.plate }}>
               {images[w.slug] && <Image src={images[w.slug]!} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />}
             </span>
-            <span className="label text-fog block mt-4">Case {w.index} · {w.year}</span>
+            <span className="label text-fog block mt-4">{t.case} {w.index} · {w.year}</span>
             <span className="type-x block text-[28px] md:text-[36px] leading-none mt-2 group-hover:text-signal transition-colors">{w.title}</span>
             <span className="block text-mist mt-2">{w.summary}</span>
           </Link>
         ))}
       </div>
-      <Link href="/case-studies" className="inline-flex mt-12 h-12 items-center rounded-full px-6 text-[15px] ring-1 ring-bone/25 hover:ring-bone transition">All eleven case studies</Link>
+      <Link href="/case-studies" className="inline-flex mt-12 h-12 items-center rounded-full px-6 text-[15px] ring-1 ring-bone/25 hover:ring-bone transition">{t.allEleven}</Link>
     </section>
   );
 }
 
 export function StillServices({ label, intro = false }: { label?: string; intro?: boolean }) {
+  const { services } = useContent();
+  const t = useUI().shelf;
   return (
     <section id="services" data-chapter="Engine" aria-labelledby="still-services-h" className="mx-auto max-w-[1600px] px-5 md:px-10 py-24">
       {label && <p className="label text-fog">{label}</p>}
       <h2 id="still-services-h" className={intro ? "type-x mt-6 text-[11vw] md:text-[clamp(40px,5vw,88px)] leading-[0.95] max-w-[1200px]" : "sr-only"}>
-        {intro ? "One engine. Seven ways to bring your vision to life." : "All seven services"}
+        {intro ? t.heading : t.allServices}
       </h2>
       <ul className={`${intro ? "mt-12" : ""} border-t border-hair`}>
         {services.map((s) => (

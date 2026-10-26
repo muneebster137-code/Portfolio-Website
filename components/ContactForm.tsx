@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { gsap } from "gsap";
-import { identity, services, serviceSlug } from "@/lib/site";
-import { contact } from "@/lib/profile";
+import { identity, services as enServices, serviceSlug } from "@/lib/site";
+import { useContent, useLang, useUI } from "@/components/i18n";
+import { fill } from "@/lib/ui";
 import { SKETCH_KEY } from "@/components/three/store";
 import { BriefBuilder, type Brief } from "@/components/BriefBuilder";
 import { track } from "@vercel/analytics";
@@ -58,6 +59,10 @@ export function ContactForm() {
   const sheet = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const built = useRef(false);
+  const lang = useLang();
+  const { services, contact } = useContent();
+  const ui = useUI();
+  const t = ui.contactForm;
 
   useEffect(() => {
     try {
@@ -103,7 +108,8 @@ export function ContactForm() {
     e.preventDefault();
     const form = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     if (form._honey) return; // filled only by bots
-    const service = services.find((s) => serviceSlug(s) === form.service)?.name ?? "Not chosen";
+    // The email stays in English for Muneeb, whatever language the visitor wrote in.
+    const service = enServices.find((s) => serviceSlug(s) === form.service)?.name ?? "Not chosen";
     setStatus("sending");
     setError("");
     const fields: Record<string, string> = {
@@ -116,6 +122,7 @@ export function ContactForm() {
       Service: service,
       Brief: form.brief,
       Timeline: form.timeline || "Not given",
+      Language: lang === "tr" ? "Turkish (sent from the Turkish site)" : "English",
     };
     const ok = async (res: Response) => res.ok && String((await res.json().catch(() => ({}))).success) === "true";
     const asJson = () => fetch(FORMSUBMIT, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(fields) });
@@ -135,7 +142,7 @@ export function ContactForm() {
       track("brief_sent", { service, sketch: !!sketch, builder: built.current });
       flyAway();
     } catch {
-      setError(`Couldn't send that. Email ${identity.email} instead.`);
+      setError(fill(t.error, { email: identity.email }));
       setStatus("error");
     }
   }
@@ -143,7 +150,7 @@ export function ContactForm() {
   if (status === "sent") {
     return (
       <div role="status" className="py-10">
-        <p className="label text-fog">Sent</p>
+        <p className="label text-fog">{t.sent}</p>
         <p className="type-x mt-4 text-[32px] md:text-[44px] leading-[1.05]">{contact.success}</p>
       </div>
     );
@@ -155,30 +162,30 @@ export function ContactForm() {
       <div ref={sheet} className="relative bg-[#F2EFE7] text-void p-6 md:p-12 origin-center will-change-transform" style={{ clipPath: SHAPES.page }}>
         <form ref={formRef} onSubmit={onSubmit} className="grid gap-10">
           <div className="flex justify-between label text-void/45" aria-hidden="true">
-            <span>A sheet of A4</span>
-            <span>Your brief</span>
+            <span>{t.sheet}</span>
+            <span>{t.yourBrief}</span>
           </div>
           <input type="text" name="_honey" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
           <BriefBuilder onUse={applyBrief} />
           <div className="grid md:grid-cols-2 gap-10">
             <label className="block">
-              <span className={label}>Name</span>
-              <input name="name" required autoComplete="name" className={field} placeholder="Your name" onChange={(e) => setSigner(e.target.value)} />
+              <span className={label}>{t.name}</span>
+              <input name="name" required autoComplete="name" className={field} placeholder={t.namePh} onChange={(e) => setSigner(e.target.value)} />
             </label>
             <label className="block">
-              <span className={label}>Email</span>
-              <input name="email" type="email" required autoComplete="email" className={field} placeholder="you@brand.com" />
+              <span className={label}>{t.email}</span>
+              <input name="email" type="email" required autoComplete="email" className={field} placeholder={t.emailPh} />
             </label>
           </div>
           <div className="grid md:grid-cols-2 gap-10">
             <label className="block">
-              <span className={label}>Brand or company</span>
-              <input name="brand" autoComplete="organization" className={field} placeholder="Brand name" />
+              <span className={label}>{t.brand}</span>
+              <input name="brand" autoComplete="organization" className={field} placeholder={t.brandPh} />
             </label>
             <label className="block">
-              <span className={label}>Service</span>
+              <span className={label}>{t.service}</span>
               <select name="service" defaultValue={preset} className={`${field} appearance-none cursor-pointer`}>
-                <option value="">Choose a service</option>
+                <option value="">{t.choose}</option>
                 {services.map((s) => (
                   <option key={s.code} value={serviceSlug(s)}>{s.name}</option>
                 ))}
@@ -186,32 +193,32 @@ export function ContactForm() {
             </label>
           </div>
           <label className="block">
-            <span className={label}>Short brief</span>
-            <textarea name="brief" required rows={4} className={`${field} resize-none`} placeholder="What should people feel, remember and do?" />
+            <span className={label}>{t.brief}</span>
+            <textarea name="brief" required rows={4} className={`${field} resize-none`} placeholder={t.briefPh} />
           </label>
           <label className="block md:max-w-[50%]">
-            <span className={label}>Timeline (optional)</span>
-            <input name="timeline" className={field} placeholder="When do you need it?" />
+            <span className={label}>{t.timeline}</span>
+            <input name="timeline" className={field} placeholder={t.timelinePh} />
           </label>
           {sketch && (
             <div className="flex flex-wrap items-end gap-6">
               <figure className="relative w-36 aspect-[1/1.414] bg-[#F7F4EC] -rotate-2 shadow-[0_14px_30px_-14px_rgba(0,0,0,0.5)] overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element -- a data URL from this visit, not a site asset */}
-                <img src={sketch} alt="Your sketch from the home page" className="absolute inset-0 size-full object-cover" />
+                <img src={sketch} alt={t.sketchAlt} className="absolute inset-0 size-full object-cover" />
                 <figcaption className="absolute right-2 bottom-1.5 text-[13px] text-void/80" style={{ font: `italic 600 13px "Segoe Script", "Brush Script MT", "Snell Roundhand", cursive` }}>
-                  — {signer || "your name"}
+                  — {signer || t.yourName}
                 </figcaption>
               </figure>
               <div>
-                <p className={label}>Your sketch, signed</p>
-                <p className="mt-2 text-[15px] text-void/70 max-w-[300px]">It goes with your brief, signed with your name.</p>
-                <button type="button" onClick={dropSketch} className="mt-2 text-[14px] underline underline-offset-4 text-void/60 hover:text-void">Leave it out</button>
+                <p className={label}>{t.sketchTitle}</p>
+                <p className="mt-2 text-[15px] text-void/70 max-w-[300px]">{t.sketchBody}</p>
+                <button type="button" onClick={dropSketch} className="mt-2 text-[14px] underline underline-offset-4 text-void/60 hover:text-void">{t.leaveOut}</button>
               </div>
             </div>
           )}
           <div className="flex flex-wrap items-center gap-6">
             <button type="submit" disabled={status === "sending" || status === "flying"} className="inline-flex h-16 items-center gap-3 rounded-full bg-signal px-9 text-lg font-medium text-void hover:bg-void hover:text-bone transition-colors disabled:opacity-60">
-              {status === "sending" ? "Sending" : "Start a project"}
+              {status === "sending" ? t.sending : ui.nav.startProject}
             </button>
             {status === "error" && <p role="alert" className="text-[15px] text-[#C2360F]">{error}</p>}
           </div>

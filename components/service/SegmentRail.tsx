@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "@/components/shell/SmoothScroll";
+import { useUI } from "@/components/i18n";
 
 // Sticky index of a service page's segments; the one on screen lights up in the service colour.
 export function SegmentRail({ names, color }: { names: string[]; color: string }) {
+  const t = useUI().shelf;
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -21,8 +23,8 @@ export function SegmentRail({ names, color }: { names: string[]; color: string }
   }, [names]);
 
   return (
-    <nav aria-label="Segments" className="hidden lg:block sticky top-28 self-start">
-      <p className="label text-fog mb-5">Segments</p>
+    <nav aria-label={t.segments} className="hidden lg:block sticky top-28 self-start">
+      <p className="label text-fog mb-5">{t.segments}</p>
       <ol className="space-y-2.5">
         {names.map((n, i) => (
           <li key={n}>

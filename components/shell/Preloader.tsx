@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { getLenis } from "./SmoothScroll";
+import { useUI } from "@/components/i18n";
 
 export const PRELOADER_DONE = "mmb:preloader-done";
 
@@ -12,6 +13,7 @@ export function Preloader() {
   const root = useRef<HTMLDivElement>(null);
   const [count, setCount] = useState(0);
   const [visible, setVisible] = useState(true);
+  const t = useUI().preloader;
 
   useEffect(() => {
     const seen = sessionStorage.getItem("mmb-loaded");
@@ -62,13 +64,13 @@ export function Preloader() {
   if (!visible) return null;
 
   return (
-    <div ref={root} className="fixed inset-0 z-[100] bg-void text-bone" role="status" aria-label="Loading">
+    <div ref={root} className="fixed inset-0 z-[100] bg-void text-bone" role="status" aria-label={t.loading}>
       <svg className="pl-svg absolute inset-x-0 top-1/2 -translate-y-1/2 w-full h-24" viewBox="0 0 1000 100" preserveAspectRatio="none" fill="none" aria-hidden="true">
         <path className="pl-line" d="M0 52 C 120 46, 220 58, 340 50 S 560 44, 680 53 S 880 49, 1000 50" stroke="#EEEAE1" strokeWidth="1.2" pathLength={1} strokeDasharray="1" vectorEffect="non-scaling-stroke" />
       </svg>
       <div className="pl-meta absolute inset-x-5 md:inset-x-10 top-6 flex justify-between label text-fog">
         <span>Muhammad Muneeb Bilal</span>
-        <span>A sheet of A4</span>
+        <span>{t.sheet}</span>
       </div>
       <span className="pl-meta absolute right-5 md:right-10 bottom-6 label text-fog tabular-nums">{String(count).padStart(3, "0")}</span>
     </div>

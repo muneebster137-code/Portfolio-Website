@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { RATIOS } from "@/lib/media-manifest";
 import type { Resolved } from "@/lib/media.server";
 import { Placeholder } from "./Slot";
+import { useUI } from "@/components/i18n";
 
 const Icon = ({ d, size = 16 }: { d: string; size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={d} /></svg>
@@ -23,6 +24,7 @@ export function VideoSlot({ slot, className = "", autoplay = true }: { slot: Res
   const [muted, setMuted] = useState(true);
   const [volume, setVolume] = useState(0.8);
   const [full, setFull] = useState(false);
+  const t = useUI().media;
 
   useEffect(() => {
     const el = video.current;
@@ -91,10 +93,10 @@ export function VideoSlot({ slot, className = "", autoplay = true }: { slot: Res
             className={`cursor-pointer ${full ? "max-h-screen max-w-full object-contain" : "absolute inset-0 size-full object-cover"}`}
           />
           <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 p-2.5 bg-gradient-to-t from-black/70 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-            <button type="button" onClick={toggle} aria-label={playing ? "Pause" : "Play"} className="grid place-items-center size-9 rounded-full bg-bone text-void">
+            <button type="button" onClick={toggle} aria-label={playing ? t.pause : t.play} className="grid place-items-center size-9 rounded-full bg-bone text-void">
               <Icon d={playing ? PAUSE : PLAY} />
             </button>
-            <button type="button" onClick={toggleMute} aria-label={muted ? "Turn sound on" : "Mute"} className="grid place-items-center size-9 rounded-full text-bone hover:bg-bone/15">
+            <button type="button" onClick={toggleMute} aria-label={muted ? t.soundOn : t.mute} className="grid place-items-center size-9 rounded-full text-bone hover:bg-bone/15">
               <Icon d={muted ? MUTED : SOUND} size={18} />
             </button>
             <input
@@ -104,10 +106,10 @@ export function VideoSlot({ slot, className = "", autoplay = true }: { slot: Res
               step={0.05}
               value={muted ? 0 : volume}
               onChange={(e) => setVol(Number(e.target.value))}
-              aria-label="Volume"
+              aria-label={t.volume}
               className="w-16 md:w-20 accent-bone"
             />
-            <button type="button" onClick={expand} aria-label={full ? "Exit full screen" : "Watch full screen"} className="ml-auto grid place-items-center size-9 rounded-full text-bone hover:bg-bone/15">
+            <button type="button" onClick={expand} aria-label={full ? t.exitFullscreen : t.fullscreen} className="ml-auto grid place-items-center size-9 rounded-full text-bone hover:bg-bone/15">
               <Icon d={EXPAND} size={18} />
             </button>
           </div>

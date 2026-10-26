@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { pointer } from "@/components/three/store";
 import { getTier } from "@/components/fx/perf";
+import { useUI } from "@/components/i18n";
+import { fill } from "@/lib/ui";
 
 export type Note = { quote: string; name: string; title: string; source: string };
 export type Logo = { name: string; src: string };
@@ -36,6 +38,7 @@ export function ProofWall({ notes, logos }: { notes: Note[]; logos: Logo[] }) {
   const wall = useRef<HTMLDivElement>(null);
   const items = useRef<(HTMLElement | null)[]>([]);
   const [open, setOpen] = useState<number | null>(null);
+  const t = useUI().proof;
   const close = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -83,7 +86,7 @@ export function ProofWall({ notes, logos }: { notes: Note[]; logos: Logo[] }) {
             type="button"
             data-r={SPOTS[i].r}
             onClick={() => setOpen(i)}
-            aria-label={`Read what ${n.name} said`}
+            aria-label={fill(t.read, { name: n.name })}
             className="group relative shrink-0 snap-center w-[78vw] max-w-[320px] md:absolute md:left-[var(--x)] md:top-[var(--y)] md:w-[clamp(240px,22vw,320px)] origin-top bg-[#F2EFE7] text-void text-left p-6 shadow-[0_24px_40px_-20px_rgba(0,0,0,0.85)] transition-shadow hover:shadow-[0_40px_60px_-24px_rgba(0,0,0,0.9)]"
             style={{ ["--x" as string]: `${SPOTS[i].x}%`, ["--y" as string]: `${SPOTS[i].y}%`, transform: `rotateZ(${SPOTS[i].r}deg)` }}
           >
@@ -105,7 +108,7 @@ export function ProofWall({ notes, logos }: { notes: Note[]; logos: Logo[] }) {
             >
               <Pin />
               <span className="relative size-full">
-                <Image src={l.src} alt={`${l.name} logo`} fill sizes="130px" className="object-contain" />
+                <Image src={l.src} alt={`${l.name} ${t.logo}`} fill sizes="130px" className="object-contain" />
               </span>
             </span>
           );
@@ -113,7 +116,7 @@ export function ProofWall({ notes, logos }: { notes: Note[]; logos: Logo[] }) {
       </div>
 
       {note && (
-        <div role="dialog" aria-modal="true" aria-label={`What ${note.name} said`} className="fixed inset-0 z-[96] grid place-items-center bg-void/80 p-5 animate-[fade-in_0.3s_ease-out]" onClick={() => setOpen(null)}>
+        <div role="dialog" aria-modal="true" aria-label={fill(t.said, { name: note.name })} className="fixed inset-0 z-[96] grid place-items-center bg-void/80 p-5 animate-[fade-in_0.3s_ease-out]" onClick={() => setOpen(null)}>
           <figure className="relative w-full max-w-[640px] bg-[#F2EFE7] text-void p-8 md:p-12 rotate-[-1.2deg] shadow-[0_60px_100px_-30px_rgba(0,0,0,0.9)]" onClick={(e) => e.stopPropagation()}>
             <Pin />
             <blockquote className="type-c text-[22px] md:text-[30px] leading-[1.3]">&ldquo;{note.quote}&rdquo;</blockquote>
@@ -122,7 +125,7 @@ export function ProofWall({ notes, logos }: { notes: Note[]; logos: Logo[] }) {
               <span className="block label text-void/55 mt-1">{note.title} · {note.source}</span>
             </figcaption>
             <button ref={close} type="button" onClick={() => setOpen(null)} className="absolute right-4 top-4 label text-void/60 hover:text-void">
-              Pin it back
+              {t.pinBack}
             </button>
           </figure>
         </div>

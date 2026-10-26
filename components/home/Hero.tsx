@@ -1,11 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { identity } from "@/lib/site";
+import { LocalLink as Link, useContent, useUI } from "@/components/i18n";
 import { useInViewport } from "@/components/three/useInViewport";
 import { PRELOADER_DONE } from "@/components/shell/Preloader";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
@@ -15,6 +14,7 @@ const PortraitScene = dynamic(() => import("@/components/three/PortraitScene"), 
 // The way to the work: a big round button on the right, its label running round the rim.
 function WorkButton() {
   const ref = useRef<HTMLAnchorElement>(null);
+  const t = useUI().hero;
   useEffect(() => {
     const el = ref.current;
     if (!el || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
@@ -33,13 +33,13 @@ function WorkButton() {
     return () => window.removeEventListener("pointermove", move);
   }, []);
   return (
-    <Link ref={ref} href="/case-studies" aria-label="View case studies" data-track="cta_view_work" data-track-from="hero" className="hero-cta group pointer-events-auto relative grid size-28 md:size-44 place-items-center rounded-full bg-signal text-void shadow-[0_30px_60px_-20px_rgba(255,74,28,0.45)]">
+    <Link ref={ref} href="/case-studies" aria-label={t.viewWork} data-track="cta_view_work" data-track-from="hero" className="hero-cta group pointer-events-auto relative grid size-28 md:size-44 place-items-center rounded-full bg-signal text-void shadow-[0_30px_60px_-20px_rgba(255,74,28,0.45)]">
       <svg viewBox="0 0 200 200" className="absolute inset-0 size-full animate-[spin_16s_linear_infinite] group-hover:animate-[spin_5s_linear_infinite]" aria-hidden="true">
         <defs>
           <path id="cta-rim" d="M100 100 m-74 0 a74 74 0 1 1 148 0 a74 74 0 1 1 -148 0" />
         </defs>
         <text className="label" fill="currentColor" fontSize="15" letterSpacing="2.6">
-          <textPath href="#cta-rim">VIEW CASE STUDIES · ELEVEN STORIES · </textPath>
+          <textPath href="#cta-rim">{t.rim}</textPath>
         </text>
       </svg>
       <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="transition-transform duration-300 group-hover:rotate-45" aria-hidden="true">
@@ -55,6 +55,9 @@ export function Hero({ portrait, cutout, tiles }: { portrait?: string; cutout: b
   const active = useInViewport(wrap, "0px");
   const reduced = useReducedMotion();
   const [ready, setReady] = useState(false);
+  const { identity } = useContent();
+  const ui = useUI();
+  const t = ui.hero;
 
   useLayoutEffect(() => {
     const q = gsap.utils.selector(wrap);
@@ -104,10 +107,10 @@ export function Hero({ portrait, cutout, tiles }: { portrait?: string; cutout: b
         <p className="hero-fade label text-fog">{identity.role}</p>
         <div className="max-w-[820px] md:mb-[6vh]">
           <h1 id="hero-h" className="type-x text-[12.5vw] md:text-[clamp(48px,5.6vw,112px)] leading-[0.9]">
-            <span className="block overflow-hidden"><span className="hero-line block">Dreamt in pencil.</span></span>
+            <span className="block overflow-hidden"><span className="hero-line block">{t.line1}</span></span>
             <span className="relative inline-block overflow-hidden pb-[0.16em]">
               <span className="hero-line block">
-                Delivered in <span className="text-signal">colour</span>.
+                {t.before}<span className="text-signal">{t.highlight}</span>{t.after}
               </span>
               {/* A pencil underline; the preloader's line lands here. */}
               <svg data-landing viewBox="0 0 400 12" preserveAspectRatio="none" className="absolute left-0 right-[4%] bottom-0 h-[0.14em] w-[96%]" aria-hidden="true">
@@ -116,14 +119,14 @@ export function Hero({ portrait, cutout, tiles }: { portrait?: string; cutout: b
             </span>
           </h1>
           <p className="hero-fade hidden md:block mt-8 max-w-[440px] text-[17px] leading-[1.6] text-mist">
-            Social media, video, print, branding, websites, packaging and pitch decks from one creative engine. I start by understanding what you want people to feel, then I build everything around that vision.
+            {t.body}
           </p>
           <div className="hero-fade mt-8 flex flex-wrap gap-3 pointer-events-auto">
-            <Link href="/contact" data-track="cta_start_project" data-track-from="hero" className="inline-flex h-12 items-center rounded-full bg-bone px-6 text-[15px] font-medium text-void hover:bg-signal transition-colors">Start a project</Link>
-            <Link href="/resume" className="inline-flex h-12 items-center rounded-full px-6 text-[15px] ring-1 ring-bone/25 hover:ring-bone transition">Resume</Link>
+            <Link href="/contact" data-track="cta_start_project" data-track-from="hero" className="inline-flex h-12 items-center rounded-full bg-bone px-6 text-[15px] font-medium text-void hover:bg-signal transition-colors">{ui.nav.startProject}</Link>
+            <Link href="/resume" className="inline-flex h-12 items-center rounded-full px-6 text-[15px] ring-1 ring-bone/25 hover:ring-bone transition">{ui.nav.resume}</Link>
           </div>
         </div>
-        <p className="hero-fade hidden md:block label text-fog">Scroll</p>
+        <p className="hero-fade hidden md:block label text-fog">{t.scroll}</p>
       </div>
 
       <div className="absolute z-20 right-5 top-[46svh] md:top-auto md:right-10 md:bottom-[12vh]">

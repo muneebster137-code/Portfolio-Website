@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { keyNumbers, story } from "@/lib/site";
+import { LocalLink as Link, useContent, useUI } from "@/components/i18n";
 import { SKETCHED, SKETCH_KEY, dreamState } from "@/components/three/store";
 import { useInViewport } from "@/components/three/useInViewport";
 import { useReducedMotion } from "@/components/motion/useReducedMotion";
@@ -30,6 +29,8 @@ export function DreamSequence({ sheetBack }: { sheetBack?: string }) {
 function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
   const wrap = useRef<HTMLElement>(null);
   const active = useInViewport(wrap, "0px");
+  const { keyNumbers, story } = useContent();
+  const t = useUI().dream;
   // Once the visitor has drawn on the sheet, they can sign it and send it with their brief.
   const [sketched, setSketched] = useState(false);
   useEffect(() => {
@@ -100,10 +101,10 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
     }, wrap);
 
     return () => ctx.revert();
-  }, []);
+  }, [story]);
 
   return (
-    <section ref={wrap} id="intro" data-chapter="Reality" className="relative h-[780svh]" aria-label="My story">
+    <section ref={wrap} id="intro" data-chapter="Reality" className="relative h-[780svh]" aria-label={t.myStory.replace(/^\d+ · /, "")}>
       <div className="sticky top-0 h-svh overflow-hidden bg-void">
         <div className="absolute inset-0">
           <PaperScene active={active} backSrc={sheetBack} />
@@ -111,25 +112,25 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
 
         {/* 01 · Reality */}
         <div className="ds-s1 absolute inset-0 px-5 md:px-10 pt-28 pb-10 flex flex-col justify-between pointer-events-none">
-          <p className="ds-fade label text-fog">01 · Reality</p>
+          <p className="ds-fade label text-fog">{t.reality}</p>
           <div className="max-w-[640px]">
             <h2 className="type-x text-[11vw] md:text-[clamp(44px,5.6vw,100px)] leading-[0.92]">
-              <span className="block overflow-hidden"><span className="ds-line block">It all starts</span></span>
-              <span className="block overflow-hidden"><span className="ds-line block">on a blank page<span className="text-signal">.</span></span></span>
+              <span className="block overflow-hidden"><span className="ds-line block">{t.start1}</span></span>
+              <span className="block overflow-hidden"><span className="ds-line block">{t.start2}<span className="text-signal">.</span></span></span>
             </h2>
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <p className="ds-fade label text-fog">Scroll<span className="hidden [@media(hover:hover)]:inline"> · or draw on the page</span></p>
+            <p className="ds-fade label text-fog">{t.scroll}<span className="hidden [@media(hover:hover)]:inline">{t.draw}</span></p>
             {sketched && (
               <Link href="/contact" data-track="sketch_sent_to_brief" onPointerDown={keepSketch} onKeyDown={(e) => e.key === "Enter" && keepSketch()} className="pointer-events-auto label text-bone underline decoration-bone/40 underline-offset-4 hover:decoration-bone animate-[fade-in_0.6s_ease-out]">
-                Sign your sketch and send it with your brief
+                {t.sendSketch}
               </Link>
             )}
           </div>
         </div>
 
         {/* 02 · The sketch */}
-        <p className="ds-s2-label invisible absolute left-5 md:left-10 top-28 label text-fog">02 · My story</p>
+        <p className="ds-s2-label invisible absolute left-5 md:left-10 top-28 label text-fog">{t.myStory}</p>
         <div className="absolute inset-x-5 bottom-[8vh] flex justify-center pointer-events-none">
           <div className="relative w-full max-w-[820px] min-h-[120px]">
             {story.map((line, i) => (
@@ -150,8 +151,8 @@ function AnimatedIntro({ sheetBack }: { sheetBack?: string }) {
         </dl>
 
         {/* 03 · The fold */}
-        <p className="ds-fold invisible absolute left-5 md:left-10 top-28 label text-fog">03 · Turn the page</p>
-        <h2 className="ds-fold invisible absolute inset-x-5 bottom-[8vh] text-center type-x text-[8vw] md:text-[clamp(32px,3.6vw,60px)] leading-[1] pointer-events-none">Work that started with a blank page</h2>
+        <p className="ds-fold invisible absolute left-5 md:left-10 top-28 label text-fog">{t.turn}</p>
+        <h2 className="ds-fold invisible absolute inset-x-5 bottom-[8vh] text-center type-x text-[8vw] md:text-[clamp(32px,3.6vw,60px)] leading-[1] pointer-events-none">{t.blankPage}</h2>
 
         <div className="ds-black invisible absolute inset-0 bg-void" />
       </div>

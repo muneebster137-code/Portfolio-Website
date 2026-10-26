@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { time } from "@/components/three/store";
 import { drone } from "./sound";
+import { useUI } from "@/components/i18n";
 
 const SLOW = 0.12;
 
@@ -12,6 +13,7 @@ const SLOW = 0.12;
 // come back up to speed. Also keeps the site's slowed clock (time.t) that the 3D scenes run on.
 export function TimeDilation() {
   const [on, setOn] = useState(false);
+  const t = useUI().time;
 
   useEffect(() => {
     let raf = 0;
@@ -76,7 +78,7 @@ export function TimeDilation() {
   return (
     <div aria-hidden="true" className={`pointer-events-none fixed inset-0 z-[85] transition-opacity duration-700 print:hidden ${on ? "opacity-100" : "opacity-0"}`}>
       <div className={`absolute inset-0 ${on ? "[backdrop-filter:saturate(0.25)_contrast(1.08)]" : ""}`} style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)" }} />
-      <p className="absolute inset-x-0 bottom-20 text-center label text-bone/80">Time slows down here. Let go to wake.</p>
+      <p className="absolute inset-x-0 bottom-20 text-center label text-bone/80">{t.message}</p>
     </div>
   );
 }

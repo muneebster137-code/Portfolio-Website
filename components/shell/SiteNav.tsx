@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { identity, navLinks, services } from "@/lib/site";
+import { LocalLink as Link, useContent, useLang, useUI } from "@/components/i18n";
+import { localize, stripLang } from "@/lib/i18n";
 import { getLenis } from "./SmoothScroll";
 import { SoundToggle } from "@/components/fx/SoundToggle";
 
@@ -13,6 +14,10 @@ export function SiteNav() {
   const overlay = useRef<HTMLDivElement>(null);
   const tl = useRef<gsap.core.Timeline | null>(null);
   const pathname = usePathname();
+  const lang = useLang();
+  const t = useUI().nav;
+  const { identity, navLinks, services } = useContent();
+  const other = lang === "en" ? "tr" : "en";
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -47,16 +52,26 @@ export function SiteNav() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-5 md:px-8 pt-5 pointer-events-none">
-        <Link href="/" className="pointer-events-auto flex h-11 items-center gap-3 rounded-full bg-void/55 px-4 text-bone backdrop-blur-xl backdrop-saturate-150 ring-1 ring-bone/10" aria-label="Muhammad Muneeb Bilal, home">
+        <Link href="/" className="pointer-events-auto flex h-11 items-center gap-3 rounded-full bg-void/55 px-4 text-bone backdrop-blur-xl backdrop-saturate-150 ring-1 ring-bone/10" aria-label={t.home}>
           <span className="type-x text-[22px] leading-none">MMB<span className="text-signal">.</span></span>
         </Link>
         <div className="pointer-events-auto flex items-center gap-2">
+          {/* The same page in the other language. */}
+          <NextLink
+            href={localize(other, stripLang(pathname || "/"))}
+            hrefLang={other}
+            aria-label={t.switchAria}
+            data-track="language_switch"
+            className="grid h-11 min-w-11 place-items-center rounded-full bg-void/55 px-3 text-[13px] font-medium text-bone ring-1 ring-bone/10 backdrop-blur-xl backdrop-saturate-150 hover:ring-bone/40 transition"
+          >
+            {t.switchLabel}
+          </NextLink>
           <SoundToggle />
           <Link href="/resume" className="hidden md:inline-flex h-11 items-center rounded-full bg-void/55 px-5 text-sm text-bone ring-1 ring-bone/10 backdrop-blur-xl backdrop-saturate-150 hover:ring-bone/40 transition">
-            Resume
+            {t.resume}
           </Link>
           <Link href="/contact" data-track="cta_start_project" data-track-from="nav" className="hidden sm:inline-flex h-11 items-center rounded-full bg-signal px-5 text-sm font-medium text-void hover:bg-bone transition-colors">
-            Start a project
+            {t.startProject}
           </Link>
           <button
             type="button"
@@ -65,7 +80,7 @@ export function SiteNav() {
             aria-controls="site-menu"
             className="h-11 inline-flex items-center gap-3 rounded-full bg-bone pl-5 pr-1.5 text-sm font-medium text-void shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] ring-1 ring-void/10"
           >
-            {open ? "Close" : "Menu"}
+            {open ? t.close : t.menu}
             <span className="relative size-8 rounded-full bg-void" aria-hidden="true">
               <span className={`absolute left-1/2 top-1/2 -ml-[7px] h-px w-3.5 bg-bone transition-transform duration-500 ${open ? "rotate-45" : "-translate-y-[3px]"}`} />
               <span className={`absolute left-1/2 top-1/2 -ml-[7px] h-px w-3.5 bg-bone transition-transform duration-500 ${open ? "-rotate-45" : "translate-y-[3px]"}`} />
@@ -81,7 +96,7 @@ export function SiteNav() {
         aria-hidden={!open}
       >
         <div className="min-h-full grid lg:grid-cols-[1fr_380px] gap-12 px-5 md:px-8 pt-28 pb-10">
-          <nav aria-label="Main menu" className="flex flex-col justify-end">
+          <nav aria-label={t.mainMenu} className="flex flex-col justify-end">
             {navLinks.map((l, i) => (
               <Link
                 key={l.href}
@@ -99,7 +114,7 @@ export function SiteNav() {
           </nav>
           <aside className="menu-aside flex flex-col justify-end gap-8">
             <div>
-              <p className="label text-fog mb-4">Seven services</p>
+              <p className="label text-fog mb-4">{t.sevenServices}</p>
               <ul className="space-y-2">
                 {services.map((s) => (
                   <li key={s.code} className="flex items-center gap-3 text-sm text-mist">

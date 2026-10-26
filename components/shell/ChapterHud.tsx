@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "./SmoothScroll";
+import { useUI } from "@/components/i18n";
 
 type Marker = { id: string; label: string; at: number };
 
 // A film-timeline scrubber: one marker per [data-chapter] section, a playhead for scroll progress.
 export function ChapterHud() {
   const pathname = usePathname();
+  const ui = useUI();
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [current, setCurrent] = useState(0);
   const [time, setTime] = useState("");
@@ -23,7 +25,7 @@ export function ChapterHud() {
       setMarkers(
         els.map((el) => ({
           id: el.id,
-          label: el.dataset.chapter ?? "",
+          label: ui.chapters[el.dataset.chapter ?? ""] ?? el.dataset.chapter ?? "",
           at: max > 0 ? Math.min(1, (el.getBoundingClientRect().top + window.scrollY) / max) : 0,
         }))
       );
@@ -36,7 +38,7 @@ export function ChapterHud() {
       ScrollTrigger.removeEventListener("refresh", measure);
       window.removeEventListener("resize", measure);
     };
-  }, [pathname]);
+  }, [pathname, ui.chapters]);
 
   useEffect(() => {
     const update = () => {
@@ -75,7 +77,7 @@ export function ChapterHud() {
           <button
             key={m.id}
             type="button"
-            aria-label={`Go to ${m.label}`}
+            aria-label={`${ui.hud.goTo} ${m.label}`}
             onClick={() => getLenis()?.scrollTo(`#${m.id}`, { duration: 1 })}
             className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 size-2.5 rotate-45 border border-bone transition-colors ${i <= current ? "bg-bone" : "bg-transparent"}`}
             style={{ left: `${m.at * 100}%` }}
@@ -83,7 +85,7 @@ export function ChapterHud() {
         ))}
         <span ref={head} className="absolute top-0 h-4 w-px bg-bone" />
       </div>
-      <span className="label w-36 shrink-0 text-right tabular-nums">Islamabad {time}</span>
+      <span className="label w-36 shrink-0 text-right tabular-nums">{ui.hud.city} {time}</span>
     </div>
   );
 }

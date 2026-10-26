@@ -1,16 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { services, serviceSlug } from "@/lib/site";
-import { cases } from "@/lib/cases";
+import { serviceSlug } from "@/lib/site";
+import { useContent, useLang, useUI } from "@/components/i18n";
+import { fill } from "@/lib/ui";
 
-const WHEN = ["This month", "In one to three months", "Just exploring"];
-const FEELINGS = ["Trust", "Excitement", "Calm", "Luxury", "Joy", "Curiosity", "Belonging"];
 
 export type Brief = { text: string; service: string; timeline: string; services: string[] };
 
-// Joins with "plus" rather than "and": several service names already contain "and".
-const list = (xs: string[], last = "and") => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} ${last} ${xs[xs.length - 1]}`);
+// Joins a list with the language's "and"; service names get "plus", since several already contain "and".
+const list = (xs: string[], last: string) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} ${last} ${xs[xs.length - 1]}`);
 
 function Chip({ on, children, onClick }: { on: boolean; children: React.ReactNode; onClick: () => void }) {
   return (
@@ -32,6 +31,15 @@ export function BriefBuilder({ onUse }: { onUse: (b: Brief) => void }) {
   const [need, setNeed] = useState<string[]>([]);
   const [when, setWhen] = useState("");
   const [feel, setFeel] = useState<string[]>([]);
+  const { services, cases } = useContent();
+  const t = useUI().builder;
+  const WHEN = t.whenOptions;
+  // Turkish needs its own lowercase rules (İ → i, I → ı).
+  const lang = useLang();
+  const lower = (s: string) => s.toLocaleLowerCase(lang === "tr" ? "tr" : "en");
+  // A sentence can begin with the list (in Turkish it does), so its first letter is capitalised after filling.
+  const cap = (s: string) => s.charAt(0).toLocaleUpperCase(lang === "tr" ? "tr" : "en") + s.slice(1);
+  const FEELINGS = t.feelings;
 
   const toggle = (xs: string[], x: string, max = 99) => (xs.includes(x) ? xs.filter((y) => y !== x) : xs.length < max ? [...xs, x] : xs);
   const chosen = services.filter((s) => need.includes(serviceSlug(s)));
@@ -42,9 +50,9 @@ export function BriefBuilder({ onUse }: { onUse: (b: Brief) => void }) {
     .slice(0, 3)
     .map((m) => m.c);
   const text = [
-    chosen.length ? `I'm looking for ${list(chosen.map((s) => s.name.toLowerCase()), "plus")}.` : "",
-    feel.length ? `When people see it, they should feel ${list(feel.map((f) => f.toLowerCase()))}.` : "",
-    similar.length ? `Work of yours that's close: ${list(similar.map((c) => c.title))}.` : "",
+    chosen.length ? cap(fill(t.looking, { list: list(chosen.map((s) => lower(s.name)), t.plus) })) : "",
+    feel.length ? cap(fill(t.feelLine, { list: list(feel.map(lower), t.and) })) : "",
+    similar.length ? cap(fill(t.close2, { list: list(similar.map((c) => c.title), t.and) })) : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -52,7 +60,7 @@ export function BriefBuilder({ onUse }: { onUse: (b: Brief) => void }) {
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)} className="self-start text-left text-[15px] text-void/70 underline decoration-void/25 underline-offset-4 hover:text-void hover:decoration-void">
-        Not sure what to write? Build your brief in three taps
+        {t.open}
       </button>
     );
   }
@@ -60,7 +68,7 @@ export function BriefBuilder({ onUse }: { onUse: (b: Brief) => void }) {
   return (
     <div className="grid gap-7 border border-void/15 p-5 md:p-7">
       <div>
-        <p className="label text-void/55">1 · What do you need?</p>
+        <p className="label text-void/55">{t.need}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {services.map((s) => (
             <Chip key={s.code} on={need.includes(serviceSlug(s))} onClick={() => setNeed((xs) => toggle(xs, serviceSlug(s)))}>
@@ -70,7 +78,7 @@ export function BriefBuilder({ onUse }: { onUse: (b: Brief) => void }) {
         </div>
       </div>
       <div>
-        <p className="label text-void/55">2 · When?</p>
+        <p className="label text-void/55">{t.when}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {WHEN.map((w) => (
             <Chip key={w} on={when === w} onClick={() => setWhen(when === w ? "" : w)}>
@@ -80,7 +88,7 @@ export function BriefBuilder({ onUse }: { onUse: (b: Brief) => void }) {
         </div>
       </div>
       <div>
-        <p className="label text-void/55">3 · What should people feel? (up to three)</p>
+        <p className="label text-void/55">{t.feel}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {FEELINGS.map((f) => (
             <Chip key={f} on={feel.includes(f)} onClick={() => setFeel((xs) => toggle(xs, f, 3))}>
@@ -92,11 +100,11 @@ export function BriefBuilder({ onUse }: { onUse: (b: Brief) => void }) {
 
       {text && (
         <div className="border-t border-void/15 pt-5">
-          <p className="label text-void/55">Your brief</p>
+          <p className="label text-void/55">{t.yourBrief}</p>
           <p className="mt-2 type-c text-[19px] leading-[1.4] text-void/85">{text}</p>
           {similar.length > 0 && (
             <p className="mt-3 text-[14px] text-void/60">
-              See:{" "}
+              {t.see}{" "}
               {similar.map((c, i) => (
                 <span key={c.slug}>
                   {i > 0 && ", "}
@@ -119,9 +127,9 @@ export function BriefBuilder({ onUse }: { onUse: (b: Brief) => void }) {
           }}
           className="inline-flex h-12 items-center rounded-full bg-void px-6 text-[15px] font-medium text-bone disabled:opacity-40 transition-opacity"
         >
-          Use this brief
+          {t.use}
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="text-[14px] text-void/60 hover:text-void">Close</button>
+        <button type="button" onClick={() => setOpen(false)} className="text-[14px] text-void/60 hover:text-void">{t.close}</button>
       </div>
     </div>
   );

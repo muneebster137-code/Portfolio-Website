@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useUI } from "@/components/i18n";
 
 // A secret: type "dream" anywhere (outside a form field), or keep scrolling past the very end of a page,
 // and the site flips into its own negative, limbo. Type it again, press Escape, or wait, to wake up.
 export function Limbo() {
   const [on, setOn] = useState(false);
+  const t = useUI().limbo;
 
   useEffect(() => {
     document.documentElement.classList.toggle("limbo", on);
@@ -52,7 +54,7 @@ export function Limbo() {
 
   return (
     <div role="status" aria-live="polite" className={`pointer-events-none fixed left-1/2 top-24 z-[96] -translate-x-1/2 rounded-full bg-void px-5 py-3 label text-bone ring-1 ring-bone/20 transition-all duration-700 ${on ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}`}>
-      {on ? "You're in limbo. Type dream again, or press Esc, to wake up." : ""}
+      {on ? t.message : ""}
     </div>
   );
 }

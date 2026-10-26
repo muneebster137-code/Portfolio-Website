@@ -1,4 +1,6 @@
 import type { CaseGallery as Gallery, SocialSet } from "@/lib/media-manifest";
+import type { Lang } from "@/lib/i18n";
+import { ui } from "@/lib/ui";
 import { MediaSlot } from "@/components/ui/Slot";
 import { CarouselSlot } from "@/components/ui/CarouselSlot";
 import { VideoSlot } from "@/components/ui/VideoSlot";
@@ -9,30 +11,30 @@ type R<T> = T extends Array<infer U> ? R<U>[] : T extends object ? { [K in keyof
 const Caption = ({ children }: { children: React.ReactNode }) => <p className="label text-fog mt-3">{children}</p>;
 
 // Posts, one carousel and one reel side by side, each in the format it was made for.
-function SocialRow({ set }: { set: R<SocialSet> }) {
+function SocialRow({ set, lang }: { set: R<SocialSet>; lang: Lang }) {
   const posts = set.posts as Resolved[];
   return (
     <div className="grid grid-cols-2 md:grid-cols-[repeat(var(--cols),minmax(0,1fr))] gap-4 md:gap-5 items-end" style={{ ["--cols" as string]: posts.length + 2 }}>
       {posts.map((p, i) => (
         <div key={p.path} data-rise>
           <MediaSlot slot={p} sizes="(min-width: 768px) 20vw, 50vw" />
-          <Caption>Post {String(i + 1).padStart(2, "0")}</Caption>
+          <Caption>{ui[lang].gallery.post} {String(i + 1).padStart(2, "0")}</Caption>
         </div>
       ))}
       <div data-rise>
         <CarouselSlot slides={set.carousel as Resolved[]} />
-        <Caption>Carousel · {set.carousel.length} slides</Caption>
+        <Caption>{ui[lang].gallery.carousel} · {set.carousel.length} {ui[lang].gallery.slides}</Caption>
       </div>
       <div data-rise>
         <VideoSlot slot={set.reel as Resolved} />
-        <Caption>Reel</Caption>
+        <Caption>{ui[lang].gallery.reel}</Caption>
       </div>
     </div>
   );
 }
 
-export function CaseGallery({ gallery, unitText }: { gallery: R<Gallery>; unitText?: Record<string, string> }) {
-  if (gallery.type === "social") return <SocialRow set={gallery.set} />;
+export function CaseGallery({ gallery, unitText, lang }: { gallery: R<Gallery>; unitText?: Record<string, string>; lang: Lang }) {
+  if (gallery.type === "social") return <SocialRow set={gallery.set} lang={lang} />;
 
   if (gallery.type === "units") {
     return (
@@ -46,7 +48,7 @@ export function CaseGallery({ gallery, unitText }: { gallery: R<Gallery>; unitTe
               </h3>
               {unitText?.[u.name] && <p className="text-mist text-[15px]">{unitText[u.name]}</p>}
             </div>
-            <SocialRow set={u.set} />
+            <SocialRow set={u.set} lang={lang} />
           </div>
         ))}
       </div>

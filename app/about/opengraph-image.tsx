@@ -1,11 +1,9 @@
-import { OG_SIZE, card, photo } from "@/lib/og";
-import { aboutPortrait } from "@/lib/media-manifest";
-import { resolveSlot } from "@/lib/media.server";
+import { OG, pageAlt, pageCard } from "@/lib/og-pages";
 
-export const alt = "About Muhammad Muneeb Bilal, Founder and Creative Specialist.";
-export const size = OG_SIZE;
-export const contentType = "image/png";
+export const alt = pageAlt("en", "about");
+export const size = OG.size;
+export const contentType = OG.contentType;
 
-export default async function Image() {
-  return card({ kicker: "About", title: "Muhammad Muneeb Bilal", sub: "Founder and creative specialist. The facts, the story and what clients say.", image: await photo(resolveSlot(aboutPortrait).src) });
+export default function Image() {
+  return pageCard("en", "about");
 }

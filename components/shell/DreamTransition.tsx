@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { nameFor } from "@/lib/page-name";
+import { useUI } from "@/components/i18n";
+import { langFromPath, stripLang } from "@/lib/i18n";
 
 // Between pages the dark closes in from where you clicked, like an iris, names where you are going,
 // and opens again on the next page. Opening a case from its picture is different: the picture itself
@@ -15,6 +17,7 @@ export function DreamTransition() {
   const pending = useRef(false);
   const cover = useRef<HTMLDivElement | null>(null);
   const [name, setName] = useState("");
+  const t = useUI().transition;
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -32,7 +35,7 @@ export function DreamTransition() {
       const go = () => router.push(url.pathname + url.search + url.hash);
       router.prefetch(url.pathname);
 
-      const img = /^\/case-studies\/[^/]+$/.test(url.pathname) ? a.querySelector("img") : null;
+      const img = /^\/case-studies\/[^/]+$/.test(stripLang(url.pathname)) ? a.querySelector("img") : null;
       if (img) {
         const r = (img.parentElement ?? img).getBoundingClientRect();
         const el = document.createElement("div");
@@ -46,7 +49,7 @@ export function DreamTransition() {
         return;
       }
 
-      setName(nameFor(url.pathname, a.textContent?.trim() || ""));
+      setName(nameFor(stripLang(url.pathname), a.textContent?.trim() || "", false, langFromPath(url.pathname)));
 
       const at = `${e.clientX}px ${e.clientY}px`;
       gsap
@@ -104,7 +107,7 @@ export function DreamTransition() {
   return (
     <div ref={root} className="fixed inset-0 z-[90] invisible bg-void pointer-events-none grid place-items-center" aria-hidden={!name}>
       <div className="text-center">
-        <p className="it-text label text-fog">Going to</p>
+        <p className="it-text label text-fog">{t.goingTo}</p>
         <p className="it-text type-x text-bone text-[9vw] md:text-[4.6vw] leading-none mt-4">{name}</p>
       </div>
     </div>

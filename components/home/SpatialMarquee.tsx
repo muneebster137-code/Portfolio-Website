@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { LocalLink as Link, useUI } from "@/components/i18n";
 import { useEffect, useRef, useState } from "react";
 import { time } from "@/components/three/store";
 import { SketchHover } from "@/components/fx/SketchHover";
@@ -23,6 +23,7 @@ export function SpatialMarquee({ items }: { items: MarqueeItem[] }) {
   const hold = useRef(false);
   const focusAt = useRef<number | null>(null);
   const [front, setFront] = useState(0);
+  const t = useUI().marquee;
 
   const n = items.length;
   const step = 360 / Math.max(1, n);
@@ -98,11 +99,11 @@ export function SpatialMarquee({ items }: { items: MarqueeItem[] }) {
     <section ref={root} id="glimpse" data-chapter="Glimpse" aria-labelledby="glimpse-h" className="relative h-[100svh] min-h-[680px] overflow-hidden bg-void">
       <div className="absolute inset-x-5 md:inset-x-10 top-24 md:top-28 z-10 flex flex-wrap items-end justify-between gap-4 pointer-events-none">
         <div>
-          <p className="label text-fog">A glimpse of the work</p>
-          <h2 id="glimpse-h" className="type-x mt-3 text-[9vw] md:text-[clamp(36px,3.6vw,64px)] leading-[0.95]">Eleven stories, in orbit</h2>
+          <p className="label text-fog">{t.label}</p>
+          <h2 id="glimpse-h" className="type-x mt-3 text-[9vw] md:text-[clamp(36px,3.6vw,64px)] leading-[0.95]">{t.title}</h2>
         </div>
         <Link href="/case-studies" className="pointer-events-auto inline-flex h-11 items-center rounded-full px-5 text-sm ring-1 ring-bone/25 hover:ring-bone transition">
-          All case studies
+          {t.all}
         </Link>
       </div>
 
@@ -126,7 +127,7 @@ export function SpatialMarquee({ items }: { items: MarqueeItem[] }) {
               <div key={it.slug} className="absolute inset-0 [transform-style:preserve-3d]" style={{ transform: `rotateY(${i * step}deg) translateZ(${radius}px)` }}>
                 <Link
                   href={`/case-studies/${it.slug}`}
-                  aria-label={`${it.title} case study`}
+                  aria-label={`${it.title} ${t.caseStudy}`}
                   data-track="case_open"
                   data-track-from="marquee"
                   onPointerEnter={() => (hold.current = true)}
@@ -151,10 +152,10 @@ export function SpatialMarquee({ items }: { items: MarqueeItem[] }) {
 
       <div className="absolute inset-x-5 md:inset-x-10 bottom-10 md:bottom-12 z-10 flex items-end justify-between gap-6 pointer-events-none">
         <div>
-          <p className="label text-fog">Now passing · {now.year}</p>
+          <p className="label text-fog">{t.passing} · {now.year}</p>
           <p className="type-x mt-2 text-[8vw] md:text-[clamp(28px,2.6vw,44px)] leading-none">{now.title}</p>
         </div>
-        <p className="hidden md:block label text-fog text-right">Scroll to spin it<br />Hover to stop it</p>
+        <p className="hidden md:block label text-fog text-right">{t.hint1}<br />{t.hint2}</p>
       </div>
     </section>
   );

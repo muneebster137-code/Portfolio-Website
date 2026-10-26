@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { isSoundOn, onSoundChange, setSound } from "./sound";
+import { useUI } from "@/components/i18n";
 
 // One small switch in the nav. Sound never plays unless the visitor turns it on.
 export function SoundToggle() {
   const [on, setOn] = useState(false);
+  const t = useUI().sound;
   useEffect(() => {
     setOn(isSoundOn());
     return onSoundChange(setOn);
@@ -16,7 +18,7 @@ export function SoundToggle() {
       onClick={() => setSound(!on)}
       data-track={on ? undefined : "sound_on"}
       aria-pressed={on}
-      aria-label={on ? "Turn sound off" : "Turn sound on"}
+      aria-label={on ? t.off : t.on}
       className="hidden md:grid h-11 w-11 place-items-center rounded-full bg-void/55 text-bone ring-1 ring-bone/10 backdrop-blur-xl backdrop-saturate-150 hover:ring-bone/40 transition"
     >
       <svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true">
