@@ -7,6 +7,12 @@ const kept = "anebos-studios|trenddeck|aba-group|facingnorth|beatrix-konnect|bak
 const dropped = "bic-szabist|green-pakistan-agro|pm-office|fairmans-uk|homeloom-uk|watch-how-malaysia";
 
 const nextConfig: NextConfig = {
+  // Pages and share cards read public/media while the site is built, so Next would otherwise pack the
+  // whole folder (videos included, 300+ MB) into every server function, past Vercel's 250 MB limit.
+  // Those files are served straight from the CDN; functions never need them.
+  outputFileTracingExcludes: {
+    "/**": ["./public/**/*", "./scripts/**/*", "./*.mp4"],
+  },
   async redirects() {
     return [
       { source: "/work", destination: "/case-studies", permanent: true },

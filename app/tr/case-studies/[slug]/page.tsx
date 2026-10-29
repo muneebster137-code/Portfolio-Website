@@ -4,6 +4,8 @@ import { CaseStudyPage, caseMeta, caseParams } from "@/components/pages/CaseStud
 type Params = { params: Promise<{ slug: string }> };
 
 export const generateStaticParams = caseParams;
+// Only the slugs built above exist; anything else is a 404 rather than a page rendered on request.
+export const dynamicParams = false;
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return caseMeta("tr", (await params).slug);

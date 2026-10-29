@@ -6,6 +6,7 @@ export const alt = "Hizmet · Muhammad Muneeb Bilal";
 export const size = OG.size;
 export const contentType = OG.contentType;
 export const generateStaticParams = serviceParams;
+export const dynamicParams = false;
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   return serviceCard("tr", (await params).slug);
