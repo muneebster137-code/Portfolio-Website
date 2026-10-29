@@ -30,3 +30,4 @@ Don't ship until every item here is resolved — most of these are open items al
 
 - [ ] Muneeb has personally read every case study page and confirmed the facts as written — this doc package was built from a case-study doc that already needed multiple corrections during scoping; one more human pass before this goes out publicly is not optional
 - [ ] LinkedIn profile (`linkedin.com/in/Muneeb-Bilal`) reflects consistent dates/roles with the rebuilt CV and site — a mismatch here is just as damaging as a site/CV mismatch
+       
